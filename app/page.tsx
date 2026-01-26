@@ -579,6 +579,13 @@ export default function HomePage() {
                         <Search className="w-4 h-4 mr-2" />
                         Search
                       </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full rounded-full bg-transparent border-primary/20 text-primary hover:bg-primary/5"
+                        onClick={toggleLanguage}
+                      >
+                        {language === 'en' ? 'العربية' : 'English'}
+                      </Button>
                     </div>
                   </div>
                 </SheetContent>

@@ -104,7 +104,7 @@ export function GlassCarousel3D({ items, autoPlayInterval = 3000 }: GlassCarouse
             {/* 3D Carousel Container */}
             <div
                 ref={containerRef}
-                className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
+                className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing touch-pan-y"
                 onMouseDown={handleDragStart}
                 onMouseMove={handleDragMove}
                 onMouseUp={handleDragEnd}
@@ -112,6 +112,7 @@ export function GlassCarousel3D({ items, autoPlayInterval = 3000 }: GlassCarouse
                 onTouchStart={handleDragStart}
                 onTouchMove={handleDragMove}
                 onTouchEnd={handleDragEnd}
+                style={{ touchAction: 'pan-y' }}
             >
                 {items.map((item, index) => (
                     <div

@@ -31,6 +31,8 @@ export default function AdminLoginPage() {
         await new Promise(resolve => setTimeout(resolve, 500))
 
         if (pin === ADMIN_PIN) {
+            // Set session cookie
+            document.cookie = "admin_session=true; path=/; max-age=86400; SameSite=Strict" // 1 day expiry
             toast.success("Access Granted")
             router.push("/admin/dashboard")
         } else {
@@ -72,8 +74,8 @@ export default function AdminLoginPage() {
                             <div
                                 key={i}
                                 className={`w-3 h-3 rounded-full transition-all duration-300 ${i < pin.length
-                                        ? "bg-primary scale-110 shadow-[0_0_10px_rgba(var(--primary),0.5)]"
-                                        : "bg-muted-foreground/20"
+                                    ? "bg-primary scale-110 shadow-[0_0_10px_rgba(var(--primary),0.5)]"
+                                    : "bg-muted-foreground/20"
                                     }`}
                             />
                         ))}

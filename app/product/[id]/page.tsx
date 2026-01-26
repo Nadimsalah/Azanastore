@@ -88,7 +88,7 @@ export default function ProductPage() {
   const reviewsCount = 127 // Placeholder
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-32 lg:pb-20">
       {/* Header */}
       <header className="sticky top-0 z-50 glass-strong py-3">
         <div className="container mx-auto px-4">
@@ -388,6 +388,49 @@ export default function ProductPage() {
           </section>
         )}
       </main>
+
+      {/* Mobile Sticky Action Bar */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-xl border-t border-white/10 z-50 lg:hidden safe-area-bottom shadow-[0_-5px_20px_rgba(0,0,0,0.1)]">
+        <div className="flex gap-3">
+          <div className="flex items-center gap-2 bg-secondary/50 rounded-xl px-1 border border-white/5 h-14">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-12 w-10 text-foreground hover:bg-white/10 rounded-lg"
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              disabled={quantity <= 1}
+            >
+              <Minus className="w-4 h-4" />
+            </Button>
+            <span className="w-4 text-center font-bold text-lg text-foreground">{quantity}</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-12 w-10 text-foreground hover:bg-white/10 rounded-lg"
+              onClick={() => setQuantity(quantity + 1)}
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+          <Button
+            size="lg"
+            className="flex-1 h-14 rounded-xl text-base font-bold shadow-lg shadow-primary/25 active:scale-95 transition-all"
+            onClick={() =>
+              addItem({
+                id: product.id,
+                name: product.title,
+                price: Number(product.price),
+                image: productImages[0],
+                quantity: quantity,
+                inStock: inStock
+              })
+            }
+          >
+            <ShoppingBag className="w-5 h-5 mr-2" />
+            {t('product.add_to_cart')} • EGP {product.price * quantity}
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }
