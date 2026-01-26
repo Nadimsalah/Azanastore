@@ -1,0 +1,118 @@
+"use client"
+
+import React, { createContext, useContext, useState, useEffect } from "react"
+import { toast } from "sonner"
+
+export interface CartItem {
+    id: string
+    name: string
+    price: number
+    image: string
+    quantity: number
+    size?: string
+    inStock: boolean
+}
+
+interface CartContextType {
+    items: CartItem[]
+    addItem: (item: CartItem) => void
+    removeItem: (id: string, size?: string) => void
+    updateQuantity: (id: string, quantity: number, size?: string) => void
+    clearCart: () => void
+    cartCount: number
+}
+
+const CartContext = createContext<CartContextType | undefined>(undefined)
+
+export function CartProvider({ children }: { children: React.ReactNode }) {
+    const [items, setItems] = useState<CartItem[]>([])
+    const [isInitialized, setIsInitialized] = useState(false)
+
+    // Load from local storage
+    useEffect(() => {
+        const storedCart = localStorage.getItem("cart")
+        if (storedCart) {
+            try {
+                setItems(JSON.parse(storedCart))
+            } catch (e) {
+                console.error("Failed to parse cart from local storage", e)
+            }
+        }
+        setIsInitialized(true)
+    }, [])
+
+    // Save to local storage
+    useEffect(() => {
+        if (isInitialized) {
+            localStorage.setItem("cart", JSON.stringify(items))
+        }
+    }, [items, isInitialized])
+
+    const addItem = (newItem: CartItem) => {
+        setItems((currentItems) => {
+            const existingItemIndex = currentItems.findIndex(
+                (item) => item.id === newItem.id && item.size === newItem.size
+            )
+
+            if (existingItemIndex > -1) {
+                const updatedItems = [...currentItems]
+                updatedItems[existingItemIndex].quantity += newItem.quantity
+                toast.success("Cart updated", {
+                    description: `${newItem.name} quantity increased.`,
+                })
+                return updatedItems
+            } else {
+                toast.success("Added to cart", {
+                    description: `${newItem.name} added to your cart.`,
+                })
+                return [...currentItems, newItem]
+            }
+        })
+    }
+
+    const removeItem = (id: string, size?: string) => {
+        setItems((currentItems) =>
+            currentItems.filter((item) => !(item.id === id && item.size === size))
+        )
+        toast.info("Item removed from cart")
+    }
+
+    const updateQuantity = (id: string, quantity: number, size?: string) => {
+        if (quantity < 1) return
+        setItems((currentItems) =>
+            currentItems.map((item) =>
+                item.id === id && item.size === size ? { ...item, quantity } : item
+            )
+        )
+    }
+
+    const clearCart = () => {
+        setItems([])
+        localStorage.removeItem("cart")
+    }
+
+    const cartCount = items.reduce((total, item) => total + item.quantity, 0)
+
+    return (
+        <CartContext.Provider
+            value={{
+                items,
+                addItem,
+                removeItem,
+                updateQuantity,
+                clearCart,
+                cartCount,
+            }}
+        >
+            {children}
+        </CartContext.Provider>
+    )
+}
+
+export function useCart() {
+    const context = useContext(CartContext)
+    if (context === undefined) {
+        throw new Error("useCart must be used within a CartProvider")
+    }
+    return context
+}
