@@ -14,7 +14,10 @@ import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { getAdminSettings } from "@/lib/supabase-api"
 
-function urlBase64ToUint8Array(base64String: string) {
+function urlBase64ToUint8Array(base64String: any) {
+    if (typeof base64String !== 'string') {
+        throw new Error("VAPID public key must be a string");
+    }
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding)
         .replace(/\-/g, '+')
@@ -80,9 +83,14 @@ export function PushNotificationManager() {
             const registration = await navigator.serviceWorker.ready;
 
             // 3. Subscribe to push manager
+            const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+            if (!vapidKey) {
+                throw new Error('VAPID public key is not configured')
+            }
+
             const subscribeOptions = {
                 userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!)
+                applicationServerKey: urlBase64ToUint8Array(vapidKey)
             }
 
             const subscription = await registration.pushManager.subscribe(subscribeOptions)

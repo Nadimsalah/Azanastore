@@ -469,9 +469,13 @@ export async function getAdminSettings() {
     }
 
     const settings: Record<string, string> = {}
-    data.forEach(item => {
-        settings[item.key] = item.value
-    })
+    if (data && Array.isArray(data)) {
+        data.forEach(item => {
+            if (item && item.key) {
+                settings[item.key] = item.value || ""
+            }
+        })
+    }
 
     return settings
 }
