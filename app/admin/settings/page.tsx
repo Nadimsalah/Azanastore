@@ -6,6 +6,7 @@ import { toast } from "sonner"
 import { getAdminSettings, updateAdminSettings } from "@/lib/supabase-api"
 import { AdminSidebar } from "@/components/admin/admin-sidebar"
 import { Switch } from "@/components/ui/switch"
+import { Button } from "@/components/ui/button"
 
 export default function SettingsPage() {
     const [settings, setSettings] = useState<Record<string, string>>({})
@@ -289,10 +290,32 @@ export default function SettingsPage() {
                                     />
                                 </div>
 
-                                <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
-                                    <p className="text-[10px] text-yellow-500 font-medium leading-normal">
-                                        Note: Enabling this will prompt admin users for notification permission upon entering the dashboard.
-                                    </p>
+                                <div className="space-y-3 p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                                    <div className="flex items-center justify-between">
+                                        <div className="space-y-0.5">
+                                            <p className="text-sm font-semibold text-foreground">Device Status</p>
+                                            <p className="text-[10px] text-muted-foreground">Subscribe your current phone/PC to receive alerts.</p>
+                                        </div>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="h-8 rounded-lg text-[10px] border-white/10 hover:bg-white/5"
+                                            onClick={() => window.dispatchEvent(new CustomEvent('show-push-prompt'))}
+                                        >
+                                            Subscribe Device
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                                    <h4 className="text-[10px] font-bold text-blue-500 mb-1 flex items-center gap-1">
+                                        <Shield className="w-3 h-3" /> Mobile Requirements
+                                    </h4>
+                                    <ul className="text-[9px] text-blue-400/80 list-disc list-inside space-y-1 leading-normal">
+                                        <li><b>Android</b>: Works in modern Chrome.</li>
+                                        <li><b>iOS (iPhone)</b>: You MUST "Add to Home Screen" first.</li>
+                                        <li>Subscriptions are device-specific; you must enable them on each phone.</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>

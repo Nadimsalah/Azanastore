@@ -37,6 +37,7 @@ export function PushNotificationManager() {
         async function checkSettings() {
             // 1. Only run on client and if supported
             if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                console.log('Push notifications not supported on this browser')
                 return
             }
 
@@ -48,13 +49,17 @@ export function PushNotificationManager() {
 
             // 3. Check current permission
             if (Notification.permission === 'default') {
-                // Wait a bit before showing to not overwhelm the user immediately on load
                 const timer = setTimeout(() => setShowPrompt(true), 3000)
                 return () => clearTimeout(timer)
             }
         }
 
         checkSettings()
+
+        // Listen for manual trigger
+        const handleManualTrigger = () => setShowPrompt(true)
+        window.addEventListener('show-push-prompt', handleManualTrigger)
+        return () => window.removeEventListener('show-push-prompt', handleManualTrigger)
     }, [])
 
     async function subscribeToPush() {
