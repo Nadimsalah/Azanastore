@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useCart } from "@/components/cart-provider"
 import { useLanguage } from "@/components/language-provider"
 import { getProductById, getProducts, type Product } from "@/lib/supabase-api"
@@ -15,10 +15,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { ShoppingBag, Star, Minus, Plus, Truck, ShieldCheck, RotateCcw, Check, Sparkles, Search } from "lucide-react"
+import { ProductDetailsSkeleton } from "@/components/ui/store-skeletons"
 
 export default function ProductPage() {
   const params = useParams()
   const productId = params.id as string
+  const router = useRouter()
   const { addItem, cartCount } = useCart()
   const { t, language } = useLanguage()
   const [selectedImage, setSelectedImage] = useState(0)
@@ -60,11 +62,19 @@ export default function ProductPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-muted-foreground animate-pulse">Loading product...</p>
-        </div>
+      <div className="min-h-screen bg-background">
+        <header className="sticky top-0 z-50 glass-strong py-3">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between">
+              <div className="w-32 h-10 bg-muted animate-pulse rounded-lg" />
+              <div className="flex gap-2">
+                <div className="w-10 h-10 bg-muted animate-pulse rounded-full" />
+                <div className="w-10 h-10 bg-muted animate-pulse rounded-full" />
+              </div>
+            </div>
+          </div>
+        </header>
+        <ProductDetailsSkeleton />
       </div>
     )
   }
@@ -257,7 +267,7 @@ export default function ProductPage() {
               <Button
                 size="lg"
                 className="flex-1 h-16 rounded-2xl text-lg font-bold shadow-2xl shadow-primary/25 hover:scale-[1.02] active:scale-[0.98] transition-all"
-                onClick={() =>
+                onClick={() => {
                   addItem({
                     id: product.id,
                     name: product.title,
@@ -265,9 +275,10 @@ export default function ProductPage() {
                     price: Number(product.price),
                     image: productImages[0],
                     quantity: quantity,
-                    inStock: inStock
+                    inStock: inStock,
                   })
-                }
+                  router.push("/cart")
+                }}
               >
                 <ShoppingBag className="w-6 h-6 mr-3" />
                 {t('product.add_to_cart')}
@@ -420,7 +431,7 @@ export default function ProductPage() {
           <Button
             size="lg"
             className="flex-1 h-14 rounded-xl text-base font-bold shadow-lg shadow-primary/25 active:scale-95 transition-all"
-            onClick={() =>
+            onClick={() => {
               addItem({
                 id: product.id,
                 name: product.title,
@@ -428,9 +439,10 @@ export default function ProductPage() {
                 price: Number(product.price),
                 image: productImages[0],
                 quantity: quantity,
-                inStock: inStock
+                inStock: inStock,
               })
-            }
+              router.push("/cart")
+            }}
           >
             <ShoppingBag className="w-5 h-5 mr-2" />
             {t('product.add_to_cart')} • {t('common.currency')} {(product.price * quantity).toFixed(2)}

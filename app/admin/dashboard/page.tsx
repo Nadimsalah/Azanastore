@@ -3,8 +3,6 @@
 import { AdminSidebar } from "@/components/admin/admin-sidebar"
 import { DashboardStats } from "@/components/admin/dashboard-stats"
 import { RecentOrders } from "@/components/admin/recent-orders"
-import { RevenueChart } from "@/components/admin/revenue-chart"
-import { QuickActions } from "@/components/admin/quick-actions"
 import { Notifications } from "@/components/admin/notifications"
 import { Search, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -55,13 +53,7 @@ export default function AdminDashboard() {
                     {/* Top Row: Stats (Spawn across all columns) */}
                     <DashboardStats />
 
-                    {/* Middle Row: Main Chart (Span 3) + Quick Actions (Span 1) */}
-                    <div className="lg:col-span-3 min-h-[400px]">
-                        <RevenueChart />
-                    </div>
-                    <div className="lg:col-span-1 min-h-[400px]">
-                        <QuickActions />
-                    </div>
+                    {/* Removed RevenueChart and QuickActions */}
 
                     {/* Bottom Row: Recent Orders (Full Width) */}
                     <div className="lg:col-span-4 min-h-[400px]">

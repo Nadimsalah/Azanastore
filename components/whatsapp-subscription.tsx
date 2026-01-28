@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CheckCircle2, MessageCircle } from "lucide-react"
+import { createWhatsappSubscription } from "@/lib/supabase-api"
 
 const COUNTRY_CODES = (t: (k: string) => string) => [
     { code: "+20", country: t('language') === 'ar' ? "مصر" : "Egypt", flag: "🇪🇬" },
@@ -27,16 +28,26 @@ export function WhatsAppSubscription() {
     const [phone, setPhone] = useState("")
     const [loading, setLoading] = useState(false)
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!phone) return
 
         setLoading(true)
-        // Simulate API call
-        setTimeout(() => {
+        const fullPhone = `${countryCode} ${phone.trim()}`
+        const { error } = await createWhatsappSubscription({
+            countryCode,
+            phone: fullPhone,
+        })
+
+        if (error) {
+            console.error(error)
             setLoading(false)
-            setSubmitted(true)
-        }, 1500)
+            // keep UI simple: just stop loading, you could add toast later
+            return
+        }
+
+        setLoading(false)
+        setSubmitted(true)
     }
 
     if (submitted) {

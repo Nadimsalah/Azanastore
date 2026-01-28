@@ -33,14 +33,11 @@ import { useRouter } from "next/navigation"
 
 export default function NewProductPage() {
     const [title, setTitle] = useState("")
-    const [titleAr, setTitleAr] = useState("")
     const [sku, setSku] = useState("")
     const [images, setImages] = useState<string[]>([])
     const [uploading, setUploading] = useState(false)
     const [benefits, setBenefits] = useState<string[]>([])
-    const [benefitsAr, setBenefitsAr] = useState<string[]>([])
     const [newBenefit, setNewBenefit] = useState("")
-    const [newBenefitAr, setNewBenefitAr] = useState("")
     const [selectedRelated, setSelectedRelated] = useState<string[]>([])
     const [status, setStatus] = useState("Active")
     const [category, setCategory] = useState("")
@@ -50,14 +47,11 @@ export default function NewProductPage() {
 
     // Form fields
     const [description, setDescription] = useState("")
-    const [descriptionAr, setDescriptionAr] = useState("")
     const [price, setPrice] = useState("")
     const [compareAtPrice, setCompareAtPrice] = useState("")
     const [stock, setStock] = useState("")
     const [ingredients, setIngredients] = useState("")
-    const [ingredientsAr, setIngredientsAr] = useState("")
     const [howToUse, setHowToUse] = useState("")
-    const [howToUseAr, setHowToUseAr] = useState("")
     const [categories, setCategories] = useState<any[]>([])
 
     // AI Rewrite State
@@ -123,26 +117,6 @@ export default function NewProductPage() {
         }
     }
 
-    const handleTranslate = async (text: string, setter: (val: string) => void, field: string) => {
-        if (!text.trim()) return
-        setRewriting(field)
-        try {
-            const res = await fetch('/api/admin/translate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, targetLang: 'ar' })
-            })
-            const data = await res.json()
-            if (data.translatedText) {
-                setter(data.translatedText)
-            }
-        } catch (error) {
-            console.error('Translation error:', error)
-        } finally {
-            setRewriting(null)
-        }
-    }
-
     const handleAutoRecommend = async () => {
         if (!title && !description) {
             alert("Please add a title or description first so AI can understand the product.")
@@ -174,6 +148,32 @@ export default function NewProductPage() {
         }
     }
 
+    const handleGenerateBenefits = async () => {
+        if (!newBenefit.trim()) return
+
+        setRewriting('benefits')
+        try {
+            const res = await fetch('/api/admin/products/generate-benefits', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: newBenefit })
+            })
+
+            const data = await res.json()
+            if (data.benefits && Array.isArray(data.benefits)) {
+                // Add unique new benefits
+                const newBenefits = data.benefits.filter((b: string) => !benefits.includes(b))
+                setBenefits([...benefits, ...newBenefits])
+                setNewBenefit("") // Clear input
+            }
+        } catch (error) {
+            console.error('Generate benefits error:', error)
+            alert("Failed to generate benefits")
+        } finally {
+            setRewriting(null)
+        }
+    }
+
     const handlePublish = async () => {
         // Validation
         if (!title.trim()) {
@@ -200,22 +200,14 @@ export default function NewProductPage() {
                 .from('products')
                 .insert({
                     title,
-                    title_ar: titleAr,
-                    description,
-                    description_ar: descriptionAr,
-                    sku,
-                    category,
                     price: parseFloat(price),
                     compare_at_price: compareAtPrice ? parseFloat(compareAtPrice) : null,
                     stock: stock ? parseInt(stock) : 0,
                     status: status.toLowerCase(),
                     images,
                     benefits,
-                    benefits_ar: benefitsAr,
                     ingredients,
-                    ingredients_ar: ingredientsAr,
                     how_to_use: howToUse,
-                    how_to_use_ar: howToUseAr
                 })
                 .select()
 
@@ -285,15 +277,12 @@ export default function NewProductPage() {
     const addBenefit = () => {
         if (newBenefit.trim()) {
             setBenefits([...benefits, newBenefit])
-            setBenefitsAr([...benefitsAr, newBenefitAr || newBenefit])
             setNewBenefit("")
-            setNewBenefitAr("")
         }
     }
 
     const removeBenefit = (index: number) => {
         setBenefits(benefits.filter((_, i) => i !== index))
-        setBenefitsAr(benefitsAr.filter((_, i) => i !== index))
     }
 
     const toggleRelated = (id: string) => {
@@ -404,89 +393,47 @@ export default function NewProductPage() {
                             <div className="p-6 space-y-6">
                                 <div className="space-y-3">
                                     <label className="text-sm font-semibold text-gray-700">Product Title</label>
-                                    <div className="grid md:grid-cols-2 gap-4">
-                                        <div className="relative">
-                                            <Input
-                                                value={title || ""}
-                                                onChange={(e) => setTitle(e.target.value)}
-                                                placeholder="e.g. Rateb's Pure Argan Oil"
-                                                className="bg-white border-gray-200 h-12 text-base focus:ring-blue-500/20 focus:border-blue-500 rounded-xl shadow-sm text-gray-900 placeholder:text-gray-400 pr-20"
-                                            />
-                                            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                                                {title.trim() && (
-                                                    <button
-                                                        onClick={() => handleRewrite('title', title, setTitle)}
-                                                        disabled={rewriting === 'title'}
-                                                        className="text-purple-400 hover:text-purple-600 p-1 rounded-full transition-all"
-                                                        title="Improve with AI"
-                                                    >
-                                                        {rewriting === 'title' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                                    </button>
-                                                )}
-                                                {title.trim() && (
-                                                    <button
-                                                        onClick={() => handleTranslate(title, setTitleAr, 'title_ar')}
-                                                        disabled={rewriting === 'title_ar'}
-                                                        className="text-blue-400 hover:text-blue-600 p-1 rounded-full transition-all"
-                                                        title="Translate to Arabic"
-                                                    >
-                                                        {rewriting === 'title_ar' ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="relative">
-                                            <Input
-                                                value={titleAr || ""}
-                                                onChange={(e) => setTitleAr(e.target.value)}
-                                                placeholder="اسم المنتج بالعربية"
-                                                dir="rtl"
-                                                className="bg-white border-gray-200 h-12 text-base focus:ring-blue-500/20 focus:border-blue-500 rounded-xl shadow-sm text-gray-900 placeholder:text-gray-400 font-arabic"
-                                            />
+                                    <div className="relative">
+                                        <Input
+                                            value={title || ""}
+                                            onChange={(e) => setTitle(e.target.value)}
+                                            placeholder="e.g. Rateb's Pure Argan Oil"
+                                            className="bg-white border-gray-200 h-12 text-base focus:ring-blue-500/20 focus:border-blue-500 rounded-xl shadow-sm text-gray-900 placeholder:text-gray-400 pr-12"
+                                        />
+                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                                            {title.trim() && (
+                                                <button
+                                                    onClick={() => handleRewrite('title', title, setTitle)}
+                                                    disabled={rewriting === 'title'}
+                                                    className="text-purple-400 hover:text-purple-600 p-1 rounded-full transition-all"
+                                                    title="Improve with AI"
+                                                >
+                                                    {rewriting === 'title' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
                                 <div className="space-y-3">
                                     <label className="text-sm font-semibold text-gray-700">Description</label>
-                                    <div className="grid md:grid-cols-2 gap-4">
-                                        <div className="relative">
-                                            <textarea
-                                                value={description}
-                                                onChange={(e) => setDescription(e.target.value)}
-                                                className="w-full min-h-[180px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none placeholder:text-gray-400 transition-all shadow-sm"
-                                                placeholder="Description in English"
-                                            />
-                                            <div className="absolute right-2 top-2 flex flex-col gap-2">
-                                                {description.trim() && (
-                                                    <button
-                                                        onClick={() => handleRewrite('description', description, setDescription)}
-                                                        disabled={rewriting === 'description'}
-                                                        className="text-purple-400 hover:text-purple-600 p-1 rounded-full transition-all bg-white/50 backdrop-blur-sm shadow-sm"
-                                                        title="Improve with AI"
-                                                    >
-                                                        {rewriting === 'description' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                                    </button>
-                                                )}
-                                                {description.trim() && (
-                                                    <button
-                                                        onClick={() => handleTranslate(description, setDescriptionAr, 'description_ar')}
-                                                        disabled={rewriting === 'description_ar'}
-                                                        className="text-blue-400 hover:text-blue-600 p-1 rounded-full transition-all bg-white/50 backdrop-blur-sm shadow-sm"
-                                                        title="Translate to Arabic"
-                                                    >
-                                                        {rewriting === 'description_ar' ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="relative">
-                                            <textarea
-                                                value={descriptionAr}
-                                                onChange={(e) => setDescriptionAr(e.target.value)}
-                                                dir="rtl"
-                                                className="w-full min-h-[180px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none placeholder:text-gray-400 transition-all shadow-sm font-arabic"
-                                                placeholder="وصف المنتج بالعربية"
-                                            />
+                                    <div className="relative">
+                                        <textarea
+                                            value={description}
+                                            onChange={(e) => setDescription(e.target.value)}
+                                            className="w-full min-h-[180px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none placeholder:text-gray-400 transition-all shadow-sm"
+                                            placeholder="Description in English"
+                                        />
+                                        <div className="absolute right-2 top-2 flex flex-col gap-2">
+                                            {description.trim() && (
+                                                <button
+                                                    onClick={() => handleRewrite('description', description, setDescription)}
+                                                    disabled={rewriting === 'description'}
+                                                    className="text-purple-400 hover:text-purple-600 p-1 rounded-full transition-all bg-white/50 backdrop-blur-sm shadow-sm"
+                                                    title="Improve with AI"
+                                                >
+                                                    {rewriting === 'description' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -542,39 +489,29 @@ export default function NewProductPage() {
                                 {/* Key Benefits */}
                                 <div>
                                     <label className="text-sm font-semibold text-gray-700 block mb-3">Key Benefits</label>
-                                    <div className="flex flex-col md:flex-row gap-2 mb-4">
+                                    <div className="flex gap-2 mb-4">
                                         <div className="relative flex-1">
                                             <Input
                                                 value={newBenefit || ""}
                                                 onChange={(e) => setNewBenefit(e.target.value)}
                                                 placeholder="Benefit description (English)"
-                                                className="bg-white border-gray-200 h-11 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm pr-10"
-                                                onKeyDown={(e) => e.key === 'Enter' && addBenefit()}
-                                            />
-                                            {newBenefit.trim() && (
-                                                <button
-                                                    onClick={() => handleTranslate(newBenefit, setNewBenefitAr, 'benefit_ar')}
-                                                    disabled={rewriting === 'benefit_ar'}
-                                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-400 hover:text-blue-600 p-1 rounded-full transition-all"
-                                                    title="Translate to Arabic"
-                                                >
-                                                    {rewriting === 'benefit_ar' ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
-                                                </button>
-                                            )}
-                                        </div>
-                                        <div className="relative flex-1">
-                                            <Input
-                                                value={newBenefitAr || ""}
-                                                onChange={(e) => setNewBenefitAr(e.target.value)}
-                                                placeholder="وصف الميزة بالعربية"
-                                                dir="rtl"
-                                                className="bg-white border-gray-200 h-11 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm font-arabic"
+                                                className="bg-white border-gray-200 h-11 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm"
                                                 onKeyDown={(e) => e.key === 'Enter' && addBenefit()}
                                             />
                                         </div>
-                                        <Button onClick={addBenefit} className="h-11 md:w-11 w-full bg-blue-600 hover:bg-blue-700 text-white shrink-0 shadow-sm">
+                                        <Button onClick={addBenefit} className="h-11 w-11 bg-blue-600 hover:bg-blue-700 text-white shrink-0 shadow-sm">
                                             <Plus className="w-5 h-5" />
                                         </Button>
+                                        {newBenefit.trim() && (
+                                            <Button
+                                                onClick={handleGenerateBenefits}
+                                                disabled={rewriting === 'benefits'}
+                                                className="h-11 px-4 bg-purple-600 hover:bg-purple-700 text-white shadow-sm flex items-center gap-2"
+                                            >
+                                                {rewriting === 'benefits' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                                Polish
+                                            </Button>
+                                        )}
                                     </div>
                                     <div className="grid grid-cols-1 gap-3">
                                         {benefits.map((benefit, i) => (
@@ -585,11 +522,6 @@ export default function NewProductPage() {
                                                     </div>
                                                     <span className="text-sm text-gray-700 flex-1">{benefit}</span>
                                                 </div>
-                                                {benefitsAr[i] && (
-                                                    <div className="pr-9 italic text-xs text-muted-foreground font-arabic text-right dir-rtl">
-                                                        {benefitsAr[i]}
-                                                    </div>
-                                                )}
                                                 <button onClick={() => removeBenefit(i)} className="absolute top-3 right-3 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
                                                     <X className="w-4 h-4" />
                                                 </button>
@@ -617,33 +549,14 @@ export default function NewProductPage() {
                                                         <span>Polish</span>
                                                     </button>
                                                 )}
-                                                {ingredients.trim() && (
-                                                    <button
-                                                        onClick={() => handleTranslate(ingredients, setIngredientsAr, 'ingredients_ar')}
-                                                        disabled={rewriting === 'ingredients_ar'}
-                                                        className="text-xs flex items-center gap-1 text-blue-500 hover:text-blue-700 transition-colors bg-blue-50 px-2 py-1 rounded-md"
-                                                    >
-                                                        {rewriting === 'ingredients_ar' ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
-                                                        <span>Translate</span>
-                                                    </button>
-                                                )}
                                             </div>
                                         </div>
-                                        <div className="grid md:grid-cols-2 gap-4">
-                                            <textarea
-                                                value={ingredients || ""}
-                                                onChange={(e) => setIngredients(e.target.value)}
-                                                className="w-full min-h-[120px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none shadow-sm"
-                                                placeholder="Comma separated ingredients (English)"
-                                            />
-                                            <textarea
-                                                value={ingredientsAr || ""}
-                                                onChange={(e) => setIngredientsAr(e.target.value)}
-                                                dir="rtl"
-                                                className="w-full min-h-[120px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none shadow-sm font-arabic"
-                                                placeholder="المكونات بالعربية"
-                                            />
-                                        </div>
+                                        <textarea
+                                            value={ingredients || ""}
+                                            onChange={(e) => setIngredients(e.target.value)}
+                                            className="w-full min-h-[120px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none shadow-sm"
+                                            placeholder="Comma separated ingredients (English)"
+                                        />
                                     </div>
 
                                     {/* How to Use section */}
@@ -661,33 +574,14 @@ export default function NewProductPage() {
                                                         <span>Polish</span>
                                                     </button>
                                                 )}
-                                                {howToUse.trim() && (
-                                                    <button
-                                                        onClick={() => handleTranslate(howToUse, setHowToUseAr, 'how_to_use_ar')}
-                                                        disabled={rewriting === 'how_to_use_ar'}
-                                                        className="text-xs flex items-center gap-1 text-blue-500 hover:text-blue-700 transition-colors bg-blue-50 px-2 py-1 rounded-md"
-                                                    >
-                                                        {rewriting === 'how_to_use_ar' ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
-                                                        <span>Translate</span>
-                                                    </button>
-                                                )}
                                             </div>
                                         </div>
-                                        <div className="grid md:grid-cols-2 gap-4">
-                                            <textarea
-                                                value={howToUse || ""}
-                                                onChange={(e) => setHowToUse(e.target.value)}
-                                                className="w-full min-h-[120px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none shadow-sm"
-                                                placeholder="Step by step instructions (English)"
-                                            />
-                                            <textarea
-                                                value={howToUseAr || ""}
-                                                onChange={(e) => setHowToUseAr(e.target.value)}
-                                                dir="rtl"
-                                                className="w-full min-h-[120px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none shadow-sm font-arabic"
-                                                placeholder="طريقة الاستخدام بالعربية"
-                                            />
-                                        </div>
+                                        <textarea
+                                            value={howToUse || ""}
+                                            onChange={(e) => setHowToUse(e.target.value)}
+                                            className="w-full min-h-[120px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none shadow-sm"
+                                            placeholder="Step by step instructions (English)"
+                                        />
                                     </div>
                                 </div>
                             </div>

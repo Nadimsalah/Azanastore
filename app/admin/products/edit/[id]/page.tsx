@@ -30,9 +30,7 @@ export default function EditProductPage() {
 
     // Form state
     const [title, setTitle] = useState("")
-    const [titleAr, setTitleAr] = useState("")
     const [description, setDescription] = useState("")
-    const [descriptionAr, setDescriptionAr] = useState("")
     const [category, setCategory] = useState("")
     const [price, setPrice] = useState("")
     const [compareAtPrice, setCompareAtPrice] = useState("")
@@ -40,11 +38,8 @@ export default function EditProductPage() {
     const [sku, setSku] = useState("")
     const [status, setStatus] = useState("active")
     const [benefits, setBenefits] = useState<string[]>([])
-    const [benefitsAr, setBenefitsAr] = useState<string[]>([])
     const [ingredients, setIngredients] = useState("")
-    const [ingredientsAr, setIngredientsAr] = useState("")
     const [howToUse, setHowToUse] = useState("")
-    const [howToUseAr, setHowToUseAr] = useState("")
 
     // AI Rewrite State
     const [rewriting, setRewriting] = useState<string | null>(null)
@@ -57,9 +52,7 @@ export default function EditProductPage() {
 
             if (product) {
                 setTitle(product.title)
-                setTitleAr(product.title_ar || "")
                 setDescription(product.description || "")
-                setDescriptionAr(product.description_ar || "")
                 setCategory(product.category)
                 setPrice(product.price.toString())
                 setCompareAtPrice(product.compare_at_price?.toString() || "")
@@ -67,11 +60,8 @@ export default function EditProductPage() {
                 setSku(product.sku)
                 setStatus(product.status)
                 setBenefits(product.benefits || [])
-                setBenefitsAr(product.benefits_ar || [])
                 setIngredients(product.ingredients || "")
-                setIngredientsAr(product.ingredients_ar || "")
                 setHowToUse(product.how_to_use || "")
-                setHowToUseAr(product.how_to_use_ar || "")
             }
 
             setLoading(false)
@@ -116,26 +106,6 @@ export default function EditProductPage() {
         }
     }
 
-    const handleTranslate = async (text: string, setter: (val: string) => void, field: string) => {
-        if (!text.trim()) return
-        setRewriting(field)
-        try {
-            const res = await fetch('/api/admin/translate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, targetLang: 'ar' })
-            })
-            const data = await res.json()
-            if (data.translatedText) {
-                setter(data.translatedText)
-            }
-        } catch (error) {
-            console.error('Translation error:', error)
-        } finally {
-            setRewriting(null)
-        }
-    }
-
     const handleSave = async () => {
         setSaving(true)
 
@@ -143,9 +113,7 @@ export default function EditProductPage() {
             .from('products')
             .update({
                 title,
-                title_ar: titleAr,
                 description,
-                description_ar: descriptionAr,
                 category,
                 price: parseFloat(price),
                 compare_at_price: compareAtPrice ? parseFloat(compareAtPrice) : null,
@@ -153,11 +121,8 @@ export default function EditProductPage() {
                 sku,
                 status,
                 benefits,
-                benefits_ar: benefitsAr,
                 ingredients,
-                ingredients_ar: ingredientsAr,
                 how_to_use: howToUse,
-                how_to_use_ar: howToUseAr,
                 updated_at: new Date().toISOString()
             })
             .eq('id', productId)
@@ -173,7 +138,6 @@ export default function EditProductPage() {
 
     const addBenefit = () => {
         setBenefits([...benefits, ""])
-        setBenefitsAr([...benefitsAr, ""])
     }
 
     const updateBenefit = (index: number, value: string) => {
@@ -182,15 +146,8 @@ export default function EditProductPage() {
         setBenefits(newBenefits)
     }
 
-    const updateBenefitAr = (index: number, value: string) => {
-        const newBenefits = [...benefitsAr]
-        newBenefits[index] = value
-        setBenefitsAr(newBenefits)
-    }
-
     const removeBenefit = (index: number) => {
         setBenefits(benefits.filter((_, i) => i !== index))
-        setBenefitsAr(benefitsAr.filter((_, i) => i !== index))
     }
 
     if (loading) {
@@ -256,90 +213,48 @@ export default function EditProductPage() {
 
                             <div className="space-y-3">
                                 <label className="text-sm font-semibold text-gray-700">Product Title</label>
-                                <div className="grid md:grid-cols-2 gap-4">
-                                    <div className="relative">
-                                        <Input
-                                            value={title || ""}
-                                            onChange={(e) => setTitle(e.target.value)}
-                                            placeholder="e.g., Pure Argan Oil"
-                                            className="h-12 text-base bg-gray-50/50 border-gray-200 focus:bg-white transition-colors pr-20"
-                                        />
-                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                                            {title.trim() && (
-                                                <button
-                                                    onClick={() => handleRewrite('title', title, setTitle)}
-                                                    disabled={rewriting === 'title'}
-                                                    className="text-purple-400 hover:text-purple-600 p-1 rounded-full transition-all"
-                                                    title="Improve with AI"
-                                                >
-                                                    {rewriting === 'title' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                                </button>
-                                            )}
-                                            {title.trim() && (
-                                                <button
-                                                    onClick={() => handleTranslate(title, setTitleAr, 'title_ar')}
-                                                    disabled={rewriting === 'title_ar'}
-                                                    className="text-blue-400 hover:text-blue-600 p-1 rounded-full transition-all"
-                                                    title="Translate to Arabic"
-                                                >
-                                                    {rewriting === 'title_ar' ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="relative">
-                                        <Input
-                                            value={titleAr || ""}
-                                            onChange={(e) => setTitleAr(e.target.value)}
-                                            placeholder="اسم المنتج بالعربية"
-                                            dir="rtl"
-                                            className="h-12 text-base bg-gray-50/50 border-gray-200 focus:bg-white transition-colors font-arabic"
-                                        />
+                                <div className="relative">
+                                    <Input
+                                        value={title || ""}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        placeholder="e.g., Pure Argan Oil"
+                                        className="h-12 text-base bg-gray-50/50 border-gray-200 focus:bg-white transition-colors pr-12"
+                                    />
+                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                                        {title.trim() && (
+                                            <button
+                                                onClick={() => handleRewrite('title', title, setTitle)}
+                                                disabled={rewriting === 'title'}
+                                                className="text-purple-400 hover:text-purple-600 p-1 rounded-full transition-all"
+                                                title="Improve with AI"
+                                            >
+                                                {rewriting === 'title' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
 
                             <div className="space-y-3">
                                 <label className="text-sm font-semibold text-gray-700">Description</label>
-                                <div className="grid md:grid-cols-2 gap-4">
-                                    <div className="relative">
-                                        <Textarea
-                                            value={description || ""}
-                                            onChange={(e) => setDescription(e.target.value)}
-                                            placeholder="Describe your product (English)..."
-                                            className="min-h-[150px] text-base bg-gray-50/50 border-gray-200 focus:bg-white transition-colors resize-none pr-10"
-                                        />
-                                        <div className="absolute right-2 top-2 flex flex-col gap-2">
-                                            {description.trim() && (
-                                                <button
-                                                    onClick={() => handleRewrite('description', description, setDescription)}
-                                                    disabled={rewriting === 'description'}
-                                                    className="text-purple-400 hover:text-purple-600 p-1 rounded-full transition-all bg-white/50 backdrop-blur-sm"
-                                                    title="Improve with AI"
-                                                >
-                                                    {rewriting === 'description' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                                </button>
-                                            )}
-                                            {description.trim() && (
-                                                <button
-                                                    onClick={() => handleTranslate(description, setDescriptionAr, 'description_ar')}
-                                                    disabled={rewriting === 'description_ar'}
-                                                    className="text-blue-400 hover:text-blue-600 p-1 rounded-full transition-all bg-white/50 backdrop-blur-sm"
-                                                    title="Translate to Arabic"
-                                                >
-                                                    {rewriting === 'description_ar' ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="relative">
-                                        <Textarea
-                                            value={descriptionAr || ""}
-                                            onChange={(e) => setDescriptionAr(e.target.value)}
-                                            placeholder="وصف المنتج بالعربية..."
-                                            dir="rtl"
-                                            className="min-h-[150px] text-base bg-gray-50/50 border-gray-200 focus:bg-white transition-colors resize-none font-arabic"
-                                        />
+                                <div className="relative">
+                                    <Textarea
+                                        value={description || ""}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        placeholder="Describe your product (English)..."
+                                        className="min-h-[150px] text-base bg-gray-50/50 border-gray-200 focus:bg-white transition-colors resize-none pr-10"
+                                    />
+                                    <div className="absolute right-2 top-2 flex flex-col gap-2">
+                                        {description.trim() && (
+                                            <button
+                                                onClick={() => handleRewrite('description', description, setDescription)}
+                                                disabled={rewriting === 'description'}
+                                                className="text-purple-400 hover:text-purple-600 p-1 rounded-full transition-all bg-white/50 backdrop-blur-sm"
+                                                title="Improve with AI"
+                                            >
+                                                {rewriting === 'description' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -364,42 +279,22 @@ export default function EditProductPage() {
                                 </div>
                                 <div className="space-y-4">
                                     {benefits.map((benefit, index) => (
-                                        <div key={index} className="flex flex-col gap-2 p-4 bg-gray-50/50 border border-gray-100 rounded-2xl relative group">
-                                            <div className="flex gap-2">
-                                                <div className="relative flex-1">
-                                                    <Input
-                                                        value={benefit || ""}
-                                                        onChange={(e) => updateBenefit(index, e.target.value)}
-                                                        placeholder="Benefit (English)"
-                                                        className="h-10 text-sm bg-white border-gray-200 pr-10"
-                                                    />
-                                                    {benefit.trim() && (
-                                                        <button
-                                                            onClick={() => handleTranslate(benefit, (val) => updateBenefitAr(index, val), `benefit_ar_${index}`)}
-                                                            disabled={rewriting === `benefit_ar_${index}`}
-                                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-400 hover:text-blue-600"
-                                                        >
-                                                            {rewriting === `benefit_ar_${index}` ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
-                                                        </button>
-                                                    )}
-                                                </div>
-                                                <Button
-                                                    type="button"
-                                                    size="icon"
-                                                    variant="ghost"
-                                                    onClick={() => removeBenefit(index)}
-                                                    className="h-10 w-10 text-red-500 hover:bg-red-50 shrink-0"
-                                                >
-                                                    <X className="w-4 h-4" />
-                                                </Button>
-                                            </div>
+                                        <div key={index} className="flex gap-2 p-4 bg-gray-50/50 border border-gray-100 rounded-2xl relative group">
                                             <Input
-                                                value={benefitsAr[index] || ""}
-                                                onChange={(e) => updateBenefitAr(index, e.target.value)}
-                                                placeholder="الميزة بالعربية"
-                                                dir="rtl"
-                                                className="h-10 text-sm bg-white border-gray-200 font-arabic"
+                                                value={benefit || ""}
+                                                onChange={(e) => updateBenefit(index, e.target.value)}
+                                                placeholder="Benefit (English)"
+                                                className="h-10 text-sm bg-white border-gray-200"
                                             />
+                                            <Button
+                                                type="button"
+                                                size="icon"
+                                                variant="ghost"
+                                                onClick={() => removeBenefit(index)}
+                                                className="h-10 w-10 text-red-500 hover:bg-red-50 shrink-0"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </Button>
                                         </div>
                                     ))}
                                     {benefits.length === 0 && (
@@ -423,32 +318,14 @@ export default function EditProductPage() {
                                                 {rewriting === 'ingredients' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />} Polish
                                             </button>
                                         )}
-                                        {ingredients.trim() && (
-                                            <button
-                                                onClick={() => handleTranslate(ingredients, setIngredientsAr, 'ingredients_ar')}
-                                                disabled={rewriting === 'ingredients_ar'}
-                                                className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1"
-                                            >
-                                                {rewriting === 'ingredients_ar' ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />} Translate
-                                            </button>
-                                        )}
                                     </div>
                                 </div>
-                                <div className="grid md:grid-cols-2 gap-4">
-                                    <Textarea
-                                        value={ingredients || ""}
-                                        onChange={(e) => setIngredients(e.target.value)}
-                                        placeholder="Ingredients (English)..."
-                                        className="min-h-[100px] text-sm bg-gray-50/50 border-gray-200 focus:bg-white transition-colors resize-none"
-                                    />
-                                    <Textarea
-                                        value={ingredientsAr || ""}
-                                        onChange={(e) => setIngredientsAr(e.target.value)}
-                                        placeholder="المكونات بالعربية..."
-                                        dir="rtl"
-                                        className="min-h-[100px] text-sm bg-gray-50/50 border-gray-200 focus:bg-white transition-colors resize-none font-arabic"
-                                    />
-                                </div>
+                                <Textarea
+                                    value={ingredients || ""}
+                                    onChange={(e) => setIngredients(e.target.value)}
+                                    placeholder="Ingredients (English)..."
+                                    className="min-h-[100px] text-sm bg-gray-50/50 border-gray-200 focus:bg-white transition-colors resize-none"
+                                />
                             </div>
 
                             <div className="space-y-4">
@@ -464,32 +341,14 @@ export default function EditProductPage() {
                                                 {rewriting === 'how_to_use' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />} Polish
                                             </button>
                                         )}
-                                        {howToUse.trim() && (
-                                            <button
-                                                onClick={() => handleTranslate(howToUse, setHowToUseAr, 'how_to_use_ar')}
-                                                disabled={rewriting === 'how_to_use_ar'}
-                                                className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1"
-                                            >
-                                                {rewriting === 'how_to_use_ar' ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />} Translate
-                                            </button>
-                                        )}
                                     </div>
                                 </div>
-                                <div className="grid md:grid-cols-2 gap-4">
-                                    <Textarea
-                                        value={howToUse || ""}
-                                        onChange={(e) => setHowToUse(e.target.value)}
-                                        placeholder="Usage Instructions (English)..."
-                                        className="min-h-[100px] text-sm bg-gray-50/50 border-gray-200 focus:bg-white transition-colors resize-none"
-                                    />
-                                    <Textarea
-                                        value={howToUseAr || ""}
-                                        onChange={(e) => setHowToUseAr(e.target.value)}
-                                        placeholder="طريقة الاستخدام بالعربية..."
-                                        dir="rtl"
-                                        className="min-h-[100px] text-sm bg-gray-50/50 border-gray-200 focus:bg-white transition-colors resize-none font-arabic"
-                                    />
-                                </div>
+                                <Textarea
+                                    value={howToUse || ""}
+                                    onChange={(e) => setHowToUse(e.target.value)}
+                                    placeholder="Usage Instructions (English)..."
+                                    className="min-h-[100px] text-sm bg-gray-50/50 border-gray-200 focus:bg-white transition-colors resize-none"
+                                />
                             </div>
                         </section>
 

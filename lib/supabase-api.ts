@@ -72,6 +72,159 @@ export interface OrderItem {
     created_at: string
 }
 
+// WhatsApp subscriptions
+export interface WhatsappSubscription {
+    id: string
+    country_code: string
+    phone: string
+    created_at: string
+}
+
+// Contact messages
+export interface ContactMessage {
+    id: string
+    name: string
+    email: string | null
+    phone: string
+    company: string | null
+    type: string | null
+    message: string
+    created_at: string
+}
+
+// Career applications
+export interface CareerApplication {
+    id: string
+    name: string
+    email: string
+    phone: string
+    role: string
+    cv_file_name: string | null
+    summary: string
+    created_at: string
+}
+
+export async function createWhatsappSubscription(input: {
+    countryCode: string
+    phone: string
+}): Promise<{ data?: WhatsappSubscription; error?: string }> {
+    const { data, error } = await supabase
+        .from('whatsapp_subscriptions')
+        .insert({
+            country_code: input.countryCode,
+            phone: input.phone,
+        })
+        .select()
+        .single()
+
+    if (error) {
+        console.error('Error creating WhatsApp subscription:', error.message)
+        return { error: error.message }
+    }
+
+    return { data: data as WhatsappSubscription }
+}
+
+export async function listWhatsappSubscriptions(): Promise<WhatsappSubscription[]> {
+    const { data, error } = await supabase
+        .from('whatsapp_subscriptions')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+    if (error) {
+        console.error('Error loading WhatsApp subscriptions:', error.message)
+        return []
+    }
+
+    return (data || []) as WhatsappSubscription[]
+}
+
+export async function createContactMessage(input: {
+    name: string
+    email?: string
+    phone: string
+    company?: string
+    type?: string
+    message: string
+}): Promise<{ data?: ContactMessage; error?: string }> {
+    const { data, error } = await supabase
+        .from('contact_messages')
+        .insert({
+            name: input.name,
+            email: input.email || null,
+            phone: input.phone,
+            company: input.company || null,
+            type: input.type || null,
+            message: input.message,
+        })
+        .select()
+        .single()
+
+    if (error) {
+        console.error('Error creating contact message:', error.message)
+        return { error: error.message }
+    }
+
+    return { data: data as ContactMessage }
+}
+
+export async function listContactMessages(): Promise<ContactMessage[]> {
+    const { data, error } = await supabase
+        .from('contact_messages')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+    if (error) {
+        console.error('Error loading contact messages:', error.message)
+        return []
+    }
+
+    return (data || []) as ContactMessage[]
+}
+
+export async function createCareerApplication(input: {
+    name: string
+    email: string
+    phone: string
+    role: string
+    summary: string
+    cvFilePath: string | null
+}): Promise<{ data?: CareerApplication; error?: string }> {
+    const { data, error } = await supabase
+        .from('career_applications')
+        .insert({
+            name: input.name,
+            email: input.email,
+            phone: input.phone,
+            role: input.role,
+            summary: input.summary,
+            cv_file_name: input.cvFilePath,
+        })
+        .select()
+        .single()
+
+    if (error) {
+        console.error('Error creating career application:', error.message)
+        return { error: error.message }
+    }
+
+    return { data: data as CareerApplication }
+}
+
+export async function listCareerApplications(): Promise<CareerApplication[]> {
+    const { data, error } = await supabase
+        .from('career_applications')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+    if (error) {
+        console.error('Error loading career applications:', error.message)
+        return []
+    }
+
+    return (data || []) as CareerApplication[]
+}
+
 // Products API
 export async function getProducts(filters?: {
     category?: string
@@ -147,7 +300,12 @@ export async function getProducts(filters?: {
     const { data, error } = await query
 
     if (error) {
-        console.error('Error fetching products:', error.message || error)
+        console.error('Error fetching products:', {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint
+        })
         return []
     }
 
@@ -464,7 +622,12 @@ export async function getAdminSettings() {
         .select('key, value')
 
     if (error) {
-        console.error('Error fetching admin settings:', error)
+        console.error('Error fetching admin settings:', {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint
+        })
         return {}
     }
 
@@ -676,7 +839,12 @@ export async function getCategories() {
         .order('name')
 
     if (error) {
-        console.error('Error fetching categories:', error)
+        console.error('Error fetching categories:', {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint
+        })
         return []
     }
 

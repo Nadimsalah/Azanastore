@@ -9,6 +9,96 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, ArrowRight, X, ChevronLeft, Loader2, ShoppingBag } from "lucide-react"
 
+// Simple best-sellers grid: reuse products API and show top products when no search query
+function BestSellersGrid() {
+    const { t, language } = useLanguage()
+    const [products, setProducts] = useState<Product[]>([])
+    const [loading, setLoading] = useState(false)
+    const isArabic = language === "ar"
+
+    useEffect(() => {
+        let mounted = true
+        async function load() {
+            try {
+                setLoading(true)
+                const data = await getProducts({ status: "active", limit: 8 })
+                if (mounted) {
+                    setProducts(data)
+                }
+            } catch (e) {
+                console.error("Failed to load best sellers for search page", e)
+            } finally {
+                if (mounted) setLoading(false)
+            }
+        }
+        load()
+        return () => {
+            mounted = false
+        }
+    }, [])
+
+    if (loading && products.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center py-10 gap-3">
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                <p className="text-muted-foreground text-sm">
+                    {isArabic ? "جاري تحميل المنتجات..." : "Loading products..."}
+                </p>
+            </div>
+        )
+    }
+
+    if (products.length === 0) {
+        return (
+            <p className="text-muted-foreground">
+                {isArabic ? "لا توجد منتجات متاحة الآن." : "No products available yet."}
+            </p>
+        )
+    }
+
+    return (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-8">
+            {products.map((product) => (
+                <Link
+                    key={product.id}
+                    href={`/product/${product.id}`}
+                    className="group glass-liquid rounded-[2.5rem] p-4 sm:p-6 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 border border-white/10 hover:border-primary/20 bg-white/5 hover:bg-white/10 flex flex-col h-full overflow-hidden relative"
+                >
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="aspect-square rounded-3xl overflow-hidden mb-6 relative">
+                        <Image
+                            src={product.images?.[0] || "/placeholder.svg"}
+                            alt={isArabic && product.title_ar ? product.title_ar : product.title}
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-700"
+                        />
+                    </div>
+                    <div className="space-y-3 relative z-10">
+                        <h3 className="font-bold text-foreground group-hover:text-primary transition-colors text-base sm:text-lg leading-tight line-clamp-2">
+                            {isArabic && product.title_ar ? product.title_ar : product.title}
+                        </h3>
+                        <div className="flex items-center justify-between gap-2 pt-2">
+                            <div className="flex flex-col">
+                                <span className="text-lg sm:text-xl font-black text-primary">
+                                    {t("common.currency")} {product.price}
+                                </span>
+                                {product.compare_at_price && (
+                                    <span className="text-xs text-muted-foreground line-through opacity-70">
+                                        {t("common.currency")} {product.compare_at_price}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl bg-primary/10 group-hover:bg-primary flex items-center justify-center text-primary group-hover:text-white transition-all duration-500 shadow-lg shadow-black/5 group-hover:shadow-primary/40">
+                                <ShoppingBag className="w-5 h-5 sm:w-6 h-6" />
+                            </div>
+                        </div>
+                    </div>
+                </Link>
+            ))}
+        </div>
+    )
+}
+
 export default function SearchPage() {
     const { t, language } = useLanguage()
     const [query, setQuery] = useState("")
@@ -162,21 +252,17 @@ export default function SearchPage() {
                         </p>
                     </div>
                 ) : (
-                    <div className="max-w-2xl mx-auto py-20 text-center animate-in fade-in duration-700">
+                    <div className="max-w-4xl mx-auto py-20 text-center animate-in fade-in duration-700">
                         <h3 className="text-muted-foreground font-medium mb-8 uppercase tracking-widest text-sm opacity-50">
-                            {isArabic ? "عمليات البحث الشائعة" : "Popular Searches"}
+                            {isArabic ? "الأكثر مبيعًا" : "Best Sellers"}
                         </h3>
-                        <div className="flex flex-wrap justify-center gap-3">
-                            {["Argan Oil", "Face Cream", "Serum", "Natural"].map((term) => (
-                                <button
-                                    key={term}
-                                    onClick={() => setQuery(term)}
-                                    className="px-6 py-3 rounded-full glass-subtle hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 text-sm font-semibold"
-                                >
-                                    {term}
-                                </button>
-                            ))}
-                        </div>
+                        <p className="text-muted-foreground mb-10 max-w-xl mx-auto">
+                            {isArabic
+                                ? "تصفح أكثر منتجاتنا مبيعًا وابدأ التسوق مباشرة."
+                                : "Browse our best-selling products and start shopping instantly."}
+                        </p>
+                        {/* Reuse home page shop section: show top products by created_at (most recent as proxy for top sellers) */}
+                        <BestSellersGrid />
                     </div>
                 )}
             </div>

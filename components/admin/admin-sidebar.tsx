@@ -2,7 +2,20 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, ShoppingBag, Package, Users, BarChart3, Settings, LogOut, Menu, Image as ImageIcon } from "lucide-react"
+import {
+    LayoutDashboard,
+    ShoppingBag,
+    Package,
+    Users,
+    BarChart3,
+    Settings,
+    LogOut,
+    Menu,
+    Image as ImageIcon,
+    MessageCircle,
+    Phone,
+    Briefcase,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import Image from "next/image"
@@ -14,6 +27,10 @@ const menuItems = [
     { icon: Users, label: "Customers", href: "/admin/customers" },
     { icon: BarChart3, label: "Analytics", href: "/admin/analytics" },
     { icon: ImageIcon, label: "Hero Carousel", href: "/admin/hero-carousel" },
+    // CRM / Marketing
+    { icon: MessageCircle, label: "WhatsApp Leads", href: "/admin/whatsapp" },
+    { icon: Phone, label: "Contact Messages", href: "/admin/contacts" },
+    { icon: Briefcase, label: "Career Applications", href: "/admin/careers" },
     { icon: Settings, label: "Settings", href: "/admin/settings" },
 ]
 

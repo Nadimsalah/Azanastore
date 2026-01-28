@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/navigation-menu"
 import { ModernHeroCarousel } from "@/components/modern-hero-carousel"
 import { WhatsAppSubscription } from "@/components/whatsapp-subscription"
+import { ProductCardSkeleton, HeroCarouselSkeleton } from "@/components/ui/store-skeletons"
 
 // Countdown Timer Component
 function CountdownTimer() {
@@ -191,9 +192,14 @@ function HeroCarousel({ products }: { products: Product[] }) {
 
   useEffect(() => {
     async function loadCarouselItems() {
-      const items = await getHeroCarouselItems()
+      let items: Awaited<ReturnType<typeof getHeroCarouselItems>> = []
+      try {
+        items = await getHeroCarouselItems()
+      } catch (error) {
+        console.error("Failed to load carousel items", error)
+      }
 
-      if (items.length > 0) {
+      if (items && items.length > 0) {
         // Use database items
         setCarouselItems(items.map(item => ({
           image: item.image_url,
@@ -279,11 +285,7 @@ function HeroCarousel({ products }: { products: Product[] }) {
   }, [])
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-[500px]">
-        <div className="animate-pulse text-muted-foreground">{t('timer.loading')}</div>
-      </div>
-    )
+    return <HeroCarouselSkeleton />
   }
 
   return <ModernHeroCarousel items={carouselItems} />
@@ -323,16 +325,25 @@ export default function HomePage() {
   useEffect(() => {
     async function loadData() {
       setLoading(true)
-      const [productsData, categoriesData, settingsData] = await Promise.all([
-        getProducts({ status: 'active', limit: 20 }),
-        getCategories(),
-        getAdminSettings()
-      ])
+      try {
+        const [productsData, categoriesData, settingsData] = await Promise.all([
+          getProducts({ status: 'active', limit: 20 }),
+          getCategories(),
+          getAdminSettings()
+        ])
 
-      setProducts(productsData || [])
-      setCategories(categoriesData || [])
-      setSettings(settingsData || {})
-      setLoading(false)
+        setProducts(productsData || [])
+        setCategories(categoriesData || [])
+        setSettings(settingsData || {})
+      } catch (e) {
+        console.error("Failed to load home page data", e)
+        // Ensure UI doesn't break
+        setProducts([])
+        setCategories([])
+        setSettings({})
+      } finally {
+        setLoading(false)
+      }
     }
     loadData()
   }, [])
@@ -362,7 +373,15 @@ export default function HomePage() {
     ? products
     : products.filter(p => p.category === selectedCategory)
 
-
+  // Fallback categories for header/menu when Supabase categories are empty
+  const headerCategories =
+    categories.length > 0
+      ? categories
+      : (['face', 'hair', 'body', 'gift'] as const).map((slug) => ({
+          id: slug,
+          slug,
+          name: getCategoryLabel(slug),
+        }))
 
   const faqs = [
     { q: t('faq.q1'), a: t('faq.a1') },
@@ -410,115 +429,8 @@ export default function HomePage() {
               />
             </Link>
 
-            {/* Desktop Navigation - Modern Mega Menu */}
-            <NavigationMenu className="hidden lg:flex" delayDuration={0}>
-              <NavigationMenuList className="gap-1">
-                {/* Categories Dropdown */}
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent text-foreground/80 hover:text-primary hover:bg-primary/5 data-[state=open]:bg-primary/5 data-[state=open]:text-primary font-medium px-4 py-2 rounded-full transition-all duration-200">
-                    {t('header.categories')}
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="glass-liquid w-[800px] p-4 rounded-[2.5rem] overflow-hidden border border-white/20 shadow-2xl backdrop-blur-3xl bg-white/10">
-                      <div className="grid grid-cols-12 gap-6">
-                        {/* Categories List */}
-                        <div className="col-span-7 p-4">
-                          <h3 className="text-sm font-bold text-primary mb-6 uppercase tracking-widest flex items-center gap-2 px-2">
-                            <Sparkles className="w-4 h-4 text-primary animate-pulse" /> {t('header.browse_by_category')}
-                          </h3>
-                          <div className="grid grid-cols-2 gap-3">
-                            {categories.map((cat) => (
-                              <NavigationMenuLink key={cat.id} asChild>
-                                <a
-                                  href="#shop"
-                                  onClick={(e) => {
-                                    e.preventDefault()
-                                    setSelectedCategory(cat.slug)
-                                    document.getElementById('shop')?.scrollIntoView({ behavior: 'smooth' })
-                                  }}
-                                  className="group relative flex flex-col justify-end p-4 h-24 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/20 hover:bg-white/10 transition-all duration-500 overflow-hidden cursor-pointer"
-                                >
-                                  {/* Hover Gradient */}
-                                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                  <div className="absolute top-0 right-0 p-3 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-500">
-                                    <ArrowRight className="w-4 h-4 text-primary" />
-                                  </div>
-
-                                  <span className="relative z-10 font-bold text-foreground group-hover:text-primary transition-colors text-base leading-tight">
-                                    {cat.name}
-                                  </span>
-                                  {cat.name_ar && language === 'en' && (
-                                    <span className="relative z-10 text-[10px] text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity delay-100 font-arabic text-left">
-                                      {cat.name_ar}
-                                    </span>
-                                  )}
-                                </a>
-                              </NavigationMenuLink>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Featured Section */}
-                        <div className="col-span-5 relative group overflow-hidden rounded-[2rem] border border-white/10">
-                          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-secondary/10 to-primary/5 active:scale-105 transition-transform duration-1000" />
-                          <div className="absolute inset-0 bg-[url('/hero-showcase-3.jpg')] bg-cover bg-center opacity-30 mix-blend-overlay group-hover:opacity-40 transition-opacity duration-700" />
-
-                          <div className="relative h-full flex flex-col justify-between p-6 bg-gradient-to-b from-transparent to-black/40">
-                            <div>
-                              <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider rounded-full border border-white/20 mb-4 shadow-lg">
-                                <Star className="w-3 h-3 fill-current" /> {t('header.new_arrival')}
-                              </span>
-                              <h4 className="font-bold text-white text-2xl leading-tight mb-2 drop-shadow-lg">
-                                {t('header.argan_elixir')}
-                              </h4>
-                              <p className="text-sm text-white/80 line-clamp-3 leading-relaxed drop-shadow-md">
-                                {t('header.argan_elixir_desc')}
-                              </p>
-                            </div>
-                            <Button
-                              size="sm"
-                              className="rounded-xl w-full bg-white/20 hover:bg-white text-white hover:text-primary border border-white/30 backdrop-blur-md shadow-xl transition-all font-bold mt-4 h-10"
-                              onClick={() => {
-                                setSelectedCategory("All")
-                                document.getElementById('shop')?.scrollIntoView({ behavior: 'smooth' })
-                              }}
-                            >
-                              {t('nav.shop_now')}
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                {/* Simple Links */}
-                <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
-                    <Link
-                      href="#about"
-                      className="text-foreground/80 hover:text-primary hover:bg-primary/5 font-medium px-4 py-2 rounded-full transition-all duration-200 inline-flex"
-                    >
-                      {t('nav.about')}
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
-                    <Link
-                      href="#faq"
-                      className="text-foreground/80 hover:text-primary hover:bg-primary/5 font-medium px-4 py-2 rounded-full transition-all duration-200 inline-flex"
-                    >
-                      {t('nav.faq')}
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-
             {/* Right Actions */}
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 ml-auto">
               <Link href="/search">
                 <Button variant="ghost" size="icon" className="hidden sm:flex rounded-full hover:bg-primary/5 hover:text-primary transition-all">
                   <Search className="w-5 h-5" />
@@ -560,51 +472,9 @@ export default function HomePage() {
                       />
                     </div>
 
-                    {/* Mobile Menu Content */}
+                    {/* Mobile Menu Content (no categories menu) */}
                     <div className="flex-1 overflow-y-auto p-6">
-                      <nav className="space-y-2">
-                        {/* Categories Section */}
-                        <Accordion type="single" collapsible className="w-full">
-                          <AccordionItem value="categories" className="border-0">
-                            <AccordionTrigger className="py-4 text-lg font-medium text-foreground hover:text-primary hover:no-underline">
-                              {t('header.categories')}
-                            </AccordionTrigger>
-                            <AccordionContent className="pb-4">
-                              <div className="space-y-2 pl-4">
-                                {categories.map((cat) => (
-                                  <a
-                                    key={cat.id}
-                                    href="#shop"
-                                    onClick={(e) => {
-                                      e.preventDefault()
-                                      setSelectedCategory(cat.slug)
-                                      document.getElementById('shop')?.scrollIntoView({ behavior: 'smooth' })
-                                      // Optional: close sheet if we had access to the state, but native behavior might be fine for now or user can close it.
-                                      // Ideally we'd toggle the sheet close trigger programmatically or use a controlled component.
-                                    }}
-                                    className="block py-2 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-                                  >
-                                    {cat.name}
-                                  </a>
-                                ))}
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-                        </Accordion>
-
-                        <Link
-                          href="#about"
-                          className="block py-4 text-lg font-medium text-foreground hover:text-primary transition-colors"
-                        >
-                          About
-                        </Link>
-                        <Link
-                          href="#faq"
-                          className="block py-4 text-lg font-medium text-foreground hover:text-primary transition-colors"
-                        >
-                          FAQ
-                        </Link>
-                      </nav>
+                      <nav className="space-y-2" />
 
                       {/* Mobile Promo Card */}
                       <div className="mt-8 p-5 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/20">
@@ -623,8 +493,8 @@ export default function HomePage() {
 
                     {/* Mobile Menu Footer */}
                     <div className="p-6 border-t border-border/50 space-y-3">
-                      <Button className="w-full rounded-full shadow-lg shadow-primary/20">
-                        Shop Now
+                      <Button className="w-full rounded-full shadow-lg shadow-primary/20" asChild>
+                        <Link href="/#shop">Shop Now</Link>
                       </Button>
                       <Button variant="outline" className="w-full rounded-full bg-transparent">
                         <Search className="w-4 h-4 mr-2" />
@@ -673,11 +543,21 @@ export default function HomePage() {
                 }
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="rounded-full text-base px-8">
-                  {t('hero.shop_collection')}
+                {/* Primary CTA → Search page */}
+                <Button asChild size="lg" className="rounded-full text-base px-8">
+                  <Link href="/search">
+                    {t('nav.search')}
+                  </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="rounded-full text-base px-8 bg-transparent">
-                  {t('hero.explore_best_sellers')}
+
+                {/* Secondary CTA → Toggle language */}
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="rounded-full text-base px-8 bg-transparent"
+                  onClick={toggleLanguage}
+                >
+                  {language === 'en' ? 'العربية' : 'English'}
                 </Button>
               </div>
               {/* Trust Badges */}
@@ -699,21 +579,7 @@ export default function HomePage() {
 
             {/* Hero 3D Glass Carousel */}
             <div className="relative">
-              {products.length > 0 ? (
-                <HeroCarousel products={products.slice(0, 6)} />
-              ) : (
-                <div className="glass rounded-[2rem] p-8 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/20" />
-                  <div className="relative aspect-square bg-gradient-to-br from-secondary to-muted rounded-2xl flex items-center justify-center">
-                    <div className="text-center space-y-4">
-                      <div className="w-32 h-32 mx-auto rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
-                        <Sparkles className="w-16 h-16 text-primary" />
-                      </div>
-                      <p className="text-xl font-semibold text-foreground">{t('timer.loading')}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
+              <HeroCarousel products={products.slice(0, 6)} />
             </div>
           </div>
         </div>
@@ -750,9 +616,15 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 animate-in fade-in duration-500">
-            {filteredProducts.slice(0, visibleProducts).map((product, i) => (
-              <ProductCard key={`${product.id}-${selectedCategory}`} {...product} />
-            ))}
+            {loading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))
+            ) : (
+              filteredProducts.slice(0, visibleProducts).map((product, i) => (
+                <ProductCard key={`${product.id}-${selectedCategory}`} {...product} />
+              ))
+            )}
           </div>
           {visibleProducts < filteredProducts.length && (
             <div className="text-center mt-10">
@@ -852,12 +724,7 @@ export default function HomePage() {
                 {t('footer.about_desc')}
               </p>
               <div className="flex gap-3">
-                {/* Modern Social Icons */}
-                {['Instagram', 'Facebook', 'Twitter'].map((social, i) => (
-                  <a key={social} href="#" className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-all duration-300 group" aria-label={social}>
-                    <Sparkles className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                  </a>
-                ))}
+                {/* Social icons removed per user request */}
               </div>
             </div>
 
@@ -866,30 +733,46 @@ export default function HomePage() {
               <div>
                 <h4 className="font-semibold text-foreground text-sm tracking-wide uppercase mb-6">{t('footer.company')}</h4>
                 <ul className="space-y-4 text-sm text-muted-foreground">
-                  <li><Link href="#about" className="hover:text-primary transition-colors block py-1">{t('footer.our_story')}</Link></li>
-                  <li><Link href="#" className="hover:text-primary transition-colors block py-1">{t('footer.sustainability')}</Link></li>
-                  <li><Link href="#" className="hover:text-primary transition-colors block py-1">{t('footer.press')}</Link></li>
-                  <li><Link href="#" className="hover:text-primary transition-colors block py-1">{t('footer.careers')}</Link></li>
+                  <li>
+                    <Link href="/our-story" className="hover:text-primary transition-colors block py-1">
+                      {t('footer.our_story')}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/sustainability" className="hover:text-primary transition-colors block py-1">
+                      {t('footer.sustainability')}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/press" className="hover:text-primary transition-colors block py-1">
+                      {t('footer.press')}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/careers" className="hover:text-primary transition-colors block py-1">
+                      {t('footer.careers')}
+                    </Link>
+                  </li>
                 </ul>
               </div>
 
               <div>
                 <h4 className="font-semibold text-foreground text-sm tracking-wide uppercase mb-6">{t('footer.support')}</h4>
                 <ul className="space-y-4 text-sm text-muted-foreground">
-                  <li><Link href="#" className="hover:text-primary transition-colors block py-1">{t('footer.contact_us')}</Link></li>
-                  <li><Link href="#" className="hover:text-primary transition-colors block py-1">{t('footer.shipping_info')}</Link></li>
-                  <li><Link href="#" className="hover:text-primary transition-colors block py-1">{t('footer.track_order')}</Link></li>
-                  <li><Link href="#faq" className="hover:text-primary transition-colors block py-1">{t('nav.faq')}</Link></li>
+                  <li><Link href="/contact" className="hover:text-primary transition-colors block py-1">{t('footer.contact_us')}</Link></li>
+                  <li><Link href="/shipping-info" className="hover:text-primary transition-colors block py-1">{t('footer.shipping_info')}</Link></li>
+                  <li><Link href="/track-order" className="hover:text-primary transition-colors block py-1">{t('footer.track_order')}</Link></li>
+                  <li><Link href="/faq" className="hover:text-primary transition-colors block py-1">{t('nav.faq')}</Link></li>
                 </ul>
               </div>
 
               <div>
                 <h4 className="font-semibold text-foreground text-sm tracking-wide uppercase mb-6">{t('footer.legal')}</h4>
                 <ul className="space-y-4 text-sm text-muted-foreground">
-                  <li><Link href="#" className="hover:text-primary transition-colors block py-1">{t('footer.privacy_policy')}</Link></li>
-                  <li><Link href="#" className="hover:text-primary transition-colors block py-1">{t('footer.terms')}</Link></li>
-                  <li><Link href="#" className="hover:text-primary transition-colors block py-1">{t('footer.refund_policy')}</Link></li>
-                  <li><Link href="#" className="hover:text-primary transition-colors block py-1">{t('footer.cookies')}</Link></li>
+                  <li><Link href="/privacy-policy" className="hover:text-primary transition-colors block py-1">{t('footer.privacy_policy')}</Link></li>
+                  <li><Link href="/terms" className="hover:text-primary transition-colors block py-1">{t('footer.terms')}</Link></li>
+                  <li><Link href="/refund-policy" className="hover:text-primary transition-colors block py-1">{t('footer.refund_policy')}</Link></li>
+                  <li><Link href="/cookies" className="hover:text-primary transition-colors block py-1">{t('footer.cookies')}</Link></li>
                 </ul>
               </div>
             </div>
@@ -899,12 +782,9 @@ export default function HomePage() {
           <div className="border-t border-border pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
             <p>© {new Date().getFullYear()} Diar Argan. {t('footer.rights')}</p>
             <div className="flex items-center gap-6">
-              <Link href="#" className="hover:text-foreground transition-colors">{t('footer.privacy_short')}</Link>
-              <Link href="#" className="hover:text-foreground transition-colors">{t('footer.terms_short')}</Link>
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/50 border border-border/50">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="font-medium text-[10px] uppercase tracking-wider">{t('footer.system_status')}</span>
-              </div>
+              <Link href="/privacy-policy" className="hover:text-foreground transition-colors">{t('footer.privacy_short')}</Link>
+              <Link href="/terms" className="hover:text-foreground transition-colors">{t('footer.terms_short')}</Link>
+              {/* System status removed per user request */}
             </div>
           </div>
         </div>

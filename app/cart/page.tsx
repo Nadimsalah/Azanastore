@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/navigation-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { CartItemSkeleton } from "@/components/ui/store-skeletons"
 
 
 
@@ -37,7 +38,7 @@ export default function CartPage() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [promoCode, setPromoCode] = useState("")
   const [promoApplied, setPromoApplied] = useState(false)
-  const { items: cartItems, removeItem, updateQuantity } = useCart()
+  const { items: cartItems, removeItem, updateQuantity, isInitialized } = useCart()
   const { t, language } = useLanguage()
 
   // Cart calculations
@@ -134,79 +135,86 @@ export default function CartPage() {
                 <span className="text-sm sm:text-base text-muted-foreground">{cartItems.length} {t('cart.items')}</span>
               </div>
 
-              {cartItems.map((item) => (
-                <div key={item.id} className="glass rounded-xl sm:rounded-2xl p-3 sm:p-6 group hover:shadow-xl transition-all">
-                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                    {/* Product Image */}
-                    <div className="relative flex-shrink-0">
-                      <div className="w-full sm:w-28 sm:h-28 lg:w-32 lg:h-32 aspect-square sm:aspect-auto rounded-xl overflow-hidden bg-muted">
-                        <Image
-                          src={item.image || "/placeholder.svg"}
-                          alt={item.name}
-                          width={128}
-                          height={128}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      {!item.inStock && (
-                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                          <span className="text-white text-xs font-semibold">Out of Stock</span>
+              {!isInitialized ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <CartItemSkeleton key={i} />
+                ))
+              ) : (
+                cartItems.map((item) => (
+                  <div key={item.id} className="glass rounded-xl sm:rounded-2xl p-3 sm:p-6 group hover:shadow-xl transition-all">
+                    {/* ... item content ... */}
+                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                      {/* Product Image */}
+                      <div className="relative flex-shrink-0">
+                        <div className="w-full sm:w-28 sm:h-28 lg:w-32 lg:h-32 aspect-square sm:aspect-auto rounded-xl overflow-hidden bg-muted">
+                          <Image
+                            src={item.image || "/placeholder.svg"}
+                            alt={item.name}
+                            width={128}
+                            height={128}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                      )}
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="flex-1 min-w-0 flex flex-col">
-                      <div className="flex items-start justify-between gap-2 mb-3">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-foreground text-base sm:text-lg mb-1 line-clamp-2">
-                            {language === 'ar' && item.nameAr ? item.nameAr : item.name}
-                          </h3>
-                          {item.size && <p className="text-xs sm:text-sm text-muted-foreground">Size: {item.size}</p>}
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 sm:h-9 sm:w-9 rounded-full hover:bg-destructive/10 hover:text-destructive transition-all flex-shrink-0"
-                          onClick={() => removeItem(item.id, item.size)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        {!item.inStock && (
+                          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                            <span className="text-white text-xs font-semibold">Out of Stock</span>
+                          </div>
+                        )}
                       </div>
 
-                      <div className="flex items-center justify-between mt-auto">
-                        {/* Quantity Controls */}
-                        <div className="flex items-center gap-1.5 sm:gap-2">
+                      {/* Product Info */}
+                      <div className="flex-1 min-w-0 flex flex-col">
+                        <div className="flex items-start justify-between gap-2 mb-3">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-foreground text-base sm:text-lg mb-1 line-clamp-2">
+                              {language === 'ar' && item.nameAr ? item.nameAr : item.name}
+                            </h3>
+                            {item.size && <p className="text-xs sm:text-sm text-muted-foreground">Size: {item.size}</p>}
+                          </div>
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="icon"
-                            className="h-8 w-8 rounded-full bg-transparent"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1, item.size)}
-                            disabled={item.quantity <= 1}
+                            className="h-8 w-8 sm:h-9 sm:w-9 rounded-full hover:bg-destructive/10 hover:text-destructive transition-all flex-shrink-0"
+                            onClick={() => removeItem(item.id, item.size)}
                           >
-                            <Minus className="w-3 h-3" />
-                          </Button>
-                          <span className="w-8 text-center font-medium text-sm sm:text-base">{item.quantity}</span>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 rounded-full bg-transparent"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1, item.size)}
-                          >
-                            <Plus className="w-3 h-3" />
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
 
-                        {/* Price */}
-                        <div className="text-right">
-                          <p className="text-base sm:text-lg font-bold text-foreground">{t('common.currency')} {(item.price * item.quantity).toFixed(2)}</p>
-                          <p className="text-xs sm:text-sm text-muted-foreground">{t('common.currency')} {item.price.toFixed(2)} each</p>
+                        <div className="flex items-center justify-between mt-auto">
+                          {/* Quantity Controls */}
+                          <div className="flex items-center gap-1.5 sm:gap-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8 rounded-full bg-transparent"
+                              onClick={() => updateQuantity(item.id, item.quantity - 1, item.size)}
+                              disabled={item.quantity <= 1}
+                            >
+                              <Minus className="w-3 h-3" />
+                            </Button>
+                            <span className="w-8 text-center font-medium text-sm sm:text-base">{item.quantity}</span>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8 rounded-full bg-transparent"
+                              onClick={() => updateQuantity(item.id, item.quantity + 1, item.size)}
+                            >
+                              <Plus className="w-3 h-3" />
+                            </Button>
+                          </div>
+
+                          {/* Price */}
+                          <div className="text-right">
+                            <p className="text-base sm:text-lg font-bold text-foreground">{t('common.currency')} {(item.price * item.quantity).toFixed(2)}</p>
+                            <p className="text-xs sm:text-sm text-muted-foreground">{t('common.currency')} {item.price.toFixed(2)} each</p>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
             {/* Order Summary */}
@@ -303,58 +311,6 @@ export default function CartPage() {
             </div>
           </div>
         )
-        }
-
-        {/* Recommended Products */}
-        {
-          cartItems.length > 0 && (
-            <div className="mt-12 sm:mt-16">
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">You May Also Like</h2>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-                {[
-                  {
-                    name: "Argan Face Cream",
-                    price: 420.0,
-                    image: "https://images.unsplash.com/photo-1616401776156-0e4c699d5122?w=400&h=400&fit=crop",
-                  },
-                  {
-                    name: "Exfoliating Scrub",
-                    price: 280.0,
-                    image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=400&h=400&fit=crop",
-                  },
-                  {
-                    name: "Night Repair Serum",
-                    price: 550.0,
-                    image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=400&fit=crop",
-                  },
-                  {
-                    name: "Hydrating Mist",
-                    price: 240.0,
-                    image: "https://images.unsplash.com/photo-1556228994-7a5c6d31ca14?w=400&h=400&fit=crop",
-                  },
-                ].map((product, idx) => (
-                  <Link key={idx} href={`/product/${idx + 1}`} className="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 group hover:shadow-xl transition-all block">
-                    <div className="aspect-square rounded-lg sm:rounded-xl overflow-hidden mb-3 sm:mb-4 bg-muted">
-                      <Image
-                        src={product.image || "/placeholder.svg"}
-                        alt={product.name}
-                        width={300}
-                        height={300}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <h3 className="font-semibold text-foreground text-sm sm:text-base mb-2 line-clamp-2">{product.name}</h3>
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                      <span className="text-base sm:text-lg font-bold text-primary">{t('common.currency')} {product.price.toFixed(2)}</span>
-                      <Button size="sm" variant="outline" className="rounded-full bg-transparent w-full sm:w-auto text-xs sm:text-sm pointer-events-none">
-                        View
-                      </Button>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )
         }
       </main >
 

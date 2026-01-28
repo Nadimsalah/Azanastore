@@ -19,6 +19,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { toast } from "sonner"
+import { CheckoutSummarySkeleton } from "@/components/ui/store-skeletons"
 
 const EGYPT_CITIES = [
     "Cairo", "Alexandria", "Giza", "Shubra El Kheima", "Port Said", "Suez", "Luxor", "Mansoura",
@@ -30,7 +31,7 @@ const EGYPT_CITIES = [
 ].sort()
 
 export default function CheckoutPage() {
-    const { items, cartCount } = useCart()
+    const { items, cartCount, isInitialized } = useCart()
     const { t, language } = useLanguage()
     const router = useRouter()
     const [loading, setLoading] = useState(false)
@@ -294,82 +295,86 @@ export default function CheckoutPage() {
 
                     {/* Right Column: Order Summary */}
                     <div className="lg:sticky lg:top-24 space-y-6">
-                        <div className="glass-strong rounded-2xl p-6 sm:p-8">
-                            <h2 className="font-bold text-lg mb-6 flex items-center gap-2">
-                                <ShoppingBag className="w-5 h-5 text-primary" />
-                                {t('cart.order_summary')}
-                            </h2>
+                        {!isInitialized ? (
+                            <CheckoutSummarySkeleton />
+                        ) : (
+                            <div className="glass-strong rounded-2xl p-6 sm:p-8">
+                                <h2 className="font-bold text-lg mb-6 flex items-center gap-2">
+                                    <ShoppingBag className="w-5 h-5 text-primary" />
+                                    {t('cart.order_summary')}
+                                </h2>
 
-                            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                                {items.map((item) => (
-                                    <div key={`${item.id}-${item.size}`} className="flex gap-4 py-2">
-                                        <div className="relative w-16 h-16 bg-muted rounded-xl overflow-hidden flex-shrink-0 border border-border/50">
-                                            <Image
-                                                src={item.image || "/placeholder.svg"}
-                                                alt={item.name}
-                                                fill
-                                                className="object-cover"
-                                            />
-                                            <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-bl-lg">
-                                                x{item.quantity}
-                                            </span>
+                                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                    {items.map((item) => (
+                                        <div key={`${item.id}-${item.size}`} className="flex gap-4 py-2">
+                                            <div className="relative w-16 h-16 bg-muted rounded-xl overflow-hidden flex-shrink-0 border border-border/50">
+                                                <Image
+                                                    src={item.image || "/placeholder.svg"}
+                                                    alt={item.name}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                                <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-bl-lg">
+                                                    x{item.quantity}
+                                                </span>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-medium text-sm text-foreground line-clamp-1">
+                                                    {language === 'ar' && item.nameAr ? item.nameAr : item.name}
+                                                </h4>
+                                                {item.size && <p className="text-xs text-muted-foreground">{item.size}</p>}
+                                                <p className="text-sm font-semibold text-primary mt-1">
+                                                    {t('common.currency')} {(item.price * item.quantity).toFixed(2)}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className="font-medium text-sm text-foreground line-clamp-1">
-                                                {language === 'ar' && item.nameAr ? item.nameAr : item.name}
-                                            </h4>
-                                            {item.size && <p className="text-xs text-muted-foreground">{item.size}</p>}
-                                            <p className="text-sm font-semibold text-primary mt-1">
-                                                {t('common.currency')} {(item.price * item.quantity).toFixed(2)}
-                                            </p>
-                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="my-6 h-px bg-border/50" />
+
+                                <div className="space-y-3 text-sm">
+                                    <div className="flex justify-between text-muted-foreground">
+                                        <span>{t('cart.subtotal')}</span>
+                                        <span className="font-medium text-foreground">{t('common.currency')} {subtotal.toFixed(2)}</span>
                                     </div>
-                                ))}
-                            </div>
-
-                            <div className="my-6 h-px bg-border/50" />
-
-                            <div className="space-y-3 text-sm">
-                                <div className="flex justify-between text-muted-foreground">
-                                    <span>{t('cart.subtotal')}</span>
-                                    <span className="font-medium text-foreground">{t('common.currency')} {subtotal.toFixed(2)}</span>
+                                    <div className="flex justify-between text-muted-foreground">
+                                        <span>{t('cart.shipping')}</span>
+                                        <span className="font-medium text-foreground">
+                                            {shipping === 0 ? t('cart.free') : `${t('common.currency')} ${shipping}`}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between text-lg font-bold text-foreground pt-3 border-t border-border/50">
+                                        <span>{t('cart.total')}</span>
+                                        <span>{t('common.currency')} {total.toFixed(2)}</span>
+                                    </div>
                                 </div>
-                                <div className="flex justify-between text-muted-foreground">
-                                    <span>{t('cart.shipping')}</span>
-                                    <span className="font-medium text-foreground">
-                                        {shipping === 0 ? t('cart.free') : `${t('common.currency')} ${shipping}`}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between text-lg font-bold text-foreground pt-3 border-t border-border/50">
-                                    <span>{t('cart.total')}</span>
-                                    <span>{t('common.currency')} {total.toFixed(2)}</span>
+
+                                {/* Submit Button (Desktop) */}
+                                <Button
+                                    onClick={handleSubmit}
+                                    size="lg"
+                                    className="w-full rounded-full hidden lg:flex mt-8 text-base h-12 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all font-bold"
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <>
+                                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                            {t('checkout.processing')}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ShieldCheck className="w-5 h-5 mr-2" />
+                                            {t('checkout.pay')} {total.toFixed(2)} {t('common.currency')}
+                                        </>
+                                    )}
+                                </Button>
+
+                                <div className="flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
+                                    <Truck className="w-3 h-3" /> {t('cart.trust.shipping')}
                                 </div>
                             </div>
-
-                            {/* Submit Button (Desktop) */}
-                            <Button
-                                onClick={handleSubmit}
-                                size="lg"
-                                className="w-full rounded-full hidden lg:flex mt-8 text-base h-12 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all font-bold"
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <>
-                                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                        {t('checkout.processing')}
-                                    </>
-                                ) : (
-                                    <>
-                                        <ShieldCheck className="w-5 h-5 mr-2" />
-                                        {t('checkout.pay')} {total.toFixed(2)} {t('common.currency')}
-                                    </>
-                                )}
-                            </Button>
-
-                            <div className="flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
-                                <Truck className="w-3 h-3" /> {t('cart.trust.shipping')}
-                            </div>
-                        </div>
+                        )}
                     </div>
 
                 </div>
