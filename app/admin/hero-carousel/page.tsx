@@ -14,6 +14,7 @@ import {
 } from "@/lib/supabase-api"
 import { supabase } from "@/lib/supabase"
 import { Plus, Trash2, CheckCircle2, XCircle } from "lucide-react"
+import { AdminSidebar } from "@/components/admin/admin-sidebar"
 
 export default function HeroCarouselPage() {
     const [items, setItems] = useState<HeroCarouselItem[]>([])
@@ -360,7 +361,7 @@ export default function HeroCarouselPage() {
                         <div className="ml-auto">
                             {items.length} Slides configured
                         </div>
-                    </div>
+                    </main>
                 </div>
                 )
 }
