@@ -246,33 +246,33 @@ function HeroCarousel({ products }: { products: Product[] }) {
           setCarouselItems([
             {
               image: '/hero-showcase-1.jpg',
-              title: 'Effortless Women\'s Style',
-              subtitle: 'Boutique looks for every day'
+              title: 'Style Féminin Sans Effort',
+              subtitle: 'Des looks boutique pour tous les jours'
             },
             {
               image: '/hero-showcase-2.jpg',
-              title: 'Luxury Evening Dresses',
-              subtitle: 'Statement gowns for special nights'
+              title: 'Robes de Soirée de Luxe',
+              subtitle: 'Des robes pour les soirées spéciales'
             },
             {
               image: '/hero-showcase-3.jpg',
-              title: 'Elevated Essentials',
-              subtitle: 'Perfect fits, premium fabrics'
+              title: 'Essentiels Élégants',
+              subtitle: 'Coupes parfaites, tissus premium'
             },
             {
               image: '/hero-showcase-4.jpg',
-              title: 'New Season Arrivals',
-              subtitle: 'Curated drops every week'
+              title: 'Nouveautés de la Saison',
+              subtitle: 'Sélections chaque semaine'
             },
             {
               image: '/hero-showcase-5.jpg',
-              title: 'Head‑to‑Toe Looks',
-              subtitle: 'From dresses to accessories'
+              title: 'Looks Complets',
+              subtitle: 'Des robes aux accessoires'
             },
             {
               image: '/hero-showcase-6.jpg',
               title: 'Azana',
-              subtitle: 'Boutique & luxury women\'s clothing'
+              subtitle: 'Vêtements féminins de luxe et de boutique'
             }
           ])
         }
@@ -406,7 +406,7 @@ export default function HomePage() {
         <p>
           {language === 'ar'
             ? (settings.announcement_bar_ar || settings.announcement_bar || "شحن مجاني للطلبات فوق ٥٠٠ د.م | استخدم كود ARGAN20 لخصم ٢٠٪")
-            : (settings.announcement_bar || "Free shipping on orders over MAD 500 | Use code ARGAN20 for 20% off")
+            : (settings.announcement_bar || "Livraison gratuite pour les commandes de plus de 500 MAD | Utilisez le code ARGAN20 pour 20% de réduction")
           }
         </p>
       </div>
@@ -449,7 +449,7 @@ export default function HomePage() {
                 onClick={toggleLanguage}
                 className="hidden sm:flex rounded-full ml-2 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 font-bold"
               >
-                {language === 'en' ? 'العربية' : 'English'}
+                {language === 'fr' ? 'العربية' : 'Français'}
               </Button>
 
               {/* Mobile Menu */}
@@ -528,16 +528,16 @@ export default function HomePage() {
                         {/* Mobile Promo Card */}
                         <div className="p-5 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/20 border border-primary/10">
                           <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full mb-2">
-                            {language === 'ar' ? 'عرض خاص' : 'Special Offer'}
+                            {language === 'ar' ? 'عرض خاص' : 'Offre Spéciale'}
                           </span>
                           <p className="font-medium text-foreground">
                             {language === 'ar'
                               ? (settings.promo_title_ar || settings.promo_title || "خصم ٢٠٪ على طلبك الأول")
-                              : (settings.promo_title || "20% off your first order")
+                              : (settings.promo_title || "20% de réduction sur votre première commande")
                             }
                           </p>
                           <p className="text-sm text-muted-foreground mt-1">
-                            {language === 'ar' ? "استخدم كود" : "Use code"} <span className="font-bold text-primary">{settings.promo_code || "ARGAN20"}</span>
+                            {language === 'ar' ? "استخدم كود" : "Utilisez le code"} <span className="font-bold text-primary">{settings.promo_code || "ARGAN20"}</span>
                           </p>
                         </div>
                       </div>
@@ -565,7 +565,7 @@ export default function HomePage() {
                           className="w-full h-12 rounded-full bg-secondary/30 border-border/50 font-bold"
                           onClick={toggleLanguage}
                         >
-                          {language === 'en' ? 'العربية' : 'English'}
+                          {language === 'fr' ? 'العربية' : 'Français'}
                         </Button>
                       </div>
                     </div>
@@ -590,7 +590,7 @@ export default function HomePage() {
                     </>
                   )
                 ) : (
-                  settings.hero_title || (
+                  (language === 'fr' ? null : settings.hero_title) || (
                     <>
                       {t('hero.title_prefix')} <span className="text-primary">{t('hero.title_suffix')}</span>
                     </>
@@ -600,7 +600,7 @@ export default function HomePage() {
               <p className="text-lg text-muted-foreground max-w-lg">
                 {language === 'ar'
                   ? (settings.hero_subtitle_ar || settings.hero_subtitle || t('hero.subtitle'))
-                  : (settings.hero_subtitle || t('hero.subtitle'))
+                  : ((language === 'fr' ? null : settings.hero_subtitle) || t('hero.subtitle'))
                 }
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -660,12 +660,12 @@ export default function HomePage() {
               {t('section.best_sellers_desc')}
             </p>
           </div>
-          <div className="flex flex-wrap justify-center gap-3 mb-10">
+          <div className="flex flex-nowrap sm:flex-wrap justify-start sm:justify-center items-center gap-3 mb-10 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
             {allCategories.map((cat) => (
               <Button
                 key={cat}
                 variant={selectedCategory === cat ? "default" : "outline"}
-                className={`rounded-full px-6 transition-all duration-300 ${selectedCategory === cat
+                className={`rounded-full px-6 transition-all duration-300 whitespace-nowrap flex-shrink-0 ${selectedCategory === cat
                   ? "shadow-lg shadow-primary/25 scale-105"
                   : "hover:scale-105"
                   }`}
@@ -807,16 +807,8 @@ export default function HomePage() {
                       {t('footer.sustainability')}
                     </Link>
                   </li>
-                  <li>
-                    <Link href="/press" className="hover:text-primary transition-colors block py-1">
-                      {t('footer.press')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/careers" className="hover:text-primary transition-colors block py-1">
-                      {t('footer.careers')}
-                    </Link>
-                  </li>
+
+
                 </ul>
               </div>
 
@@ -825,7 +817,7 @@ export default function HomePage() {
                 <ul className="space-y-4 text-sm text-muted-foreground">
                   <li><Link href="/contact" className="hover:text-primary transition-colors block py-1">{t('footer.contact_us')}</Link></li>
                   <li><Link href="/shipping-info" className="hover:text-primary transition-colors block py-1">{t('footer.shipping_info')}</Link></li>
-                  <li><Link href="/track-order" className="hover:text-primary transition-colors block py-1">{t('footer.track_order')}</Link></li>
+
                   <li><Link href="/faq" className="hover:text-primary transition-colors block py-1">{t('nav.faq')}</Link></li>
                 </ul>
               </div>

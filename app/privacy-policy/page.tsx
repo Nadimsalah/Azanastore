@@ -17,7 +17,7 @@ export default function PrivacyPolicyPage() {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{isArabic ? "العودة إلى الرئيسية" : "Back to Home"}</span>
+            <span>{isArabic ? "العودة إلى الرئيسية" : "Retour à l'accueil"}</span>
           </Link>
           <span className="text-xs text-muted-foreground uppercase tracking-[0.25em]">
             {isArabic ? "سياسة الخصوصية" : "Privacy Policy"}
@@ -37,16 +37,16 @@ export default function PrivacyPolicyPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "١. البيانات التي نقوم بجمعها" : "1. Information we collect"}
+            {isArabic ? "١. البيانات التي نقوم بجمعها" : "1. Informations que nous collectons"}
           </h2>
           <p>
             {isArabic
               ? "قد نقوم بجمع بيانات مثل الاسم، رقم الهاتف، البريد الإلكتروني، عنوان التسليم، وسجل الطلبات عند الشراء من موقعنا أو عند التواصل معنا عبر نموذج الاتصال أو واتساب."
-              : "We may collect data such as your name, phone number, email address, delivery address, and order history when you purchase from our website or contact us via forms or WhatsApp."}
+              : "Nous pouvons collecter des données telles que votre nom, numéro de téléphone, adresse e-mail, adresse de livraison et historique de commandes lorsque vous achetez sur notre site ou nous contactez via des formulaires ou WhatsApp."}
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٢. كيفية استخدام البيانات" : "2. How we use your data"}
+            {isArabic ? "٢. كيفية استخدام البيانات" : "2. Comment nous utilisons vos données"}
           </h2>
           <p>
             {isArabic
@@ -55,7 +55,7 @@ export default function PrivacyPolicyPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٣. مشاركة البيانات مع الغير" : "3. Sharing with third parties"}
+            {isArabic ? "٣. مشاركة البيانات مع الغير" : "3. Partage avec des tiers"}
           </h2>
           <p>
             {isArabic
@@ -64,16 +64,16 @@ export default function PrivacyPolicyPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٤. حقوقك" : "4. Your rights"}
+            {isArabic ? "٤. حقوقك" : "4. Vos droits"}
           </h2>
           <p>
             {isArabic
               ? "يحق لك طلب الوصول إلى بياناتك، تصحيحها، أو طلب مسحها، وكذلك سحب موافقتك على استخدام البيانات التسويقية، وذلك من خلال التواصل معنا عبر صفحة الاتصال."
-              : "You have the right to request access to your data, rectification, deletion, and to withdraw your consent for marketing use, by contacting us through our contact page."}
+              : "Vous avez le droit de demander l'accès à vos données, leur rectification, suppression, et de retirer votre consentement pour l'utilisation marketing, en nous contactant via notre page de contact."}
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٥. الاحتفاظ بالبيانات" : "5. Data retention"}
+            {isArabic ? "٥. الاحتفاظ بالبيانات" : "5. Conservation des données"}
           </h2>
           <p>
             {isArabic
@@ -87,7 +87,7 @@ export default function PrivacyPolicyPage() {
           <p>
             {isArabic
               ? "لأي أسئلة بخصوص سياسة الخصوصية أو بياناتك، يمكنك التواصل معنا من خلال نموذج الاتصال في الموقع أو قنوات التواصل الرسمية لدينا."
-              : "For any questions regarding this policy or your data, please contact us via the website contact form or our official communication channels."}
+              : "Pour toute question concernant cette politique ou vos données, veuillez nous contacter via le formulaire de contact du site ou nos canaux de communication officiels."}
           </p>
         </div>
       </main>

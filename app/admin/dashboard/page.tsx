@@ -8,8 +8,11 @@ import { Search, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PushNotificationManager } from "@/components/admin/push-notification-manager"
+import { useLanguage } from "@/components/language-provider"
 
 export default function AdminDashboard() {
+    const { t } = useLanguage()
+
     return (
         <div className="min-h-screen bg-background relative overflow-hidden">
             <PushNotificationManager />
@@ -21,7 +24,7 @@ export default function AdminDashboard() {
 
             <AdminSidebar />
 
-            <main className="lg:pl-72 p-4 sm:p-6 lg:p-8 min-h-screen relative z-10 transition-all duration-300">
+            <main className="lg:pl-72 lg:rtl:pl-0 lg:rtl:pr-72 p-4 sm:p-6 lg:p-8 min-h-screen relative z-10 transition-all duration-300">
                 {/* Header */}
                 <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 sticky top-4 z-40 glass-strong p-4 rounded-3xl border border-white/5 shadow-lg shadow-black/5">
                     <div className="flex items-center gap-3">
@@ -29,17 +32,17 @@ export default function AdminDashboard() {
                             <Sparkles className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-foreground">Tableau de bord</h1>
-                            <p className="text-xs text-muted-foreground">Vue d'ensemble détaillée</p>
+                            <h1 className="text-xl font-bold text-foreground">{t('admin.dashboard.title')}</h1>
+                            <p className="text-xs text-muted-foreground">{t('admin.dashboard.subtitle')}</p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-3">
                         <div className="relative hidden md:block">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground rtl:left-auto rtl:right-3" />
                             <Input
-                                placeholder="Rechercher..."
-                                className="pl-9 w-64 rounded-full bg-background/50 border-white/10 focus:bg-background transition-all h-10"
+                                placeholder={t('admin.dashboard.search')}
+                                className="pl-9 rtl:pl-3 rtl:pr-9 w-64 rounded-full bg-background/50 border-white/10 focus:bg-background transition-all h-10"
                             />
                         </div>
                         <Notifications />
@@ -64,3 +67,4 @@ export default function AdminDashboard() {
         </div>
     )
 }
+

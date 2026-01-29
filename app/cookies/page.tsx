@@ -17,50 +17,50 @@ export default function CookiesPage() {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{isArabic ? "العودة إلى الرئيسية" : "Back to Home"}</span>
+            <span>{isArabic ? "العودة إلى الرئيسية" : "Retour à l'accueil"}</span>
           </Link>
           <span className="text-xs text-muted-foreground uppercase tracking-[0.25em]">
-            {isArabic ? "سياسة الكوكيز" : "Cookie Policy"}
+            {isArabic ? "سياسة الكوكيز" : "Politique des cookies"}
           </span>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-10 sm:py-14 max-w-4xl">
         <h1 className={`text-2xl sm:text-3xl font-bold mb-6 ${isArabic ? "text-right" : ""}`}>
-          {isArabic ? "سياسة الكوكيز لأزانا – المغرب" : "Azana Morocco – Cookie Policy"}
+          {isArabic ? "سياسة الكوكيز لأزانا – المغرب" : "Azana Maroc – Politique de cookies"}
         </h1>
         <div className={`space-y-5 text-sm sm:text-base text-muted-foreground leading-relaxed ${isArabic ? "text-right" : ""}`}>
           <p>
             {isArabic
               ? "يستخدم موقع أزانا ملفات تعريف الارتباط (الكوكيز) لتحسين تجربة التصفح وقياس الأداء، بما يتوافق مع القوانين المغربية المنظمة لاستخدام البيانات الإلكترونية."
-              : "Azana&apos;s website uses cookies to improve your browsing experience and measure performance, in line with Moroccan regulations on electronic data usage."}
+              : "Le site Azana utilise des cookies pour améliorer votre expérience de navigation et mesurer les performances, conformément à la réglementation marocaine sur l'utilisation des données électroniques."}
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "١. ما هي الكوكيز؟" : "1. What are cookies?"}
+            {isArabic ? "١. ما هي الكوكيز؟" : "1. Qu'est-ce que les cookies ?"}
           </h2>
           <p>
             {isArabic
               ? "الكوكيز هي ملفات نصية صغيرة تُخزن على متصفحك عند زيارة الموقع، وتسمح لنا بتذكّر تفضيلاتك مثل اللغة أو محتويات عربة التسوق."
-              : "Cookies are small text files stored in your browser when you visit our site, allowing us to remember preferences such as language or cart contents."}
+              : "Les cookies sont de petits fichiers texte stockés dans votre navigateur lorsque vous visitez notre site, nous permettant de mémoriser vos préférences telles que la langue ou le contenu du panier."}
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٢. أنواع الكوكيز التي نستخدمها" : "2. Types of cookies we use"}
+            {isArabic ? "٢. أنواع الكوكيز التي نستخدمها" : "2. Types de cookies utilisés"}
           </h2>
           <p>
             {isArabic
               ? "نستخدم كوكيز أساسية لعمل الموقع (مثل حفظ الجلسة وعربة التسوق)، وكوكيز تحليلية مجهولة الهوية لمساعدتنا على فهم كيفية استخدام العملاء للموقع وتحسينه."
-              : "We use essential cookies to operate the site (such as session and cart cookies) and anonymous analytics cookies to understand how our website is used and to improve it."}
+              : "Nous utilisons des cookies essentiels au fonctionnement du site (comme ceux de session et de panier) et des cookies analytiques anonymes pour comprendre l'utilisation de notre site et l'améliorer."}
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٣. التحكم في الكوكيز" : "3. Managing cookies"}
+            {isArabic ? "٣. التحكم في الكوكيز" : "3. Gestion des cookies"}
           </h2>
           <p>
             {isArabic
               ? "يمكنك إدارة أو تعطيل الكوكيز من إعدادات المتصفح الخاص بك. يرجى ملاحظة أن إيقاف الكوكيز الأساسية قد يؤثر على عمل بعض وظائف الموقع مثل إتمام الطلبات."
-              : "You can manage or disable cookies in your browser settings. Please note that disabling essential cookies may affect key site functions such as completing orders."}
+              : "Vous pouvez gérer ou désactiver les cookies dans les paramètres de votre navigateur. Veuillez noter que la désactivation des cookies essentiels peut affecter certaines fonctionnalités clés du site, comme la finalisation des commandes."}
           </p>
         </div>
       </main>

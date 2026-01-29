@@ -6,10 +6,12 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Delete, ArrowRight, Lock } from "lucide-react"
 import { toast } from "sonner"
+import { useLanguage } from "@/components/language-provider"
 
 const ADMIN_PIN = "20008808"
 
 export default function AdminLoginPage() {
+    const { t } = useLanguage()
     const [pin, setPin] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
@@ -33,10 +35,10 @@ export default function AdminLoginPage() {
         if (pin === ADMIN_PIN) {
             // Set session cookie
             document.cookie = "admin_session=true; path=/; max-age=86400; SameSite=Strict" // 1 day expiry
-            toast.success("Access Granted")
+            toast.success(t('admin.login.access_granted'))
             router.push("/admin/dashboard")
         } else {
-            toast.error("Invalid PIN")
+            toast.error(t('admin.login.invalid'))
             setPin("")
             setIsLoading(false)
             // Shake animation could be added here
@@ -64,8 +66,8 @@ export default function AdminLoginPage() {
                         <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6 rotate-3">
                             <Lock className="w-8 h-8 text-primary" />
                         </div>
-                        <h1 className="text-2xl font-bold text-foreground">Admin Access</h1>
-                        <p className="text-sm text-muted-foreground">Enter your secure 8-digit PIN</p>
+                        <h1 className="text-2xl font-bold text-foreground">{t('admin.login.title')}</h1>
+                        <p className="text-sm text-muted-foreground">{t('admin.login.subtitle')}</p>
                     </div>
 
                     {/* PIN Display */}
@@ -110,10 +112,11 @@ export default function AdminLoginPage() {
                     </div>
 
                     <div className="text-center">
-                        <p className="text-xs text-muted-foreground opacity-50">Authorized Personnel Only</p>
+                        <p className="text-xs text-muted-foreground opacity-50">{t('admin.login.authorized')}</p>
                     </div>
                 </div>
             </div>
         </div>
     )
 }
+

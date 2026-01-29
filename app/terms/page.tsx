@@ -17,54 +17,54 @@ export default function TermsPage() {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{isArabic ? "العودة إلى الرئيسية" : "Back to Home"}</span>
+            <span>{isArabic ? "العودة إلى الرئيسية" : "Retour à l'accueil"}</span>
           </Link>
           <span className="text-xs text-muted-foreground uppercase tracking-[0.25em]">
-            {isArabic ? "شروط الخدمة" : "Terms of Service"}
+            {isArabic ? "شروط الخدمة" : "Conditions de service"}
           </span>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-10 sm:py-14 max-w-4xl">
         <h1 className={`text-2xl sm:text-3xl font-bold mb-6 ${isArabic ? "text-right" : ""}`}>
-          {isArabic ? "شروط وأحكام استخدام موقع أزانا – المغرب" : "Azana Morocco – Terms of Service"}
+          {isArabic ? "شروط وأحكام استخدام موقع أزانا – المغرب" : "Azana Maroc – Conditions de service"}
         </h1>
         <div className={`space-y-5 text-sm sm:text-base text-muted-foreground leading-relaxed ${isArabic ? "text-right" : ""}`}>
           <p>
             {isArabic
               ? "باستخدامك لموقع أزانا في المغرب أو إجرائك لأي طلب شراء، فأنت توافق على الشروط والأحكام الموضحة أدناه، والمطبقة وفقًا لأحكام القانون المغربي."
-              : "By accessing Azana&apos;s website in Morocco or placing an order, you agree to the terms and conditions below, applied in accordance with Moroccan law."}
+              : "En accédant au site web d'Azana au Maroc ou en passant commande, vous acceptez les conditions ci-dessous, appliquées conformément à la loi marocaine."}
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "١. استخدام الموقع" : "1. Use of the website"}
+            {isArabic ? "١. استخدام الموقع" : "1. Utilisation du site web"}
           </h2>
           <p>
             {isArabic
               ? "يُسمح لك باستخدام الموقع لعرض المنتجات وطلبها لأغراض شخصية وغير تجارية فقط. لا يُسمح بأي استخدام غير قانوني أو يضر بديار أرجان أو بعملائها."
-              : "You may use the website to browse and purchase products for personal, non‑commercial use only. Any unlawful use or use that may harm Diar Argan or its customers is prohibited."}
+              : "Vous pouvez utiliser le site pour naviguer et acheter des produits à des fins personnelles et non commerciales. Toute utilisation illégale ou préjudiciable à Diar Argan ou à ses clients est interdite."}
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٢. الأسعار والدفع" : "2. Prices and payment"}
+            {isArabic ? "٢. الأسعار والدفع" : "2. Prix et paiement"}
           </h2>
           <p>
             {isArabic
               ? "جميع الأسعار بالدرهم المغربي (د.م) وتشمل الضرائب المطبقة ما لم يُذكر خلاف ذلك. يتم السداد باستخدام الوسائل المتاحة على الموقع أو عند الاستلام وفقًا لشروط كل عرض."
-              : "All prices are in Moroccan dirhams (MAD) and include applicable taxes unless stated otherwise. Payment is made using the methods available on the website or cash on delivery, depending on the offer."}
+              : "Tous les prix sont en dirhams marocains (MAD) et incluent les taxes applicables sauf indication contraire. Le paiement s'effectue via les méthodes disponibles sur le site ou en espèces à la livraison, selon l'offre."}
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٣. الشحن والتسليم" : "3. Shipping and delivery"}
+            {isArabic ? "٣. الشحن والتسليم" : "3. Expédition et livraison"}
           </h2>
           <p>
             {isArabic
               ? "نقوم بتوصيل الطلبات داخل المملكة المغربية فقط. يتم تقدير مواعيد التسليم وطرق الشحن في صفحة الدفع، وقد تختلف بحسب المنطقة وشركات الشحن."
-              : "We deliver orders within the Kingdom of Morocco only. Delivery times and methods are indicated at checkout and may vary by region and courier."}
+              : "Nous livrons les commandes au sein du Royaume du Maroc uniquement. Les délais et méthodes de livraison sont indiqués lors du paiement et peuvent varier selon la région et le transporteur."}
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٤. المسؤولية" : "4. Liability"}
+            {isArabic ? "٤. المسؤولية" : "4. Responsabilité"}
           </h2>
           <p>
             {isArabic
@@ -73,12 +73,12 @@ export default function TermsPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٥. التعديلات على الشروط" : "5. Changes to the terms"}
+            {isArabic ? "٥. التعديلات على الشروط" : "5. Modifications des conditions"}
           </h2>
           <p>
             {isArabic
               ? "يحق لدیار أرجان تعديل هذه الشروط من وقت لآخر. يسري أي تحديث من تاريخ نشره على هذه الصفحة، ويُعد استمرار استخدامك للموقع بعد التعديل موافقة ضمنية على الشروط المحدثة."
-              : "Diar Argan may update these terms from time to time. Any changes take effect from the date they are published on this page, and your continued use of the website constitutes acceptance of the updated terms."}
+              : "Diar Argan peut mettre à jour ces conditions de temps à autre. Tout changement prend effet dès sa publication sur cette page, et votre utilisation continue du site constitue une acceptation des conditions mises à jour."}
           </p>
         </div>
       </main>

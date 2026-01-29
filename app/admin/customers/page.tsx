@@ -16,8 +16,10 @@ import {
     Users,
 } from "lucide-react"
 import { getCustomers, type Customer } from "@/lib/supabase-api"
+import { useLanguage } from "@/components/language-provider"
 
 export default function CustomersPage() {
+    const { t } = useLanguage()
     const [customers, setCustomers] = useState<Customer[]>([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState("")
@@ -38,15 +40,15 @@ export default function CustomersPage() {
     )
 
     const stats = [
-        { label: "Total Customers", value: customers.length.toLocaleString(), icon: Users, color: "text-primary" },
-        { label: "Active Customers", value: customers.filter(c => c.status === 'active').length.toLocaleString(), icon: UserCheck, color: "text-green-500" },
+        { label: t('admin.customers.total_customers'), value: customers.length.toLocaleString(), icon: Users, color: "text-primary" },
+        { label: t('admin.customers.active_customers'), value: customers.filter(c => c.status === 'active').length.toLocaleString(), icon: UserCheck, color: "text-green-500" },
     ]
 
     return (
         <div className="min-h-screen bg-background relative overflow-hidden">
             <AdminSidebar />
 
-            <main className="lg:pl-72 p-4 sm:p-6 lg:p-8 min-h-screen relative z-10 transition-all duration-300">
+            <main className="lg:pl-72 lg:rtl:pl-0 lg:rtl:pr-72 p-4 sm:p-6 lg:p-8 min-h-screen relative z-10 transition-all duration-300">
                 {/* Header */}
                 <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 sticky top-4 z-40 glass-strong p-4 rounded-3xl border border-white/5 shadow-lg shadow-black/5">
                     <div className="flex items-center gap-3">
@@ -54,14 +56,14 @@ export default function CustomersPage() {
                             <Users className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-foreground">Customers</h1>
-                            <p className="text-xs text-muted-foreground">Manage your customer base</p>
+                            <h1 className="text-xl font-bold text-foreground">{t('admin.customers.title')}</h1>
+                            <p className="text-xs text-muted-foreground">{t('admin.customers.subtitle')}</p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-2">
                         <Button variant="outline" className="rounded-full h-9 bg-background/50 border-white/10 hidden sm:flex">
-                            <Download className="w-4 h-4 mr-2" /> Export
+                            <Download className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2" /> {t('admin.customers.export')}
                         </Button>
                     </div>
                 </header>
@@ -87,36 +89,36 @@ export default function CustomersPage() {
                 <div className="space-y-6">
                     <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-background/40 backdrop-blur-md p-4 rounded-3xl border border-white/5">
                         <div className="relative w-full sm:w-96">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground rtl:left-auto rtl:right-3" />
                             <Input
-                                placeholder="Search customers..."
+                                placeholder={t('admin.customers.search')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 rounded-full bg-white/5 border-white/10"
+                                className="pl-9 rtl:pl-3 rtl:pr-9 rounded-full bg-white/5 border-white/10"
                             />
                         </div>
                         <Button variant="outline" className="rounded-full h-10 bg-white/5 border-white/10">
-                            <Filter className="w-4 h-4 mr-2" /> Filters
+                            <Filter className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2" /> {t('admin.customers.filters')}
                         </Button>
                     </div>
 
                     <div className="glass-strong rounded-3xl overflow-hidden min-h-[500px]">
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
+                            <table className="w-full text-left rtl:text-right border-collapse">
                                 <thead>
                                     <tr className="border-b border-white/10 bg-white/5 font-semibold text-muted-foreground uppercase tracking-wider text-[10px] sm:text-xs">
-                                        <th className="py-4 px-6">Customer</th>
-                                        <th className="py-4 px-6">Status</th>
-                                        <th className="py-4 px-6 hidden md:table-cell">Orders</th>
-                                        <th className="py-4 px-6 hidden lg:table-cell">Total Spent</th>
-                                        <th className="py-4 px-6 hidden xl:table-cell">Join Date</th>
-                                        <th className="py-4 px-6 text-right">Actions</th>
+                                        <th className="py-4 px-6 text-left rtl:text-right">{t('admin.customers.table_customer')}</th>
+                                        <th className="py-4 px-6 text-left rtl:text-right">{t('status.all')}</th>
+                                        <th className="py-4 px-6 hidden md:table-cell text-left rtl:text-right">{t('admin.customers.table_orders')}</th>
+                                        <th className="py-4 px-6 hidden lg:table-cell text-left rtl:text-right">{t('admin.customers.table_spent')}</th>
+                                        <th className="py-4 px-6 hidden xl:table-cell text-left rtl:text-right">{t('admin.customers.table_joined')}</th>
+                                        <th className="py-4 px-6 text-right rtl:text-left">{t('admin.recent_orders.action')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
                                     {loading ? (
                                         <tr>
-                                            <td colSpan={6} className="py-12 text-center text-muted-foreground animate-pulse">Loading customers...</td>
+                                            <td colSpan={6} className="py-12 text-center text-muted-foreground animate-pulse">{t('admin.customers.loading')}</td>
                                         </tr>
                                     ) : filteredCustomers.length > 0 ? (
                                         filteredCustomers.map((customer) => (
@@ -142,8 +144,8 @@ export default function CustomersPage() {
                                                 <td className="py-4 px-6 hidden xl:table-cell text-sm text-muted-foreground">
                                                     {new Date(customer.created_at).toLocaleDateString()}
                                                 </td>
-                                                <td className="py-4 px-6 text-right">
-                                                    <div className="flex items-center justify-end gap-2">
+                                                <td className="py-4 px-6 text-right rtl:text-left">
+                                                    <div className="flex items-center justify-end rtl:justify-start gap-2">
                                                         <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/10">
                                                             <Mail className="w-4 h-4 text-muted-foreground" />
                                                         </Button>
@@ -159,7 +161,7 @@ export default function CustomersPage() {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan={6} className="py-12 text-center text-muted-foreground">No customers found.</td>
+                                            <td colSpan={6} className="py-12 text-center text-muted-foreground">{t('admin.customers.no_customers')}</td>
                                         </tr>
                                     )}
                                 </tbody>
@@ -171,3 +173,4 @@ export default function CustomersPage() {
         </div>
     )
 }
+

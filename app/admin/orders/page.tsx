@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { getOrders, type Order } from "@/lib/supabase-api"
 import { Notifications } from "@/components/admin/notifications"
+import { useLanguage } from "@/components/language-provider" // Import translation hook
 import {
     Search,
     Filter,
@@ -21,7 +22,8 @@ import {
 } from "lucide-react"
 
 export default function AdminOrdersPage() {
-    const [activeTab, setActiveTab] = useState("All")
+    const { t } = useLanguage() // Initialize translation hook
+    const [activeTab, setActiveTab] = useState("all") // Use lowercase keys
     const [searchQuery, setSearchQuery] = useState("")
     const [orders, setOrders] = useState<Order[]>([])
     const [totalOrders, setTotalOrders] = useState(0)
@@ -31,7 +33,7 @@ export default function AdminOrdersPage() {
         async function loadOrders() {
             setLoading(true)
             const { data, count } = await getOrders({
-                status: activeTab === "All" ? undefined : activeTab.toLowerCase()
+                status: activeTab === "all" ? undefined : activeTab
             })
             setOrders(data)
             setTotalOrders(count)
@@ -40,7 +42,7 @@ export default function AdminOrdersPage() {
         loadOrders()
     }, [activeTab])
 
-    const tabs = ["All", "Processing", "Delivered", "Pending", "Cancelled"]
+    const tabs = ["all", "processing", "delivered", "pending", "cancelled"]
 
     const filteredOrders = orders.filter(order => {
         const matchesSearch =
@@ -84,13 +86,8 @@ export default function AdminOrdersPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Button variant="outline" className="rounded-full h-9 bg-background/50 border-white/10 hidden sm:flex">
-                            <Download className="w-4 h-4 mr-2" /> Exporter
-                        </Button>
-                        <Button className="rounded-full h-9 shadow-lg shadow-primary/20">
-                            <span className="hidden sm:inline">Créer une commande</span>
-                            <span className="sm:hidden">+</span>
-                        </Button>
+
+                        {/* Create Order Button Removed */}
                         <Notifications />
                     </div>
                 </header>
@@ -109,7 +106,7 @@ export default function AdminOrdersPage() {
                                         : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
                                         }`}
                                 >
-                                    {tab}
+                                    {t(`status.${tab}`)}
                                 </button>
                             ))}
                         </div>
@@ -168,7 +165,7 @@ export default function AdminOrdersPage() {
                                                 <td className="py-4 px-4 text-sm font-bold text-foreground">MAD {order.total}</td>
                                                 <td className="py-4 px-4">
                                                     <Badge variant="outline" className={`border ${getStatusColor(order.status)} text-[10px] sm:text-xs py-0.5 px-2`}>
-                                                        {order.status}
+                                                        {t(`status.${order.status.toLowerCase()}`) || order.status}
                                                     </Badge>
                                                 </td>
                                                 <td className="py-4 pr-6 text-right">

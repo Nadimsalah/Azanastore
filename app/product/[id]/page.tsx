@@ -265,7 +265,7 @@ export default function ProductPage() {
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Button
                 size="lg"
-                className="flex-1 h-16 rounded-2xl text-lg font-bold shadow-2xl shadow-primary/25 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                className="hidden lg:flex flex-1 h-16 rounded-2xl text-lg font-bold shadow-2xl shadow-primary/25 hover:scale-[1.02] active:scale-[0.98] transition-all"
                 onClick={() => {
                   addItem({
                     id: product.id,

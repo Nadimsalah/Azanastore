@@ -177,4 +177,13 @@
     background-size: 200% 100%;
     animation: shimmer 2s infinite linear;
   }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 }

@@ -92,11 +92,11 @@ const translations = {
         "footer.legal": "Légal",
         "footer.our_story": "Notre histoire",
         "footer.sustainability": "Durabilité",
-        "footer.press": "Presse",
-        "footer.careers": "Carrières",
+
+
         "footer.contact_us": "Contactez-nous",
         "footer.shipping_info": "Informations de livraison",
-        "footer.track_order": "Suivre la commande",
+
         "footer.privacy_policy": "Politique de confidentialité",
         "footer.terms": "Conditions de service",
         "footer.refund_policy": "Politique de remboursement",
@@ -141,15 +141,129 @@ const translations = {
         "faq.q1": "Comment choisir la bonne taille ?",
         "faq.a1": "Vous trouverez un guide des tailles détaillé sur chaque page produit. Si vous êtes entre deux tailles, nous recommandons généralement de prendre la taille supérieure pour une coupe plus décontractée.",
         "faq.q2": "Combien de temps prend la livraison ?",
+
+        // Common Statuses
+        "status.all": "Tout",
+        "status.processing": "Traitement",
+        "status.delivered": "Livré",
+        "status.pending": "En attente",
+        "status.cancelled": "Annulé",
+
         "faq.a2": "Nous offrons une livraison rapide ! Les commandes locales arrivent généralement en 2 à 4 jours ouvrables. Les commandes internationales arrivent généralement dans les 5 à 8 jours ouvrables.",
         "faq.q3": "Quelle est votre politique de retour ?",
         "faq.a3": "Si quelque chose ne vous convient pas, vous pouvez retourner les articles non portés avec leurs étiquettes dans les 14 jours suivant la livraison pour un échange ou un remboursement, selon notre politique.",
         "faq.q4": "Un article sera-t-il réapprovisionné ?",
         "faq.a4": "Certaines de nos pièces sont des séries limitées. Si un article est épuisé, vous pouvez rejoindre la liste d'attente sur la page produit et nous vous avertirons s'il revient.",
+
         "faq.q5": "Comment dois-je entretenir mes pièces Azana ?",
         "faq.a5": "La plupart des articles peuvent être lavés en machine à cycle délicat à l'eau froide et séchés à l'air. Vérifiez toujours l'étiquette d'entretien sur chaque vêtement pour des instructions spécifiques.",
         "faq.q6": "Puis-je modifier ou annuler ma commande ?",
         "faq.a6": "Nous commençons à préparer votre commande rapidement, mais vous pouvez nous contacter dès que possible et nous ferons de notre mieux pour la mettre à jour ou l'annuler avant l'expédition.",
+
+        // Admin Navigation
+        "admin.nav.dashboard": "Tableau de bord",
+        "admin.nav.orders": "Commandes",
+        "admin.nav.products": "Produits",
+        "admin.nav.customers": "Clients",
+        "admin.nav.analytics": "Analyses",
+        "admin.nav.carousel": "Carrousel",
+        "admin.nav.whatsapp": "Prospects WhatsApp",
+        "admin.nav.contacts": "Messages",
+        "admin.nav.careers": "Candidatures",
+        "admin.nav.settings": "Paramètres",
+        "admin.nav.logout": "Déconnexion",
+
+        // Admin Dashboard
+        "admin.dashboard.title": "Tableau de bord",
+        "admin.dashboard.subtitle": "Vue d'ensemble détaillée",
+        "admin.dashboard.search": "Rechercher...",
+
+        // Admin Login
+        "admin.login.title": "Accès Admin",
+        "admin.login.subtitle": "Entrez votre code PIN sécurisé",
+        "admin.login.authorized": "Personnel autorisé uniquement",
+        "admin.login.invalid": "PIN invalide",
+        "admin.login.access_granted": "Accès autorisé",
+
+        // Admin Stats & Recent Orders
+        "admin.stats.total_revenue": "Revenu total",
+        "admin.stats.total_orders": "Total des commandes",
+        "admin.stats.total_products": "Total des produits",
+        "admin.stats.total_customers": "Total des clients",
+        "admin.stats.active": "Actif",
+        "admin.stats.sync": "Synchronisation",
+        "admin.recent_orders.title": "Commandes récentes",
+        "admin.recent_orders.view_all": "Voir tout",
+        "admin.recent_orders.order_id": "ID Commande",
+        "admin.recent_orders.customer": "Client",
+        "admin.recent_orders.email": "Email",
+        "admin.recent_orders.amount": "Montant",
+        "admin.recent_orders.status": "Statut",
+        "admin.recent_orders.action": "Action",
+        "admin.recent_orders.loading": "Chargement...",
+        "admin.recent_orders.empty": "Aucune commande récente.",
+
+        // Admin Customers
+        "admin.customers.title": "Clients",
+        "admin.customers.subtitle": "Gérer votre base de clients",
+        "admin.customers.export": "Exporter",
+        "admin.customers.filters": "Filtres",
+        "admin.customers.search": "Rechercher des clients...",
+        "admin.customers.total_customers": "Total Clients",
+        "admin.customers.active_customers": "Clients Actifs",
+        "admin.customers.table_customer": "Client",
+        "admin.customers.table_orders": "Commandes",
+        "admin.customers.table_spent": "Total Dépensé",
+        "admin.customers.table_joined": "Date d'inscription",
+        "admin.customers.no_customers": "Aucun client trouvé.",
+        "admin.customers.loading": "Chargement des clients...",
+
+        // Admin Products
+        "admin.products.title": "Produits",
+        "admin.products.manage_inventory": "Gérez votre inventaire",
+        "admin.products.manage_categories": "Gérer les catégories",
+        "admin.products.add_product": "Ajouter un produit",
+        "admin.products.total_products": "Total Produits",
+        "admin.products.total_inventory": "Inventaire Total",
+        "admin.products.low_stock": "Stock Faible",
+        "admin.products.out_of_stock": "Rupture de Stock",
+        "admin.products.new_arrival": "Nouvel Arrivage",
+        "admin.products.discard": "Annuler",
+        "admin.products.publish": "Publier le produit",
+        "admin.products.basic_info": "Informations de base",
+        "admin.products.essential": "Essentiel",
+        "admin.products.product_title": "Titre du produit",
+        "admin.products.title_placeholder": "ex. Huile d'Argan Pure Rateb",
+        "admin.products.description": "Description",
+        "admin.products.description_placeholder": "Description en anglais",
+        "admin.products.media_gallery": "Galerie Média",
+        "admin.products.upload_image": "Télécharger Image",
+        "admin.products.specifics": "Spécificités",
+        "admin.products.key_benefits": "Avantages Clés",
+        "admin.products.benefit_placeholder": "Description de l'avantage (Anglais)",
+        "admin.products.no_benefits": "Aucun avantage ajouté.",
+        "admin.products.size_guide": "Guide des tailles",
+        "admin.products.size_guide_placeholder": "Informations sur le guide des tailles (ex. XS: Buste 32-34...)",
+        "admin.products.status": "Statut",
+        "admin.products.status_draft": "Brouillon",
+        "admin.products.status_active": "Actif",
+        "admin.products.category": "Catégorie",
+        "admin.products.select_category": "Sélectionner une catégorie",
+        "admin.products.product_type": "Type de produit",
+        "admin.products.product_type_placeholder": "ex. Sérum",
+        "admin.products.pricing": "Prix",
+        "admin.products.price": "Prix (MAD)",
+        "admin.products.compare_at": "Prix comparatif (Optionnel)",
+        "admin.products.inventory": "Inventaire",
+        "admin.products.stock": "Stock",
+        "admin.products.sku": "SKU",
+        "admin.products.auto_generated": "Généré automatiquement",
+        "admin.products.cross_sells": "Ventes croisées",
+        "admin.products.auto_select": "Sélection Auto",
+        "admin.products.recommended_desc": "Produits recommandés basés sur la description.",
+        "admin.products.uploading": "Téléchargement...",
+        "admin.products.polish": "Améliorer",
+
 
         // Checkout
         "checkout.title": "Paiement",
@@ -294,11 +408,11 @@ const translations = {
         "footer.legal": "قانوني",
         "footer.our_story": "قصتنا",
         "footer.sustainability": "الاستدامة",
-        "footer.press": "الصحافة",
-        "footer.careers": "وظائف",
+
+
         "footer.contact_us": "اتصل بنا",
         "footer.shipping_info": "معلومات الشحن",
-        "footer.track_order": "تتبع الطلب",
+
         "footer.privacy_policy": "سياسة الخصوصية",
         "footer.terms": "شروط الخدمة",
         "footer.refund_policy": "سياسة الاسترجاع",
@@ -347,6 +461,14 @@ const translations = {
         "faq.q1": "كيف أختار المقاس المناسب؟",
         "faq.a1": "ستجدين جدول مقاسات مفصل على كل صفحة منتج. إذا كنتِ بين مقاسين، ننصح باختيار المقاس الأكبر لإحساس أكثر راحة.",
         "faq.q2": "كم يستغرق الشحن؟",
+
+        // Common Statuses
+        "status.all": "الكل",
+        "status.processing": "قيد المعالجة",
+        "status.delivered": "تم التوصيل",
+        "status.pending": "قيد الانتظار",
+        "status.cancelled": "ملغى",
+
         "faq.a2": "نوفر شحن سريع! الطلبات المحلية تصل عادة خلال 2-4 أيام عمل، والطلبات الدولية خلال 5-8 أيام عمل تقريباً.",
         "faq.q3": "ما هي سياسة الاسترجاع؟",
         "faq.a3": "إذا كان المنتج غير مناسب، يمكنك إرجاعه خلال 14 يوماً من الاستلام بشرط أن يكون بحالته الأصلية ومعه التذكرة، وفقاً لسياسة الاسترجاع.",
@@ -356,6 +478,111 @@ const translations = {
         "faq.a5": "معظم القطع يُنصح بغسلها على دورة لطيفة بمياه باردة وتركها تجف في الهواء. دائماً اتبعي تعليمات العناية المكتوبة على كل قطعة.",
         "faq.q6": "هل أستطيع تعديل أو إلغاء طلبي؟",
         "faq.a6": "نبدأ بتحضير الطلبات بسرعة، فإذا كنتِ ترغبين بتعديل أو إلغاء طلبك، اتصلي بنا بأسرع وقت وسنحاول مساعدتك قبل أن يتم شحن الطلب.",
+
+        // Admin Navigation
+        "admin.nav.dashboard": "لوحة القيادة",
+        "admin.nav.orders": "الطلبات",
+        "admin.nav.products": "المنتجات",
+        "admin.nav.customers": "العملاء",
+        "admin.nav.analytics": "التحليلات",
+        "admin.nav.carousel": "الشريط الإعلاني",
+        "admin.nav.whatsapp": "عملاء واتساب",
+        "admin.nav.contacts": "الرسائل",
+        "admin.nav.careers": "الوظائف",
+        "admin.nav.settings": "الإعدادات",
+        "admin.nav.logout": "تسجيل الخروج",
+
+        // Admin Dashboard
+        "admin.dashboard.title": "لوحة القيادة",
+        "admin.dashboard.subtitle": "نظرة عامة مفصلة",
+        "admin.dashboard.search": "بحث...",
+
+        // Admin Login
+        "admin.login.title": "دخول المسؤول",
+        "admin.login.subtitle": "أدخل رمز PIN الآمن",
+        "admin.login.authorized": "للموظفين المصرح لهم فقط",
+        "admin.login.invalid": "رمز غير صحيح",
+        "admin.login.access_granted": "تم السماح بالدخول",
+
+        // Admin Stats & Recent Orders
+        "admin.stats.total_revenue": "إجمالي الإيرادات",
+        "admin.stats.total_orders": "إجمالي الطلبات",
+        "admin.stats.total_products": "إجمالي المنتجات",
+        "admin.stats.total_customers": "إجمالي العملاء",
+        "admin.stats.active": "نشط",
+        "admin.stats.sync": "مزامنة",
+        "admin.recent_orders.title": "أحدث الطلبات",
+        "admin.recent_orders.view_all": "عرض الكل",
+        "admin.recent_orders.order_id": "رقم الطلب",
+        "admin.recent_orders.customer": "العميل",
+        "admin.recent_orders.email": "البريد الإلكتروني",
+        "admin.recent_orders.amount": "المبلغ",
+        "admin.recent_orders.status": "الحالة",
+        "admin.recent_orders.action": "إجراء",
+        "admin.recent_orders.loading": "جاري التحميل...",
+        "admin.recent_orders.empty": "لا توجد طلبات حديثة.",
+
+        // Admin Customers
+        "admin.customers.title": "العملاء",
+        "admin.customers.subtitle": "إدارة قاعدة عملائك",
+        "admin.customers.export": "تصدير",
+        "admin.customers.filters": "تصفية",
+        "admin.customers.search": "بحث عن العملاء...",
+        "admin.customers.total_customers": "إجمالي العملاء",
+        "admin.customers.active_customers": "العملاء النشطين",
+        "admin.customers.table_customer": "العميل",
+        "admin.customers.table_orders": "الطلبات",
+        "admin.customers.table_spent": "إجمالي المصروفات",
+        "admin.customers.table_joined": "تاريخ الانضمام",
+        "admin.customers.no_customers": "لم يتم العثور على عملاء.",
+        "admin.customers.loading": "جاري تحميل العملاء...",
+
+        // Admin Products
+        "admin.products.title": "المنتجات",
+        "admin.products.manage_inventory": "إدارة المخزون",
+        "admin.products.manage_categories": "إدارة الأقسام",
+        "admin.products.add_product": "إضافة منتج",
+        "admin.products.total_products": "إجمالي المنتجات",
+        "admin.products.total_inventory": "إجمالي المخزون",
+        "admin.products.low_stock": "مخزون منخفض",
+        "admin.products.out_of_stock": "نفذ المخزون",
+        "admin.products.new_arrival": "وصول جديد",
+        "admin.products.discard": "إلغاء",
+        "admin.products.publish": "نشر المنتج",
+        "admin.products.basic_info": "معلومات أساسية",
+        "admin.products.essential": "أساسي",
+        "admin.products.product_title": "اسم المنتج",
+        "admin.products.title_placeholder": "مثال: زيت أركان نقي راتب",
+        "admin.products.description": "الوصف",
+        "admin.products.description_placeholder": "الوصف بالإنجليزية",
+        "admin.products.media_gallery": "معرض الوسائط",
+        "admin.products.upload_image": "رفع صورة",
+        "admin.products.specifics": "التفاصيل",
+        "admin.products.key_benefits": "الفوائد الرئيسية",
+        "admin.products.benefit_placeholder": "وصف الفائدة (إنجليزية)",
+        "admin.products.no_benefits": "لم يتم إضافة فوائد.",
+        "admin.products.size_guide": "دليل المقاسات",
+        "admin.products.size_guide_placeholder": "معلومات دليل القياسات...",
+        "admin.products.status": "الحالة",
+        "admin.products.status_draft": "مسودة",
+        "admin.products.status_active": "نشط",
+        "admin.products.category": "القسم",
+        "admin.products.select_category": "اختر القسم",
+        "admin.products.product_type": "نوع المنتج",
+        "admin.products.product_type_placeholder": "مثال: مصل",
+        "admin.products.pricing": "التسعير",
+        "admin.products.price": "السعر (درهم)",
+        "admin.products.compare_at": "السعر المقارن (اختياري)",
+        "admin.products.inventory": "المخزون",
+        "admin.products.stock": "الكمية",
+        "admin.products.sku": "SKU",
+        "admin.products.auto_generated": "توليد تلقائي",
+        "admin.products.cross_sells": "منتجات مقترحة",
+        "admin.products.auto_select": "تحديد تلقائي",
+        "admin.products.recommended_desc": "منتجات موصى بها بناءً على الوصف.",
+        "admin.products.uploading": "جاري الرفع...",
+        "admin.products.polish": "تحسين",
+
 
         // Checkout
         "checkout.title": "إتمام الطلب",
@@ -409,9 +636,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         // Check localStorage or browser preference on mount
-        const savedLang = localStorage.getItem("language") as Language
-        if (savedLang) {
+        const savedLang = localStorage.getItem("language")
+        if (savedLang === "ar" || savedLang === "fr") {
             setLanguage(savedLang)
+        } else {
+            // If invalid or 'en', force French and update storage
+            setLanguage("fr")
+            localStorage.setItem("language", "fr")
         }
     }, [])
 

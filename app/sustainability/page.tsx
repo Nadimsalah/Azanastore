@@ -20,7 +20,7 @@ export default function SustainabilityPage() {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{isArabic ? "العودة إلى الصفحة الرئيسية" : "Back to Home"}</span>
+            <span>{isArabic ? "العودة إلى الصفحة الرئيسية" : "Retour à l'accueil"}</span>
           </Link>
           <Link href="/" className="flex-shrink-0 relative group">
             <Image
@@ -47,26 +47,26 @@ export default function SustainabilityPage() {
               {isArabic ? "جمال مسؤول • من المغرب" : "Beauté responsable • Du Maroc"}
             </p>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
-              {isArabic ? "الاستدامة في ديار أرجان" : "Sustainability at Diar Argan"}
+              {isArabic ? "الاستدامة في ديار أرجان" : "La durabilité chez Diar Argan"}
             </h1>
             <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
               {isArabic
                 ? "منذ عام 1999 ونحن نؤمن أن جمال الأرغان الحقيقي لا يكتمل إلا عندما يحترم الأرض والناس الذين يقفون وراءه. في ديار أرجان، الاستدامة ليست مجرد كلمة، بل طريقة عمل يومية."
-                : "Since 1999, we believe that the true beauty of argan oil is only complete when it respects both the earth and the people behind it. At Diar Argan, sustainability is not a slogan – it is a daily way of working."}
+                : "Depuis 1999, nous croyons que la vraie beauté de l'huile d'argan n'est complète que lorsqu'elle respecte à la fois la terre et les personnes qui la cultivent. Chez Diar Argan, la durabilité n'est pas un slogan, c'est une méthode de travail quotidienne."}
             </p>
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
               {isArabic
                 ? "نعمل مع تعاونيات محلية في المغرب، نختار مكوناتنا بعناية، ونصمم عبوات تهدف لتقليل الأثر البيئي مع الحفاظ على جودة المنتجات التي تحبينها."
-                : "We work closely with local cooperatives in Morocco, carefully select our ingredients, and design packaging that aims to reduce environmental impact while preserving the quality you love."}
+                : "Nous travaillons en étroite collaboration avec des coopératives locales au Maroc, sélectionnons nos ingrédients avec soin et concevons des emballages visant à réduire l'impact environnemental tout en préservant la qualité que vous aimez."}
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 text-emerald-700 text-xs font-semibold uppercase tracking-[0.2em]">
                 <Leaf className="w-3.5 h-3.5" />
-                {isArabic ? "مكونات أنظف" : "Clean Ingredients"}
+                {isArabic ? "مكونات أنظف" : "Ingrédients propres"}
               </div>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-[0.2em]">
                 <Recycle className="w-3.5 h-3.5" />
-                {isArabic ? "عبوات مدروسة" : "Thoughtful Packaging"}
+                {isArabic ? "عبوات مدروسة" : "Emballage réfléchi"}
               </div>
             </div>
           </div>
@@ -76,7 +76,7 @@ export default function SustainabilityPage() {
               <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl shadow-black/10">
                 <Image
                   src="/hero-showcase-5.jpg"
-                  alt={isArabic ? "أشجار الأرجان في الطبيعة" : "Argan trees in nature"}
+                  alt={isArabic ? "أشجار الأرجان في الطبيعة" : "Arganiers dans la nature"}
                   fill
                   className="object-cover"
                 />
@@ -84,7 +84,7 @@ export default function SustainabilityPage() {
               <div className="relative aspect-square rounded-3xl overflow-hidden shadow-xl shadow-black/10">
                 <Image
                   src="/hero-showcase-6.jpg"
-                  alt={isArabic ? "تفاصيل زيت الأرجان النقي" : "Details of pure argan oil"}
+                  alt={isArabic ? "تفاصيل زيت الأرجان النقي" : "Détails de l'huile d'argan pure"}
                   fill
                   className="object-cover"
                 />
@@ -94,7 +94,7 @@ export default function SustainabilityPage() {
               <div className="relative aspect-square rounded-3xl overflow-hidden shadow-xl shadow-black/10">
                 <Image
                   src="/hero-showcase-2.jpg"
-                  alt={isArabic ? "زيت الأرجان في عبوة زجاجية" : "Argan oil in glass bottle"}
+                  alt={isArabic ? "زيت الأرجان في عبوة زجاجية" : "Huile d'argan en bouteille verre"}
                   fill
                   className="object-cover"
                 />
@@ -102,7 +102,7 @@ export default function SustainabilityPage() {
               <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl shadow-black/10">
                 <Image
                   src="/hero-showcase-1.jpg"
-                  alt={isArabic ? "منابع الأرجان في المغرب" : "Argan origins in Morocco"}
+                  alt={isArabic ? "منابع الأرجان في المغرب" : "Origines de l'argan au Maroc"}
                   fill
                   className="object-cover"
                 />
@@ -117,7 +117,7 @@ export default function SustainabilityPage() {
         <div className="container mx-auto px-4 max-w-5xl space-y-12">
           <div className={`space-y-4 text-center max-w-2xl mx-auto ${isArabic ? "rtl" : ""}`}>
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-              {isArabic ? "ثلاث ركائز للاستدامة في ديار أرجان" : "Three Pillars of Sustainability at Diar Argan"}
+              {isArabic ? "ثلاث ركائز للاستدامة في ديار أرجان" : "Trois piliers de la durabilité chez Diar Argan"}
             </h2>
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
               {isArabic
@@ -132,12 +132,12 @@ export default function SustainabilityPage() {
                 <Droplets className="w-5 h-5" />
               </div>
               <h3 className="font-semibold text-foreground">
-                {isArabic ? "مكونات نقية ومسؤولة" : "Pure, Responsible Ingredients"}
+                {isArabic ? "مكونات نقية ومسؤولة" : "Ingrédients purs et responsables"}
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {isArabic
                   ? "نستخدم زيت أرجان نقي ومكونات مختارة بعناية، ونتجنب الإضافات غير الضرورية، لنعطي بشرتك وشعرك ما يحتاجه فقط."
-                  : "We use pure argan oil and carefully selected ingredients, avoiding unnecessary additives so your skin and hair receive only what they truly need."}
+                  : "Nous utilisons de l'huile d'argan pure et des ingrédients soigneusement sélectionnés, évitant les additifs inutiles pour que votre peau et vos cheveux ne reçoivent que ce dont ils ont vraiment besoin."}
               </p>
             </div>
 
@@ -146,12 +146,12 @@ export default function SustainabilityPage() {
                 <Globe2 className="w-5 h-5" />
               </div>
               <h3 className="font-semibold text-foreground">
-                {isArabic ? "دعم المجتمعات المحلية" : "Supporting Local Communities"}
+                {isArabic ? "دعم المجتمعات المحلية" : "Soutenir les communautés locales"}
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {isArabic
                   ? "نعمل مع تعاونيات نسائية في المغرب لضمان دخل عادل وتحسين ظروف العمل، مع الحفاظ على المهارات التقليدية."
-                  : "We work with women-led cooperatives in Morocco, ensuring fair income and better working conditions while preserving traditional expertise."}
+                  : "Nous travaillons avec des coopératives dirigées par des femmes au Maroc, garantissant un revenu équitable et de meilleures conditions de travail tout en préservant le savoir-faire traditionnel."}
               </p>
             </div>
 
@@ -160,12 +160,12 @@ export default function SustainabilityPage() {
                 <Recycle className="w-5 h-5" />
               </div>
               <h3 className="font-semibold text-foreground">
-                {isArabic ? "عبوات واعية بالبيئة" : "Eco‑Conscious Packaging"}
+                {isArabic ? "عبوات واعية بالبيئة" : "Emballage éco-responsable"}
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {isArabic
                   ? "نختار عبوات يمكن إعادة تدويرها قدر الإمكان، ونقلل من المواد الزائدة بدون التأثير على حماية المنتج."
-                  : "We choose packaging that is as recyclable as possible and minimize excess materials, without compromising product protection."}
+                  : "Nous choisissons des emballages aussi recyclables que possible et minimisons les matériaux superflus, sans compromettre la protection du produit."}
               </p>
             </div>
           </div>
@@ -176,19 +176,19 @@ export default function SustainabilityPage() {
       <section className="py-16 sm:py-20 bg-secondary/5 border-t border-border/40">
         <div className={`container mx-auto px-4 max-w-3xl text-center space-y-6 ${isArabic ? "rtl" : ""}`}>
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-            {isArabic ? "اختاري جمالاً يحترم الكوكب" : "Choose beauty that respects the planet"}
+            {isArabic ? "اختاري جمالاً يحترم الكوكب" : "Choisissez une beauté qui respecte la planète"}
           </h2>
           <p className="text-muted-foreground leading-relaxed">
             {isArabic
               ? "كل منتج من ديار أرجان هو خطوة صغيرة نحو روتين عناية أجمل وأكثر وعياً. اختاري منتجات تعكس قيمك وتدلّل بشرتك في نفس الوقت."
-              : "Every Diar Argan product is a small step towards a more beautiful and conscious routine. Choose treatments that reflect your values and pamper your skin at the same time."}
+              : "Chaque produit Diar Argan est un petit pas vers une routine plus belle et consciente. Choisissez des soins qui reflètent vos valeurs et chouchoutent votre peau en même temps."}
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild size="lg" className="rounded-full shadow-lg shadow-primary/25">
-              <Link href="/#shop">{isArabic ? "تسوقي المنتجات" : "Shop Products"}</Link>
+              <Link href="/#shop">{isArabic ? "تسوقي المنتجات" : "Acheter des produits"}</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="rounded-full bg-transparent">
-              <Link href="/our-story">{isArabic ? "اقرئي قصتنا" : "Read Our Story"}</Link>
+              <Link href="/our-story">{isArabic ? "اقرئي قصتنا" : "Lire notre histoire"}</Link>
             </Button>
           </div>
         </div>

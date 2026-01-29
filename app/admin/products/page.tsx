@@ -7,6 +7,7 @@ import { AdminSidebar } from "@/components/admin/admin-sidebar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useLanguage } from "@/components/language-provider"
 import {
     Search,
     Filter,
@@ -31,7 +32,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 
-// Mock Products Data
+// Mock Products Data (kept for reference if needed, but unused generally)
 const allProducts = [
     {
         id: "PROD-001",
@@ -43,59 +44,11 @@ const allProducts = [
         sales: 1205,
         image: "/placeholder.svg?height=80&width=80"
     },
-    {
-        id: "PROD-002",
-        name: "Body Butter Set",
-        category: "Body Care",
-        price: "MAD 420.00",
-        stock: 45,
-        status: "In Stock",
-        sales: 850,
-        image: "/placeholder.svg?height=80&width=80"
-    },
-    {
-        id: "PROD-003",
-        name: "Hair Repair Mask",
-        category: "Hair Care",
-        price: "MAD 280.00",
-        stock: 8,
-        status: "Low Stock",
-        sales: 432,
-        image: "/placeholder.svg?height=80&width=80"
-    },
-    {
-        id: "PROD-004",
-        name: "Gift Box Premium",
-        category: "Gift Sets",
-        price: "MAD 1,200.00",
-        stock: 0,
-        status: "Out of Stock",
-        sales: 156,
-        image: "/placeholder.svg?height=80&width=80"
-    },
-    {
-        id: "PROD-005",
-        name: "Face Serum",
-        category: "Face Care",
-        price: "MAD 580.00",
-        stock: 67,
-        status: "In Stock",
-        sales: 980,
-        image: "/placeholder.svg?height=80&width=80"
-    },
-    {
-        id: "PROD-006",
-        name: "Argan Soap Trio",
-        category: "Body Care",
-        price: "MAD 150.00",
-        stock: 200,
-        status: "In Stock",
-        sales: 2100,
-        image: "/placeholder.svg?height=80&width=80"
-    },
+    // ...
 ]
 
 export default function AdminProductsPage() {
+    const { t, language } = useLanguage()
     const [activeTab, setActiveTab] = useState("All")
     const [searchQuery, setSearchQuery] = useState("")
     const [products, setProducts] = useState<Product[]>([])
@@ -208,9 +161,10 @@ export default function AdminProductsPage() {
     const tabs = ["All", ...categories.map(c => c.slug)]
 
     const getCategoryName = (slug: string) => {
-        if (slug === "All") return "All"
+        if (slug === "All") return t('status.all')
         const category = categories.find(c => c.slug === slug)
-        return category?.name || slug
+        if (!category) return slug
+        return (language === 'ar' && category.name_ar) ? category.name_ar : category.name
     }
 
     const filteredProducts = products.filter(product => {
@@ -220,18 +174,16 @@ export default function AdminProductsPage() {
     })
 
     const getStockStatus = (stock: number) => {
-        if (stock === 0) return "Out of Stock"
-        if (stock < 10) return "Low Stock"
-        return "In Stock"
+        if (stock === 0) return t('admin.products.out_of_stock')
+        if (stock < 10) return t('admin.products.low_stock')
+        return t('product.in_stock')
     }
 
     const getStatusColor = (status: string) => {
-        switch (status) {
-            case "In Stock": return "bg-green-500/10 text-green-500 border-green-500/20"
-            case "Low Stock": return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
-            case "Out of Stock": return "bg-red-500/10 text-red-500 border-red-500/20"
-            default: return "bg-secondary text-secondary-foreground"
-        }
+        if (status === t('product.in_stock')) return "bg-green-500/10 text-green-500 border-green-500/20"
+        if (status === t('admin.products.low_stock')) return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
+        if (status === t('admin.products.out_of_stock')) return "bg-red-500/10 text-red-500 border-red-500/20"
+        return "bg-secondary text-secondary-foreground"
     }
 
     return (
@@ -252,8 +204,8 @@ export default function AdminProductsPage() {
                             <Package className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-foreground">Products</h1>
-                            <p className="text-xs text-muted-foreground">Manage your inventory</p>
+                            <h1 className="text-xl font-bold text-foreground">{t('admin.products.title')}</h1>
+                            <p className="text-xs text-muted-foreground">{t('admin.products.manage_inventory')}</p>
                         </div>
                     </div>
 
@@ -262,12 +214,12 @@ export default function AdminProductsPage() {
                             <DialogTrigger asChild>
                                 <Button variant="outline" className="rounded-full h-9">
                                     <Tag className="w-4 h-4 sm:mr-2" />
-                                    <span className="hidden sm:inline">Manage Categories</span>
+                                    <span className="hidden sm:inline">{t('admin.products.manage_categories')}</span>
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-md">
                                 <DialogHeader>
-                                    <DialogTitle>Manage Categories</DialogTitle>
+                                    <DialogTitle>{t('admin.products.manage_categories')}</DialogTitle>
                                 </DialogHeader>
                                 <div className="space-y-4">
                                     {/* Add Category */}
@@ -297,7 +249,7 @@ export default function AdminProductsPage() {
                                                 )}
                                             </div>
                                             <Button onClick={handleAddCategory}>
-                                                <Plus className="w-4 h-4 mr-1" /> Add
+                                                <Plus className="w-4 h-4 mr-1" /> {t('cart.apply')}
                                             </Button>
                                         </div>
                                     </div>
@@ -329,7 +281,7 @@ export default function AdminProductsPage() {
                         <Link href="/admin/products/new">
                             <Button className="rounded-full h-9 shadow-lg shadow-primary/20">
                                 <Plus className="w-4 h-4 sm:mr-2" />
-                                <span className="hidden sm:inline">Add Product</span>
+                                <span className="hidden sm:inline">{t('admin.products.add_product')}</span>
                             </Button>
                         </Link>
                         <Notifications />
@@ -339,23 +291,23 @@ export default function AdminProductsPage() {
                 {/* Inventory Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     <div className="glass-strong rounded-2xl p-4 flex flex-col">
-                        <span className="text-sm text-muted-foreground font-medium">Total Products</span>
+                        <span className="text-sm text-muted-foreground font-medium">{t('admin.products.total_products')}</span>
                         <span className="text-2xl font-bold text-foreground mt-1">{products.length}</span>
                     </div>
                     <div className="glass-strong rounded-2xl p-4 flex flex-col">
-                        <span className="text-sm text-muted-foreground font-medium">Total Inventory</span>
+                        <span className="text-sm text-muted-foreground font-medium">{t('admin.products.total_inventory')}</span>
                         <span className="text-2xl font-bold text-foreground mt-1">
                             {products.reduce((acc, curr) => acc + curr.stock, 0).toLocaleString()}
                         </span>
                     </div>
                     <div className="glass-strong rounded-2xl p-4 flex flex-col">
-                        <span className="text-sm text-muted-foreground font-medium">Low Stock</span>
+                        <span className="text-sm text-muted-foreground font-medium">{t('admin.products.low_stock')}</span>
                         <span className="text-2xl font-bold text-orange-500 mt-1">
                             {products.filter(p => p.stock < 10 && p.stock > 0).length}
                         </span>
                     </div>
                     <div className="glass-strong rounded-2xl p-4 flex flex-col">
-                        <span className="text-sm text-muted-foreground font-medium">Out of Stock</span>
+                        <span className="text-sm text-muted-foreground font-medium">{t('admin.products.out_of_stock')}</span>
                         <span className="text-2xl font-bold text-red-500 mt-1">
                             {products.filter(p => p.stock === 0).length}
                         </span>
@@ -399,11 +351,11 @@ export default function AdminProductsPage() {
                             <table className="w-full">
                                 <thead>
                                     <tr className="border-b border-white/10 bg-white/5 text-left">
-                                        <th className="py-4 pl-4 sm:pl-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Product</th>
-                                        <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden sm:table-cell">Category</th>
-                                        <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Price</th>
-                                        <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Stock</th>
-                                        <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
+                                        <th className="py-4 pl-4 sm:pl-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('admin.products.product_title')}</th>
+                                        <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden sm:table-cell">{t('admin.products.category')}</th>
+                                        <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('admin.products.pricing')}</th>
+                                        <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">{t('admin.products.stock')}</th>
+                                        <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('admin.products.status')}</th>
                                         <th className="py-4 pr-6 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>

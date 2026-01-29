@@ -27,11 +27,13 @@ import {
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { useLanguage } from "@/components/language-provider" // Import translation hook
 
 // Mock Data for "You May Also Like"
 // replaced by DB call
 
 export default function NewProductPage() {
+    const { t } = useLanguage() // Initialize translation hook
     const [title, setTitle] = useState("")
     const [sku, setSku] = useState("")
     const [images, setImages] = useState<string[]>([])
@@ -330,7 +332,7 @@ export default function NewProductPage() {
                     <div className="flex items-center gap-3">
                         <Link href="/admin/products">
                             <Button variant="ghost" className="rounded-full hover:bg-gray-100 text-gray-600 hover:text-gray-900">
-                                Discard
+                                {t('admin.products.discard')}
                             </Button>
                         </Link>
                         <Button
@@ -340,11 +342,11 @@ export default function NewProductPage() {
                         >
                             {isPublishing ? (
                                 <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Publishing...
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('admin.products.uploading')}
                                 </>
                             ) : (
                                 <>
-                                    <Save className="w-4 h-4 mr-2" /> Publish Product
+                                    <Save className="w-4 h-4 mr-2" /> {t('admin.products.publish')}
                                 </>
                             )}
                         </Button>
@@ -387,18 +389,18 @@ export default function NewProductPage() {
                             <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
                                 <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
                                     <Sparkles className="w-4 h-4 text-amber-500" />
-                                    Basic Information
+                                    {t('admin.products.basic_info')}
                                 </h3>
-                                <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200">Essential</Badge>
+                                <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200">{t('admin.products.essential')}</Badge>
                             </div>
                             <div className="p-6 space-y-6">
                                 <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-gray-700">Product Title</label>
+                                    <label className="text-sm font-semibold text-gray-700">{t('admin.products.product_title')}</label>
                                     <div className="relative">
                                         <Input
                                             value={title || ""}
                                             onChange={(e) => setTitle(e.target.value)}
-                                            placeholder="e.g. Rateb's Pure Argan Oil"
+                                            placeholder={t('admin.products.title_placeholder')}
                                             className="bg-white border-gray-200 h-12 text-base focus:ring-blue-500/20 focus:border-blue-500 rounded-xl shadow-sm text-gray-900 placeholder:text-gray-400 pr-12"
                                         />
                                         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
@@ -416,13 +418,13 @@ export default function NewProductPage() {
                                     </div>
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-gray-700">Description</label>
+                                    <label className="text-sm font-semibold text-gray-700">{t('admin.products.description')}</label>
                                     <div className="relative">
                                         <textarea
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
                                             className="w-full min-h-[180px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none placeholder:text-gray-400 transition-all shadow-sm"
-                                            placeholder="Description in English"
+                                            placeholder={t('admin.products.description_placeholder')}
                                         />
                                         <div className="absolute right-2 top-2 flex flex-col gap-2">
                                             {description.trim() && (
@@ -446,7 +448,7 @@ export default function NewProductPage() {
                             <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
                                 <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
                                     <ImageIcon className="w-4 h-4 text-purple-500" />
-                                    Media Gallery
+                                    {t('admin.products.media_gallery')}
                                 </h3>
                             </div>
                             <div className="p-6">
@@ -470,7 +472,7 @@ export default function NewProductPage() {
                                             )}
                                         </div>
                                         <span className="text-xs font-bold uppercase tracking-wide">
-                                            {uploading ? 'Uploading...' : 'Upload Image'}
+                                            {uploading ? t('admin.products.uploading') : t('admin.products.upload_image')}
                                         </span>
                                         <input type="file" className="hidden" multiple onChange={handleImageUpload} accept="image/*" disabled={uploading} />
                                     </label>
@@ -483,19 +485,19 @@ export default function NewProductPage() {
                             <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
                                 <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
                                     <Layers className="w-4 h-4 text-emerald-500" />
-                                    Specifics
+                                    {t('admin.products.specifics')}
                                 </h3>
                             </div>
                             <div className="p-6 space-y-8">
                                 {/* Key Benefits */}
                                 <div>
-                                    <label className="text-sm font-semibold text-gray-700 block mb-3">Key Benefits</label>
+                                    <label className="text-sm font-semibold text-gray-700 block mb-3">{t('admin.products.key_benefits')}</label>
                                     <div className="flex gap-2 mb-4">
                                         <div className="relative flex-1">
                                             <Input
                                                 value={newBenefit || ""}
                                                 onChange={(e) => setNewBenefit(e.target.value)}
-                                                placeholder="Benefit description (English)"
+                                                placeholder={t('admin.products.benefit_placeholder')}
                                                 className="bg-white border-gray-200 h-11 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm"
                                                 onKeyDown={(e) => e.key === 'Enter' && addBenefit()}
                                             />
@@ -510,7 +512,8 @@ export default function NewProductPage() {
                                                 className="h-11 px-4 bg-purple-600 hover:bg-purple-700 text-white shadow-sm flex items-center gap-2"
                                             >
                                                 {rewriting === 'benefits' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                                Polish
+                                                {rewriting === 'benefits' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                                {t('admin.products.polish')}
                                             </Button>
                                         )}
                                     </div>
@@ -528,14 +531,14 @@ export default function NewProductPage() {
                                                 </button>
                                             </div>
                                         ))}
-                                        {benefits.length === 0 && <div className="col-span-full p-6 rounded-xl border border-dashed border-gray-200 text-center text-sm text-gray-500 bg-gray-50/50">No benefits added yet.</div>}
+                                        {benefits.length === 0 && <div className="col-span-full p-6 rounded-xl border border-dashed border-gray-200 text-center text-sm text-gray-500 bg-gray-50/50">{t('admin.products.no_benefits')}</div>}
                                     </div>
                                 </div>
 
                                 {/* Size Guide */}
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-center px-1">
-                                        <label className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Size Guide</label>
+                                        <label className="text-sm font-semibold text-gray-700 uppercase tracking-wider">{t('admin.products.size_guide')}</label>
                                         <div className="flex items-center gap-2">
                                             {sizeGuide.trim() && (
                                                 <button
@@ -544,7 +547,7 @@ export default function NewProductPage() {
                                                     className="text-xs flex items-center gap-1 text-purple-500 hover:text-purple-700 transition-colors bg-purple-50 px-2 py-1 rounded-md"
                                                 >
                                                     {rewriting === 'size_guide' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                                    <span>Polish</span>
+                                                    <span>{t('admin.products.polish')}</span>
                                                 </button>
                                             )}
                                         </div>
@@ -553,7 +556,7 @@ export default function NewProductPage() {
                                         value={sizeGuide || ""}
                                         onChange={(e) => setSizeGuide(e.target.value)}
                                         className="w-full min-h-[200px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none shadow-sm"
-                                        placeholder="Size guide information (e.g., XS: Bust 32-34, Waist 24-26, Hips 34-36...)"
+                                        placeholder={t('admin.products.size_guide_placeholder')}
                                     />
                                 </div>
                             </div>
@@ -568,13 +571,13 @@ export default function NewProductPage() {
                         <section className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                             <div className="p-6 space-y-6">
                                 <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-gray-700">Status</label>
+                                    <label className="text-sm font-semibold text-gray-700">{t('admin.products.status')}</label>
                                     <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl border border-gray-200">
-                                        {['Draft', 'Active'].map((s) => (
+                                        {[t('admin.products.status_draft'), t('admin.products.status_active')].map((s) => (
                                             <button
                                                 key={s}
-                                                onClick={() => setStatus(s)}
-                                                className={`py-2 rounded-lg text-sm font-medium transition-all shadow-sm ${status === s ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50 shadow-none'}`}
+                                                onClick={() => setStatus(s === t('admin.products.status_draft') ? 'Draft' : 'Active')} // Map back to English for logic
+                                                className={`py-2 rounded-lg text-sm font-medium transition-all shadow-sm ${status === (s === t('admin.products.status_draft') ? 'Draft' : 'Active') ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50 shadow-none'}`}
                                             >
                                                 {s}
                                             </button>
@@ -583,13 +586,13 @@ export default function NewProductPage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-gray-700">Category</label>
+                                    <label className="text-sm font-semibold text-gray-700">{t('admin.products.category')}</label>
                                     <div className="relative">
                                         <select
                                             value={category || ""}
                                             onChange={(e) => setCategory(e.target.value)}
                                             className="w-full h-12 rounded-xl border border-gray-200 bg-white px-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-gray-700 appearance-none shadow-sm">
-                                            <option value="" disabled>Select Category</option>
+                                            <option value="" disabled>{t('admin.products.select_category')}</option>
                                             {categories.map((cat) => (
                                                 <option key={cat.id} value={cat.slug || cat.id}>{cat.name}</option>
                                             ))}
@@ -599,10 +602,10 @@ export default function NewProductPage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-gray-700">Product Type</label>
+                                    <label className="text-sm font-semibold text-gray-700">{t('admin.products.product_type')}</label>
                                     <div className="relative">
                                         <Tags className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                        <Input placeholder="e.g. Serum" className="bg-white border-gray-200 h-12 pl-11 text-base rounded-xl shadow-sm focus:ring-blue-500/20 focus:border-blue-500" />
+                                        <Input placeholder={t('admin.products.product_type_placeholder')} className="bg-white border-gray-200 h-12 pl-11 text-base rounded-xl shadow-sm focus:ring-blue-500/20 focus:border-blue-500" />
                                     </div>
                                 </div>
                             </div>
@@ -613,12 +616,12 @@ export default function NewProductPage() {
                             <div className="p-6 border-b border-gray-50 bg-gray-50/30">
                                 <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
                                     <DollarSign className="w-4 h-4 text-green-500" />
-                                    Pricing
+                                    {t('admin.products.pricing')}
                                 </h3>
                             </div>
                             <div className="p-6 space-y-6">
                                 <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-gray-700">Price (MAD)</label>
+                                    <label className="text-sm font-semibold text-gray-700">{t('admin.products.price')}</label>
                                     <div className="relative">
                                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">MAD</span>
                                         <Input
@@ -631,7 +634,7 @@ export default function NewProductPage() {
                                     </div>
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-gray-700">Compare at Price (Optional)</label>
+                                    <label className="text-sm font-semibold text-gray-700">{t('admin.products.compare_at')}</label>
                                     <div className="relative">
                                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">MAD</span>
                                         <Input
@@ -651,12 +654,12 @@ export default function NewProductPage() {
                             <div className="p-6 border-b border-gray-50 bg-gray-50/30">
                                 <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
                                     <Package className="w-4 h-4 text-blue-500" />
-                                    Inventory
+                                    {t('admin.products.inventory')}
                                 </h3>
                             </div>
                             <div className="p-6 space-y-6">
                                 <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-gray-700">Stock</label>
+                                    <label className="text-sm font-semibold text-gray-700">{t('admin.products.stock')}</label>
                                     <Input
                                         type="number"
                                         value={stock || ""}
@@ -664,12 +667,12 @@ export default function NewProductPage() {
                                         placeholder="0" className="bg-white border-gray-200 h-12 text-lg font-mono rounded-xl shadow-sm focus:ring-blue-500/20 focus:border-blue-500 text-gray-900" />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-gray-700">SKU</label>
+                                    <label className="text-sm font-semibold text-gray-700">{t('admin.products.sku')}</label>
                                     <div className="flex gap-2">
                                         <Input
                                             value={sku || ""}
                                             onChange={(e) => setSku(e.target.value)}
-                                            placeholder="Auto-generated"
+                                            placeholder={t('admin.products.auto_generated')}
                                             className="bg-white border-gray-200 h-12 text-base font-mono rounded-xl uppercase tracking-wider shadow-sm focus:ring-blue-500/20 focus:border-blue-500 text-gray-900"
                                         />
                                         <Button onClick={generateSku} type="button" className="h-12 w-12 shrink-0 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl text-indigo-600">
@@ -685,7 +688,7 @@ export default function NewProductPage() {
                             <div className="p-6 border-b border-gray-50 bg-gray-50/30 flex justify-between items-center">
                                 <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
                                     <RefreshCw className="w-4 h-4 text-pink-500" />
-                                    Cross-Sells
+                                    {t('admin.products.cross_sells')}
                                 </h3>
                                 <button
                                     onClick={handleAutoRecommend}
@@ -693,11 +696,11 @@ export default function NewProductPage() {
                                     className="text-xs flex items-center gap-1 text-pink-600 hover:text-pink-700 font-medium px-2 py-1 rounded-lg hover:bg-pink-50 transition-colors"
                                 >
                                     {rewriting === 'recommend' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                    Auto-Select
+                                    {t('admin.products.auto_select')}
                                 </button>
                             </div>
                             <div className="p-6">
-                                <p className="text-xs text-gray-500 mb-4">Recommended products based on description.</p>
+                                <p className="text-xs text-gray-500 mb-4">{t('admin.products.recommended_desc')}</p>
                                 <div className="space-y-2 max-h-[240px] overflow-y-auto pr-2 custom-scrollbar">
                                     {relatedProducts.map(prod => {
                                         const isSelected = selectedRelated.includes(prod.id)

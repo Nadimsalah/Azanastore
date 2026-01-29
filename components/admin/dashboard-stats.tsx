@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react"
 import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Package, Users } from "lucide-react"
 import { getDashboardStats } from "@/lib/supabase-api"
+import { useLanguage } from "@/components/language-provider"
 
 export function DashboardStats() {
+    const { t } = useLanguage()
     const [statsData, setStatsData] = useState<any>(null)
     const [loading, setLoading] = useState(true)
 
@@ -29,7 +31,7 @@ export function DashboardStats() {
 
     const stats = [
         {
-            label: "Revenu total",
+            label: t('admin.stats.total_revenue'),
             value: `MAD ${statsData?.totalRevenue?.toLocaleString()}`,
             change: "+12.5%", // Mock change for now
             trend: "up",
@@ -38,7 +40,7 @@ export function DashboardStats() {
             textColor: "text-primary",
         },
         {
-            label: "Total des commandes",
+            label: t('admin.stats.total_orders'),
             value: statsData?.totalOrders?.toString(),
             change: `+${statsData?.pendingOrders}`,
             trend: "up",
@@ -47,18 +49,18 @@ export function DashboardStats() {
             textColor: "text-blue-500",
         },
         {
-            label: "Total des produits",
+            label: t('admin.stats.total_products'),
             value: statsData?.totalProducts?.toString(),
-            change: "Actif",
+            change: t('admin.stats.active'),
             trend: "up",
             icon: Package,
             color: "from-orange-500/20 to-red-500/20",
             textColor: "text-orange-500",
         },
         {
-            label: "Total des clients",
+            label: t('admin.stats.total_customers'),
             value: statsData?.totalCustomers?.toString(),
-            change: "Synchronisation",
+            change: t('admin.stats.sync'),
             trend: "up",
             icon: Users,
             color: "from-purple-500/20 to-pink-500/20",
@@ -70,7 +72,7 @@ export function DashboardStats() {
         <>
             {stats.map((stat, i) => (
                 <div key={i} className="glass-strong rounded-3xl p-6 relative overflow-hidden group hover:scale-[1.02] transition-all duration-300">
-                    <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full bg-gradient-to-br ${stat.color} blur-2xl opacity-50 group-hover:opacity-100 transition-opacity`} />
+                    <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full bg-gradient-to-br ${stat.color} blur-2xl opacity-50 group-hover:opacity-100 transition-opacity rtl:right-auto rtl:left-[-1rem]`} />
 
                     <div className="relative z-10 flex flex-col h-full justify-between">
                         <div className="flex justify-between items-start mb-4">
@@ -79,7 +81,7 @@ export function DashboardStats() {
                             </div>
                             <span className={`flex items-center text-xs font-bold px-2 py-1 rounded-full bg-white/5 ${stat.trend === 'up' ? 'text-green-400' : 'text-red-400'}`}>
                                 {stat.change}
-                                {stat.trend === 'up' ? <TrendingUp className="w-3 h-3 ml-1" /> : <TrendingDown className="w-3 h-3 ml-1" />}
+                                {stat.trend === 'up' ? <TrendingUp className="w-3 h-3 ml-1 rtl:ml-0 rtl:mr-1" /> : <TrendingDown className="w-3 h-3 ml-1 rtl:ml-0 rtl:mr-1" />}
                             </span>
                         </div>
 
@@ -93,3 +95,4 @@ export function DashboardStats() {
         </>
     )
 }
+

@@ -65,10 +65,10 @@ export default function ContactPage() {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{isArabic ? "العودة إلى الرئيسية" : "Back to Home"}</span>
+            <span>{isArabic ? "العودة إلى الرئيسية" : "Retour à l'accueil"}</span>
           </Link>
           <span className="text-xs text-muted-foreground uppercase tracking-[0.25em]">
-            {isArabic ? "اتصل بنا" : "Contact Us"}
+            {isArabic ? "اتصل بنا" : "Contactez-nous"}
           </span>
         </div>
       </header>
@@ -76,12 +76,12 @@ export default function ContactPage() {
       <main className="container mx-auto px-4 py-10 sm:py-16 max-w-4xl">
         <div className={cn("space-y-6 mb-10", isArabic && "text-right")}>
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-            {isArabic ? "يسعدنا التواصل معك" : "We’d love to hear from you"}
+            {isArabic ? "يسعدنا التواصل معك" : "Nous serions ravis de vous entendre"}
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
             {isArabic
               ? "سواء كنتِ عميلة، شريكاً محتملاً، أو موزعاً مهتماً بأزانا في المغرب، املئي النموذج التالي وسنقوم بالرد عليك في أقرب وقت."
-              : "Whether you’re a customer, potential partner, or interested distributor in Morocco, fill in the form below and we’ll get back to you as soon as possible."}
+              : "Que vous soyez cliente, partenaire potentiel ou distributeur intéressé par Azana au Maroc, remplissez le formulaire ci-dessous et nous vous répondrons dans les plus brefs délais."}
           </p>
 
           {/* Type selector */}
@@ -96,7 +96,7 @@ export default function ContactPage() {
                   : "bg-transparent text-muted-foreground hover:text-foreground",
               )}
             >
-              {isArabic ? "عميلة" : "Client"}
+              {isArabic ? "عميلة" : "Cliente"}
             </button>
             <button
               type="button"
@@ -108,7 +108,7 @@ export default function ContactPage() {
                   : "bg-transparent text-muted-foreground hover:text-foreground",
               )}
             >
-              {isArabic ? "شريك" : "Partner"}
+              {isArabic ? "شريك" : "Partenaire"}
             </button>
             <button
               type="button"
@@ -120,7 +120,7 @@ export default function ContactPage() {
                   : "bg-transparent text-muted-foreground hover:text-foreground",
               )}
             >
-              {isArabic ? "موزع" : "Distributor"}
+              {isArabic ? "موزع" : "Distributeur"}
             </button>
           </div>
         </div>
@@ -133,14 +133,14 @@ export default function ContactPage() {
             <div className="space-y-2">
               <label className="text-xs font-semibold text-muted-foreground flex items-center gap-2">
                 <User className="w-3.5 h-3.5 text-primary" />
-                {isArabic ? "الاسم الكامل" : "Full name"}
+                {isArabic ? "الاسم الكامل" : "Nom complet"}
               </label>
-              <Input name="name" required placeholder={isArabic ? "اكتبي اسمك هنا" : "Enter your name"} className="rounded-xl" />
+              <Input name="name" required placeholder={isArabic ? "اكتبي اسمك هنا" : "Entrez votre nom"} className="rounded-xl" />
             </div>
             <div className="space-y-2">
               <label className="text-xs font-semibold text-muted-foreground flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 text-primary" />
-                {isArabic ? "البريد الإلكتروني (اختياري)" : "Email (optional)"}
+                {isArabic ? "البريد الإلكتروني (اختياري)" : "Email (optionnel)"}
               </label>
               <Input name="email" type="email" placeholder="you@example.com" className="rounded-xl" />
             </div>
@@ -150,16 +150,16 @@ export default function ContactPage() {
             <div className="space-y-2">
               <label className="text-xs font-semibold text-muted-foreground flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5 text-primary" />
-                {isArabic ? "رقم الموبايل" : "Phone number"}
+                {isArabic ? "رقم الموبايل" : "Numéro de téléphone"}
               </label>
               <Input name="phone" required placeholder="+212 ..." className="rounded-xl" />
             </div>
             <div className="space-y-2">
               <label className="text-xs font-semibold text-muted-foreground flex items-center gap-2">
                 <Building2 className="w-3.5 h-3.5 text-primary" />
-                {isArabic ? "الشركة (اختياري)" : "Company (optional)"}
+                {isArabic ? "الشركة (اختياري)" : "Société (optionnel)"}
               </label>
-              <Input name="company" placeholder={isArabic ? "اسم الشركة إن وجد" : "Company name, if any"} className="rounded-xl" />
+              <Input name="company" placeholder={isArabic ? "اسم الشركة إن وجد" : "Nom de la société, si applicable"} className="rounded-xl" />
             </div>
           </div>
 
@@ -169,13 +169,13 @@ export default function ContactPage() {
                 ? type === "client"
                   ? "كيف يمكننا مساعدتك؟"
                   : type === "partner"
-                  ? "اخبرنا عن نوع الشراكة التي تبحث عنها"
-                  : "أخبرينا عن خطتك للتوزيع في السوق المغربي"
+                    ? "اخبرنا عن نوع الشراكة التي تبحث عنها"
+                    : "أخبرينا عن خطتك للتوزيع في السوق المغربي"
                 : type === "client"
-                ? "How can we help you?"
-                : type === "partner"
-                ? "Tell us what kind of partnership you are looking for"
-                : "Tell us about your distribution plans in the Moroccan market"}
+                  ? "Comment pouvons-nous vous aider ?"
+                  : type === "partner"
+                    ? "Dites-nous quel type de partenariat vous recherchez"
+                    : "Parlez-nous de vos plans de distribution sur le marché marocain"}
             </label>
             <Textarea
               name="message"
@@ -185,7 +185,7 @@ export default function ContactPage() {
               placeholder={
                 isArabic
                   ? "اكتبي رسالتك هنا..."
-                  : "Write your message here..."
+                  : "Écrivez votre message ici..."
               }
             />
           </div>
@@ -194,7 +194,7 @@ export default function ContactPage() {
             <p className="text-[11px] sm:text-xs text-muted-foreground max-w-md">
               {isArabic
                 ? "بإرسال هذه الرسالة، أنتِ توافقين على أن نتواصل معك بخصوص استفسارك عبر الهاتف أو البريد الإلكتروني."
-                : "By submitting this form, you agree that we may contact you regarding your inquiry by phone or email."}
+                : "En soumettant ce formulaire, vous acceptez que nous puissions vous contacter concernant votre demande par téléphone ou par e-mail."}
             </p>
             <Button
               type="submit"
@@ -205,10 +205,10 @@ export default function ContactPage() {
               {submitted
                 ? isArabic
                   ? "تم إرسال الرسالة ✓"
-                  : "Message sent ✓"
+                  : "Message envoyé ✓"
                 : isArabic
-                ? (loading ? "جاري الإرسال..." : "إرسال الرسالة")
-                : (loading ? "Sending..." : "Send message")}
+                  ? (loading ? "جاري الإرسال..." : "إرسال الرسالة")
+                  : (loading ? "Envoi en cours..." : "Envoyer le message")}
             </Button>
           </div>
 
@@ -216,7 +216,7 @@ export default function ContactPage() {
             <p className="text-xs text-emerald-600 mt-2">
               {isArabic
                 ? "تم إرسال رسالتك بنجاح، وسنقوم بالتواصل معك قريباً."
-                : "Your message has been sent successfully; we’ll get back to you soon."}
+                : "Votre message a été envoyé avec succès ; nous vous répondrons bientôt."}
             </p>
           )}
 
@@ -224,7 +224,7 @@ export default function ContactPage() {
             <p className="text-xs text-destructive mt-2">
               {isArabic
                 ? "حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى لاحقاً."
-                : "There was an error sending your message. Please try again later."}
+                : "Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer plus tard."}
             </p>
           )}
         </form>
