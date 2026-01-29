@@ -150,11 +150,11 @@ export default function AdminOrdersPage() {
                                                 <td className="py-3 sm:py-4 pl-4 sm:pl-6">
                                                     <span className="font-semibold text-foreground text-xs sm:text-sm">{order.order_number}</span>
                                                     <div className="md:hidden text-[10px] text-muted-foreground mt-0.5">
-                                                        {new Date(order.created_at).toLocaleDateString()}
+                                                        {new Date(order.created_at).toLocaleDateString('en-US')}
                                                     </div>
                                                 </td>
                                                 <td className="py-4 px-4 text-sm text-foreground/80 hidden md:table-cell">
-                                                    {new Date(order.created_at).toLocaleDateString()}
+                                                    {new Date(order.created_at).toLocaleDateString('en-US')}
                                                 </td>
                                                 <td className="py-4 px-4 text-sm font-medium text-foreground hidden sm:table-cell">
                                                     {order.customer_name}
@@ -162,7 +162,7 @@ export default function AdminOrdersPage() {
                                                 <td className="py-4 px-4 text-sm text-muted-foreground hidden lg:table-cell">
                                                     {order.customer_email}
                                                 </td>
-                                                <td className="py-4 px-4 text-sm font-bold text-foreground">MAD {order.total}</td>
+                                                <td className="py-4 px-4 text-sm font-bold text-foreground">MAD {order.total.toLocaleString('en-US')}</td>
                                                 <td className="py-4 px-4">
                                                     <Badge variant="outline" className={`border ${getStatusColor(order.status)} text-[10px] sm:text-xs py-0.5 px-2`}>
                                                         {t(`status.${order.status.toLowerCase()}`) || order.status}

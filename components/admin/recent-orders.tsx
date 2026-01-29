@@ -71,7 +71,7 @@ export function RecentOrders() {
                                     <td className="py-4 pl-2 rtl:pl-0 rtl:pr-2 font-medium text-foreground text-xs sm:text-base">{order.order_number}</td>
                                     <td className="py-4 text-foreground/80 hidden sm:table-cell">{order.customer_name}</td>
                                     <td className="py-4 text-sm text-muted-foreground max-w-[200px] truncate hidden md:table-cell">{order.customer_email}</td>
-                                    <td className="py-4 font-semibold text-foreground text-xs sm:text-base">MAD {order.total}</td>
+                                    <td className="py-4 font-semibold text-foreground text-xs sm:text-base">MAD {typeof order.total === 'number' ? order.total.toLocaleString('en-US') : order.total}</td>
                                     <td className="py-4">
                                         <Badge variant="outline" className={`border-0 ${getStatusColor(order.status)} text-[10px] sm:text-xs`}>
                                             {t(`status.${order.status.toLowerCase()}`) || order.status}

@@ -40,8 +40,8 @@ export default function CustomersPage() {
     )
 
     const stats = [
-        { label: t('admin.customers.total_customers'), value: customers.length.toLocaleString(), icon: Users, color: "text-primary" },
-        { label: t('admin.customers.active_customers'), value: customers.filter(c => c.status === 'active').length.toLocaleString(), icon: UserCheck, color: "text-green-500" },
+        { label: t('admin.customers.total_customers'), value: customers.length.toLocaleString('en-US'), icon: Users, color: "text-primary" },
+        { label: t('admin.customers.active_customers'), value: customers.filter(c => c.status === 'active').length.toLocaleString('en-US'), icon: UserCheck, color: "text-green-500" },
     ]
 
     return (
@@ -140,9 +140,9 @@ export default function CustomersPage() {
                                                     </Badge>
                                                 </td>
                                                 <td className="py-4 px-6 hidden md:table-cell text-sm">{customer.total_orders || 0}</td>
-                                                <td className="py-4 px-6 hidden lg:table-cell font-semibold">MAD {customer.total_spent?.toLocaleString() || 0}</td>
+                                                <td className="py-4 px-6 hidden lg:table-cell font-semibold">MAD {customer.total_spent?.toLocaleString('en-US') || 0}</td>
                                                 <td className="py-4 px-6 hidden xl:table-cell text-sm text-muted-foreground">
-                                                    {new Date(customer.created_at).toLocaleDateString()}
+                                                    {new Date(customer.created_at).toLocaleDateString('en-US')}
                                                 </td>
                                                 <td className="py-4 px-6 text-right rtl:text-left">
                                                     <div className="flex items-center justify-end rtl:justify-start gap-2">

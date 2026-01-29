@@ -149,6 +149,11 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Force Western numerals in Arabic */
+  :lang(ar) {
+    font-variant-numeric: lining-nums;
+  }
 }
 
 @layer utilities {
@@ -183,7 +188,9 @@
   }
 
   .no-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
   }
 }

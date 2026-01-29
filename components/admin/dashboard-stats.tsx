@@ -32,7 +32,7 @@ export function DashboardStats() {
     const stats = [
         {
             label: t('admin.stats.total_revenue'),
-            value: `MAD ${statsData?.totalRevenue?.toLocaleString()}`,
+            value: `MAD ${statsData?.totalRevenue?.toLocaleString('en-US')}`,
             change: "+12.5%", // Mock change for now
             trend: "up",
             icon: DollarSign,

@@ -119,7 +119,7 @@ export default function OrderDetailsPage() {
                                     {order.status}
                                 </Badge>
                             </h1>
-                            <p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleString()}</p>
+                            <p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleString('en-US')}</p>
                         </div>
                     </div>
 
@@ -158,10 +158,10 @@ export default function OrderDetailsPage() {
                                         </div>
                                         <div className="flex-1">
                                             <h4 className="font-semibold text-foreground">{item.product_title}</h4>
-                                            <p className="text-sm text-muted-foreground">Qty: {item.quantity} × MAD {item.price}</p>
+                                            <p className="text-sm text-muted-foreground">Qty: {item.quantity} × MAD {item.price.toLocaleString('en-US')}</p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="font-bold text-foreground">MAD {item.subtotal}</p>
+                                            <p className="font-bold text-foreground">MAD {item.subtotal.toLocaleString('en-US')}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -170,15 +170,15 @@ export default function OrderDetailsPage() {
                             <div className="mt-6 pt-6 border-t border-white/10 space-y-2">
                                 <div className="flex justify-between text-sm text-muted-foreground">
                                     <span>Subtotal</span>
-                                    <span>MAD {order.subtotal}</span>
+                                    <span>MAD {order.subtotal.toLocaleString('en-US')}</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-muted-foreground">
                                     <span>Shipping</span>
-                                    <span>MAD {order.shipping_cost}</span>
+                                    <span>MAD {order.shipping_cost.toLocaleString('en-US')}</span>
                                 </div>
                                 <div className="flex justify-between text-lg font-bold text-foreground pt-4 border-t border-white/5">
                                     <span>Total</span>
-                                    <span className="text-primary">MAD {order.total}</span>
+                                    <span className="text-primary">MAD {order.total.toLocaleString('en-US')}</span>
                                 </div>
                             </div>
                         </div>
