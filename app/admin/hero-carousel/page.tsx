@@ -360,8 +360,7 @@ export default function HeroCarouselPage() {
                         <span>Recommended: 1920x1080px or 1200x1200px</span>
                     </div>
                 </div>
+            </main>
         </div>
-            </main >
-        </div >
     )
 }
