@@ -77,7 +77,7 @@ export default function SettingsPage() {
         <div className="flex min-h-screen bg-background">
             <AdminSidebar />
 
-            <main className="flex-1 lg:ml-72 p-4 sm:p-8">
+            <main className="flex-1 lg:ml-72 lg:rtl:ml-0 lg:rtl:mr-72 p-4 sm:p-8 transition-all duration-300">
                 <div className="max-w-4xl mx-auto space-y-8">
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
