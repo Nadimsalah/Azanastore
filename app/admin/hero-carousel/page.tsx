@@ -358,10 +358,10 @@ export default function HeroCarouselPage() {
                         </span>
                         <span className="w-px h-4 bg-white/10" />
                         <span>Recommended: 1920x1080px or 1200x1200px</span>
-                        <div className="ml-auto">
-                            {items.length} Slides configured
-                        </div>
-                    </main>
+                    </div>
                 </div>
-                )
+        </div>
+            </main >
+        </div >
+    )
 }
