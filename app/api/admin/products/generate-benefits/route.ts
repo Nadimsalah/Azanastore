@@ -119,7 +119,7 @@ Output Requirements:
     } catch (error: any) {
         console.error('Generate Benefits Error:', error)
         return NextResponse.json({
-            benefits: ["ترطيب عميق فوري", "مكونات طبيعية ١٠٠٪", "خالي من المواد الضارة", "نتائج فعالة وسريعة"],
+            benefits: ["ترطيب عميق فوري", "مكونات طبيعية 100%", "خالي من المواد الضارة", "نتائج فعالة وسريعة"],
             source: "mock_fallback"
         });
     }

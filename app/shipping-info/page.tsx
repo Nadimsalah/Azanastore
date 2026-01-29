@@ -38,7 +38,7 @@ export default function ShippingInfoPage() {
 
           <h2 className="font-semibold text-foreground flex items-center gap-2">
             <Truck className="w-4 h-4 text-primary" />
-            {isArabic ? "١. مدة التوصيل" : "1. Délais de livraison"}
+            {isArabic ? "1. مدة التوصيل" : "1. Délais de livraison"}
           </h2>
           <p>
             {isArabic
@@ -47,7 +47,7 @@ export default function ShippingInfoPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٢. رسوم الشحن" : "2. Frais de port"}
+            {isArabic ? "2. رسوم الشحن" : "2. Frais de port"}
           </h2>
           <p>
             {isArabic
@@ -56,7 +56,7 @@ export default function ShippingInfoPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٣. متابعة الشحنة" : "3. Suivi de votre commande"}
+            {isArabic ? "3. متابعة الشحنة" : "3. Suivi de votre commande"}
           </h2>
           <p>
             {isArabic

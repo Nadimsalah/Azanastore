@@ -37,7 +37,7 @@ export default function PrivacyPolicyPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "١. البيانات التي نقوم بجمعها" : "1. Informations que nous collectons"}
+            {isArabic ? "1. البيانات التي نقوم بجمعها" : "1. Informations que nous collectons"}
           </h2>
           <p>
             {isArabic
@@ -46,7 +46,7 @@ export default function PrivacyPolicyPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٢. كيفية استخدام البيانات" : "2. Comment nous utilisons vos données"}
+            {isArabic ? "2. كيفية استخدام البيانات" : "2. Comment nous utilisons vos données"}
           </h2>
           <p>
             {isArabic
@@ -55,7 +55,7 @@ export default function PrivacyPolicyPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٣. مشاركة البيانات مع الغير" : "3. Partage avec des tiers"}
+            {isArabic ? "3. مشاركة البيانات مع الغير" : "3. Partage avec des tiers"}
           </h2>
           <p>
             {isArabic
@@ -64,7 +64,7 @@ export default function PrivacyPolicyPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٤. حقوقك" : "4. Vos droits"}
+            {isArabic ? "4. حقوقك" : "4. Vos droits"}
           </h2>
           <p>
             {isArabic
@@ -73,7 +73,7 @@ export default function PrivacyPolicyPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٥. الاحتفاظ بالبيانات" : "5. Conservation des données"}
+            {isArabic ? "5. الاحتفاظ بالبيانات" : "5. Conservation des données"}
           </h2>
           <p>
             {isArabic
@@ -82,7 +82,7 @@ export default function PrivacyPolicyPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٦. التواصل" : "6. Contact"}
+            {isArabic ? "6. التواصل" : "6. Contact"}
           </h2>
           <p>
             {isArabic

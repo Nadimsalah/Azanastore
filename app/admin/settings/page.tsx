@@ -179,7 +179,7 @@ export default function SettingsPage() {
                                         value={settings.announcement_bar_ar || ""}
                                         onChange={(e) => handleChange("announcement_bar_ar", e.target.value)}
                                         className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm resize-none placeholder:text-muted-foreground/30 text-right font-arabic"
-                                        placeholder="شحن مجاني للطلبات فوق ٥٠٠ د.م | استخدم كود ARGAN20 لخصم ٢٠٪"
+                                        placeholder="شحن مجاني للطلبات فوق 500 د.م | استخدم كود ARGAN20 لخصم 20%"
                                         dir="rtl"
                                     />
                                 </div>

@@ -37,7 +37,7 @@ export default function RefundPolicyPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "١. فترة الاسترجاع" : "1. Période de retour"}
+            {isArabic ? "1. فترة الاسترجاع" : "1. Période de retour"}
           </h2>
           <p>
             {isArabic
@@ -46,7 +46,7 @@ export default function RefundPolicyPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٢. المنتجات التالفة أو الخاطئة" : "2. Articles endommagés ou incorrects"}
+            {isArabic ? "2. المنتجات التالفة أو الخاطئة" : "2. Articles endommagés ou incorrects"}
           </h2>
           <p>
             {isArabic
@@ -55,7 +55,7 @@ export default function RefundPolicyPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٣. طريقة الاسترجاع" : "3. Traitement des remboursements"}
+            {isArabic ? "3. طريقة الاسترجاع" : "3. Traitement des remboursements"}
           </h2>
           <p>
             {isArabic
@@ -64,7 +64,7 @@ export default function RefundPolicyPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٤. الاستثناءات" : "4. Exceptions"}
+            {isArabic ? "4. الاستثناءات" : "4. Exceptions"}
           </h2>
           <p>
             {isArabic

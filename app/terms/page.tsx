@@ -37,7 +37,7 @@ export default function TermsPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "١. استخدام الموقع" : "1. Utilisation du site web"}
+            {isArabic ? "1. استخدام الموقع" : "1. Utilisation du site web"}
           </h2>
           <p>
             {isArabic
@@ -46,7 +46,7 @@ export default function TermsPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٢. الأسعار والدفع" : "2. Prix et paiement"}
+            {isArabic ? "2. الأسعار والدفع" : "2. Prix et paiement"}
           </h2>
           <p>
             {isArabic
@@ -55,7 +55,7 @@ export default function TermsPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٣. الشحن والتسليم" : "3. Expédition et livraison"}
+            {isArabic ? "3. الشحن والتسليم" : "3. Expédition et livraison"}
           </h2>
           <p>
             {isArabic
@@ -64,7 +64,7 @@ export default function TermsPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٤. المسؤولية" : "4. Responsabilité"}
+            {isArabic ? "4. المسؤولية" : "4. Responsabilité"}
           </h2>
           <p>
             {isArabic
@@ -73,7 +73,7 @@ export default function TermsPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٥. التعديلات على الشروط" : "5. Modifications des conditions"}
+            {isArabic ? "5. التعديلات على الشروط" : "5. Modifications des conditions"}
           </h2>
           <p>
             {isArabic

@@ -229,7 +229,7 @@ function HeroCarousel({ products }: { products: Product[] }) {
             {
               image: '/hero-showcase-4.jpg',
               title: 'إشراقة طبيعية',
-              subtitle: 'عضوي ١٠٠٪ • معتمد'
+              subtitle: 'عضوي 100% • معتمد'
             },
             {
               image: '/hero-showcase-5.jpg',
@@ -405,7 +405,7 @@ export default function HomePage() {
       <div className="bg-primary text-primary-foreground py-2 text-center text-sm">
         <p>
           {language === 'ar'
-            ? (settings.announcement_bar_ar || settings.announcement_bar || "شحن مجاني للطلبات فوق ٥٠٠ د.م | استخدم كود ARGAN20 لخصم ٢٠٪")
+            ? (settings.announcement_bar_ar || settings.announcement_bar || "شحن مجاني للطلبات فوق 500 د.م | استخدم كود ARGAN20 لخصم 20%")
             : (settings.announcement_bar || "Livraison gratuite pour les commandes de plus de 500 MAD | Utilisez le code ARGAN20 pour 20% de réduction")
           }
         </p>
@@ -532,7 +532,7 @@ export default function HomePage() {
                           </span>
                           <p className="font-medium text-foreground">
                             {language === 'ar'
-                              ? (settings.promo_title_ar || settings.promo_title || "خصم ٢٠٪ على طلبك الأول")
+                              ? (settings.promo_title_ar || settings.promo_title || "خصم 20% على طلبك الأول")
                               : (settings.promo_title || "20% de réduction sur votre première commande")
                             }
                           </p>

@@ -37,7 +37,7 @@ export default function CookiesPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "١. ما هي الكوكيز؟" : "1. Qu'est-ce que les cookies ?"}
+            {isArabic ? "1. ما هي الكوكيز؟" : "1. Qu'est-ce que les cookies ?"}
           </h2>
           <p>
             {isArabic
@@ -46,7 +46,7 @@ export default function CookiesPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٢. أنواع الكوكيز التي نستخدمها" : "2. Types de cookies utilisés"}
+            {isArabic ? "2. أنواع الكوكيز التي نستخدمها" : "2. Types de cookies utilisés"}
           </h2>
           <p>
             {isArabic
@@ -55,7 +55,7 @@ export default function CookiesPage() {
           </p>
 
           <h2 className="font-semibold text-foreground">
-            {isArabic ? "٣. التحكم في الكوكيز" : "3. Gestion des cookies"}
+            {isArabic ? "3. التحكم في الكوكيز" : "3. Gestion des cookies"}
           </h2>
           <p>
             {isArabic
