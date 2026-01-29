@@ -734,39 +734,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Certifications */}
-      <section className="py-10 relative overflow-hidden bg-secondary/5 border-t border-border/50">
-        <div className="relative flex overflow-x-hidden group" dir="ltr">
-          <div className="animate-marquee whitespace-nowrap flex items-center gap-12 sm:gap-20 px-4">
-            {/* Original Set */}
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="relative w-24 h-24 sm:w-32 sm:h-32 grayscale hover:grayscale-0 transition-all duration-500 opacity-70 hover:opacity-100 flex-shrink-0">
-                <Image
-                  src={`/certifications/${i}.png`}
-                  alt={`Certification ${i}`}
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            ))}
-            {/* Duplicate Set for smooth infinite scroll */}
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={`dup-${i}`} className="relative w-24 h-24 sm:w-32 sm:h-32 grayscale hover:grayscale-0 transition-all duration-500 opacity-70 hover:opacity-100 flex-shrink-0">
-                <Image
-                  src={`/certifications/${i}.png`}
-                  alt={`Certification ${i}`}
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            ))}
-          </div>
-          <div className="absolute top-0 flex w-full h-full pointer-events-none">
-            <div className={`w-1/6 h-full bg-gradient-to-r ${language === 'ar' ? 'bg-gradient-to-l ml-auto' : 'from-background'} to-transparent`}></div>
-            <div className={`w-1/6 h-full bg-gradient-to-l ${language === 'ar' ? 'bg-gradient-to-r mr-auto' : 'from-background ml-auto'} to-transparent`}></div>
-          </div>
-        </div>
-      </section>
+
 
       {/* Footer */}
       <footer className="bg-background border-t border-border/40 py-16 sm:py-20 relative overflow-hidden">
