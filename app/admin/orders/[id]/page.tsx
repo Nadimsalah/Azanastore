@@ -347,7 +347,10 @@ export default function OrderDetailsPage() {
                         {/* Customer Details */}
                         <div className="glass-strong rounded-3xl p-6">
                             <div className="flex justify-between items-start mb-6">
-                                <h3 className="text-lg font-bold text-foreground">Customer</h3>
+                                <div>
+                                    <h3 className="text-lg font-bold text-foreground">Customer</h3>
+                                    <p className="text-sm font-medium text-muted-foreground mt-1">{order.customer_name}</p>
+                                </div>
                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
                                     {order.customer_name.charAt(0)}
                                 </div>
