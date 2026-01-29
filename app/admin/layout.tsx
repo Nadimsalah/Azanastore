@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { AdminNotifications } from "@/components/admin/admin-notifications"
 import { PushNotificationManager } from "@/components/admin/push-notification-manager"
+import { useLanguage } from "@/components/language-provider"
 
 export default function AdminLayout({
     children,
@@ -34,12 +35,14 @@ export default function AdminLayout({
         return null // or a loading spinner
     }
 
+    const { dir } = useLanguage()
+
     // If on login page, render children regardless of auth status to avoid redirect loops
     // If authenticated, render children
     // Otherwise render nothing (while redirecting)
     if (pathname === "/admin/login" || isAuthorized) {
         return (
-            <div dir="ltr" className="min-h-screen bg-background">
+            <div dir={dir} className="min-h-screen bg-background">
                 <AdminNotifications />
                 <PushNotificationManager />
                 {children}
