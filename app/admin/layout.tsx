@@ -13,6 +13,7 @@ export default function AdminLayout({
 }) {
     const router = useRouter()
     const pathname = usePathname()
+    const { dir } = useLanguage()
     const [isAuthorized, setIsAuthorized] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
 
@@ -34,8 +35,6 @@ export default function AdminLayout({
     if (isLoading) {
         return null // or a loading spinner
     }
-
-    const { dir } = useLanguage()
 
     // If on login page, render children regardless of auth status to avoid redirect loops
     // If authenticated, render children
