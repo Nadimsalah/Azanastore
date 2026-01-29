@@ -78,17 +78,17 @@ export default function AdminOrdersPage() {
                             <ShoppingBag className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-foreground">Orders</h1>
-                            <p className="text-xs text-muted-foreground">Manage and track orders</p>
+                            <h1 className="text-xl font-bold text-foreground">Commandes</h1>
+                            <p className="text-xs text-muted-foreground">Gérer et suivre les commandes</p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-2">
                         <Button variant="outline" className="rounded-full h-9 bg-background/50 border-white/10 hidden sm:flex">
-                            <Download className="w-4 h-4 mr-2" /> Export
+                            <Download className="w-4 h-4 mr-2" /> Exporter
                         </Button>
                         <Button className="rounded-full h-9 shadow-lg shadow-primary/20">
-                            <span className="hidden sm:inline">Create Order</span>
+                            <span className="hidden sm:inline">Créer une commande</span>
                             <span className="sm:hidden">+</span>
                         </Button>
                         <Notifications />
@@ -165,7 +165,7 @@ export default function AdminOrdersPage() {
                                                 <td className="py-4 px-4 text-sm text-muted-foreground hidden lg:table-cell">
                                                     {order.customer_email}
                                                 </td>
-                                                <td className="py-4 px-4 text-sm font-bold text-foreground">EGP {order.total}</td>
+                                                <td className="py-4 px-4 text-sm font-bold text-foreground">MAD {order.total}</td>
                                                 <td className="py-4 px-4">
                                                     <Badge variant="outline" className={`border ${getStatusColor(order.status)} text-[10px] sm:text-xs py-0.5 px-2`}>
                                                         {order.status}

@@ -158,10 +158,10 @@ export default function OrderDetailsPage() {
                                         </div>
                                         <div className="flex-1">
                                             <h4 className="font-semibold text-foreground">{item.product_title}</h4>
-                                            <p className="text-sm text-muted-foreground">Qty: {item.quantity} × EGP {item.price}</p>
+                                            <p className="text-sm text-muted-foreground">Qty: {item.quantity} × MAD {item.price}</p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="font-bold text-foreground">EGP {item.subtotal}</p>
+                                            <p className="font-bold text-foreground">MAD {item.subtotal}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -170,15 +170,15 @@ export default function OrderDetailsPage() {
                             <div className="mt-6 pt-6 border-t border-white/10 space-y-2">
                                 <div className="flex justify-between text-sm text-muted-foreground">
                                     <span>Subtotal</span>
-                                    <span>EGP {order.subtotal}</span>
+                                    <span>MAD {order.subtotal}</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-muted-foreground">
                                     <span>Shipping</span>
-                                    <span>EGP {order.shipping_cost}</span>
+                                    <span>MAD {order.shipping_cost}</span>
                                 </div>
                                 <div className="flex justify-between text-lg font-bold text-foreground pt-4 border-t border-white/5">
                                     <span>Total</span>
-                                    <span className="text-primary">EGP {order.total}</span>
+                                    <span className="text-primary">MAD {order.total}</span>
                                 </div>
                             </div>
                         </div>
@@ -199,17 +199,17 @@ export default function OrderDetailsPage() {
                                     <div className="relative w-56 h-24 mb-4">
                                         <Image
                                             src="/logo.webp"
-                                            alt="Diar Argan Logo"
+                                            alt="Azana boutique logo"
                                             fill
                                             className="object-contain object-left"
                                             priority
                                         />
                                     </div>
                                     <div className="space-y-0.5">
-                                        <p className="text-sm font-black text-[#1a1a1a]">Diar Argan</p>
-                                        <p className="text-xs text-black/70 italic">L'excellence de l'Argan Bio</p>
+                                        <p className="text-sm font-black text-[#1a1a1a]">Azana</p>
+                                        <p className="text-xs text-black/70 italic">Boutique & Luxury Clothing</p>
                                         <p className="text-xs text-black/60">Casablanca, Morocco</p>
-                                        <p className="text-xs text-black/60">Email: contact@diarargan.com</p>
+                                        <p className="text-xs text-black/60">Email: contact@azana.com</p>
                                     </div>
                                 </div>
                                 <div className="text-right">
@@ -264,8 +264,8 @@ export default function OrderDetailsPage() {
                                                     {item.variant_name && <p className="text-[10px] text-black/60 italic mt-1 bg-gray-50 inline-block px-2 py-0.5 rounded-md">{item.variant_name}</p>}
                                                 </td>
                                                 <td className="py-5 px-2 text-center font-bold text-sm">{item.quantity}</td>
-                                                <td className="py-5 px-2 text-right text-sm">{(item.price || 0).toLocaleString('fr-FR')} EGP</td>
-                                                <td className="py-5 px-2 text-right font-black text-sm">{(item.subtotal || 0).toLocaleString('fr-FR')} EGP</td>
+                                                <td className="py-5 px-2 text-right text-sm">{(item.price || 0).toLocaleString('fr-FR')} MAD</td>
+                                                <td className="py-5 px-2 text-right font-black text-sm">{(item.subtotal || 0).toLocaleString('fr-FR')} MAD</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -277,15 +277,15 @@ export default function OrderDetailsPage() {
                                 <div className="w-96 space-y-3">
                                     <div className="flex justify-between items-center py-2 border-b border-gray-100 px-2">
                                         <span className="text-xs font-bold text-black/60">Sous-total</span>
-                                        <span className="text-sm font-medium">{(order.subtotal || 0).toLocaleString('fr-FR')} EGP</span>
+                                        <span className="text-sm font-medium">{(order.subtotal || 0).toLocaleString('fr-FR')} MAD</span>
                                     </div>
                                     <div className="flex justify-between items-center py-2 border-b border-gray-100 px-2">
                                         <span className="text-xs font-bold text-black/60">Frais de livraison</span>
-                                        <span className="text-sm font-medium">{(order.shipping_cost || 0).toLocaleString('fr-FR')} EGP</span>
+                                        <span className="text-sm font-medium">{(order.shipping_cost || 0).toLocaleString('fr-FR')} MAD</span>
                                     </div>
                                     <div className="flex justify-between items-center py-4 bg-[#1a1a1a] text-white rounded-xl px-6 shadow-xl">
                                         <span className="text-sm font-black uppercase tracking-wider">Total à payer</span>
-                                        <span className="text-2xl font-black font-mono">{(order.total || 0).toLocaleString('fr-FR')} EGP</span>
+                                        <span className="text-2xl font-black font-mono">{(order.total || 0).toLocaleString('fr-FR')} MAD</span>
                                     </div>
                                     {order.status !== 'delivered' && (
                                         <div className="text-right pt-2">
@@ -314,7 +314,7 @@ export default function OrderDetailsPage() {
                             </div>
 
                             <div className="fixed bottom-10 left-0 right-0 text-center">
-                                <p className="text-[10px] text-black/30 font-bold uppercase tracking-[0.2em]">Diar Argan SARL — RC: 123456 — ICE: 0000000000000000</p>
+                                <p className="text-[10px] text-black/30 font-bold uppercase tracking-[0.2em]">Azana Boutique — RC: 123456 — ICE: 0000000000000000</p>
                             </div>
                         </div>
 
@@ -401,7 +401,7 @@ export default function OrderDetailsPage() {
                                     <MapPin className="w-4 h-4 text-primary" />
                                     <div>
                                         <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">Destination</p>
-                                        <p className="text-foreground font-medium">{order.city}, Egypt</p>
+                                        <p className="text-foreground font-medium">{order.city}, Morocco</p>
                                     </div>
                                 </div>
                             </div>

@@ -44,7 +44,7 @@ export default function SustainabilityPage() {
         <div className="container mx-auto px-4 py-16 sm:py-24 relative z-10 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div className={`space-y-6 ${isArabic ? "text-right" : ""}`}>
             <p className="text-xs font-semibold tracking-[0.35em] uppercase text-primary/80">
-              {isArabic ? "جمال مسؤول • من المغرب إلى مصر" : "Responsible Beauty • From Morocco to Egypt"}
+              {isArabic ? "جمال مسؤول • من المغرب" : "Beauté responsable • Du Maroc"}
             </p>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
               {isArabic ? "الاستدامة في ديار أرجان" : "Sustainability at Diar Argan"}
@@ -122,7 +122,7 @@ export default function SustainabilityPage() {
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
               {isArabic
                 ? "نوازن بين الجودة العالية واحترام الإنسان والبيئة، من شجرة الأرجان في المغرب حتى روتين العناية اليومي في مصر."
-                : "We balance high quality with respect for people and the planet – from the argan tree in Morocco to your daily ritual in Egypt."}
+                : "Nous équilibrons une qualité élevée avec le respect des personnes et de la planète – de l'arbre d'argan au Maroc à votre rituel quotidien."}
             </p>
           </div>
 

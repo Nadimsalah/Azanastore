@@ -27,13 +27,13 @@ export default function PrivacyPolicyPage() {
 
       <main className="container mx-auto px-4 py-10 sm:py-14 max-w-4xl">
         <h1 className={`text-2xl sm:text-3xl font-bold mb-6 ${isArabic ? "text-right" : ""}`}>
-          {isArabic ? "سياسة الخصوصية لديار أرجان – مصر" : "Diar Argan Egypt – Privacy Policy"}
+          {isArabic ? "سياسة الخصوصية لأزانا – المغرب" : "Azana Maroc – Politique de confidentialité"}
         </h1>
         <div className={`space-y-5 text-sm sm:text-base text-muted-foreground leading-relaxed ${isArabic ? "text-right" : ""}`}>
           <p>
             {isArabic
               ? "هذه السياسة تشرح كيفية قيام ديار أرجان مصر بجمع واستخدام وحماية بياناتك الشخصية وفقًا لأحكام قانون حماية البيانات الشخصية المصري رقم 151 لسنة 2020 واللوائح ذات الصلة."
-              : "This policy explains how Diar Argan Egypt collects, uses, and protects your personal data in accordance with Egyptian Personal Data Protection Law No. 151 of 2020 and applicable regulations."}
+              : "Cette politique explique comment Azana Maroc collecte, utilise et protège vos données personnelles conformément à la loi marocaine sur la protection des données personnelles et aux règlements applicables."}
           </p>
 
           <h2 className="font-semibold text-foreground">
@@ -51,7 +51,7 @@ export default function PrivacyPolicyPage() {
           <p>
             {isArabic
               ? "نستخدم بياناتك لمعالجة الطلبات، توصيل المنتجات داخل مصر، التواصل بشأن حالة الطلب أو خدمة العملاء، وإرسال عروض تسويقية بعد الحصول على موافقتك الصريحة."
-              : "We use your data to process orders, deliver products within Egypt, communicate about order status or customer service, and send marketing offers where you have given explicit consent."}
+              : "Nous utilisons vos données pour traiter les commandes, livrer les produits au Maroc, communiquer sur le statut des commandes ou le service client, et envoyer des offres marketing lorsque vous avez donné votre consentement explicite."}
           </p>
 
           <h2 className="font-semibold text-foreground">
@@ -60,7 +60,7 @@ export default function PrivacyPolicyPage() {
           <p>
             {isArabic
               ? "قد نشارك بياناتك بشكل محدود مع شركات الشحن أو مزودي خدمات الدفع داخل مصر فقط بالقدر اللازم لتنفيذ الطلب، مع التزامهم بالحفاظ على سرية البيانات."
-              : "We may share your data in a limited way with shipping partners and payment providers in Egypt, strictly for order fulfillment and subject to confidentiality obligations."}
+              : "Nous pouvons partager vos données de manière limitée avec des partenaires de livraison et des prestataires de paiement au Maroc, strictement pour l'exécution des commandes et sous réserve d'obligations de confidentialité."}
           </p>
 
           <h2 className="font-semibold text-foreground">
@@ -78,7 +78,7 @@ export default function PrivacyPolicyPage() {
           <p>
             {isArabic
               ? "نحتفظ بالبيانات فقط للمدة اللازمة لأغراض المعالجة والامتثال للالتزامات القانونية والضريبية في مصر، ثم يتم حذفها أو إخفاؤها عن الهوية."
-              : "We retain your data only for as long as necessary for processing and to comply with legal and tax obligations in Egypt, after which it is deleted or anonymised."}
+              : "Nous conservons vos données uniquement aussi longtemps que nécessaire pour le traitement et pour respecter les obligations légales et fiscales au Maroc, après quoi elles sont supprimées ou anonymisées."}
           </p>
 
           <h2 className="font-semibold text-foreground">

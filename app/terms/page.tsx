@@ -27,13 +27,13 @@ export default function TermsPage() {
 
       <main className="container mx-auto px-4 py-10 sm:py-14 max-w-4xl">
         <h1 className={`text-2xl sm:text-3xl font-bold mb-6 ${isArabic ? "text-right" : ""}`}>
-          {isArabic ? "شروط وأحكام استخدام موقع ديار أرجان – مصر" : "Diar Argan Egypt – Terms of Service"}
+          {isArabic ? "شروط وأحكام استخدام موقع أزانا – المغرب" : "Azana Morocco – Terms of Service"}
         </h1>
         <div className={`space-y-5 text-sm sm:text-base text-muted-foreground leading-relaxed ${isArabic ? "text-right" : ""}`}>
           <p>
             {isArabic
-              ? "باستخدامك لموقع ديار أرجان في مصر أو إجرائك لأي طلب شراء، فأنت توافق على الشروط والأحكام الموضحة أدناه، والمطبقة وفقًا لأحكام القانون المصري."
-              : "By accessing Diar Argan&apos;s website in Egypt or placing an order, you agree to the terms and conditions below, applied in accordance with Egyptian law."}
+              ? "باستخدامك لموقع أزانا في المغرب أو إجرائك لأي طلب شراء، فأنت توافق على الشروط والأحكام الموضحة أدناه، والمطبقة وفقًا لأحكام القانون المغربي."
+              : "By accessing Azana&apos;s website in Morocco or placing an order, you agree to the terms and conditions below, applied in accordance with Moroccan law."}
           </p>
 
           <h2 className="font-semibold text-foreground">
@@ -50,8 +50,8 @@ export default function TermsPage() {
           </h2>
           <p>
             {isArabic
-              ? "جميع الأسعار بالعملة المصرية (ج.م) وتشمل الضرائب المطبقة ما لم يُذكر خلاف ذلك. يتم السداد باستخدام الوسائل المتاحة على الموقع أو عند الاستلام وفقًا لشروط كل عرض."
-              : "All prices are in Egyptian pounds (EGP) and include applicable taxes unless stated otherwise. Payment is made using the methods available on the website or cash on delivery, depending on the offer."}
+              ? "جميع الأسعار بالدرهم المغربي (د.م) وتشمل الضرائب المطبقة ما لم يُذكر خلاف ذلك. يتم السداد باستخدام الوسائل المتاحة على الموقع أو عند الاستلام وفقًا لشروط كل عرض."
+              : "All prices are in Moroccan dirhams (MAD) and include applicable taxes unless stated otherwise. Payment is made using the methods available on the website or cash on delivery, depending on the offer."}
           </p>
 
           <h2 className="font-semibold text-foreground">
@@ -59,8 +59,8 @@ export default function TermsPage() {
           </h2>
           <p>
             {isArabic
-              ? "نقوم بتوصيل الطلبات داخل جمهورية مصر العربية فقط. يتم تقدير مواعيد التسليم وطرق الشحن في صفحة الدفع، وقد تختلف بحسب المحافظة وشركات الشحن."
-              : "We deliver orders within the Arab Republic of Egypt only. Delivery times and methods are indicated at checkout and may vary by governorate and courier."}
+              ? "نقوم بتوصيل الطلبات داخل المملكة المغربية فقط. يتم تقدير مواعيد التسليم وطرق الشحن في صفحة الدفع، وقد تختلف بحسب المنطقة وشركات الشحن."
+              : "We deliver orders within the Kingdom of Morocco only. Delivery times and methods are indicated at checkout and may vary by region and courier."}
           </p>
 
           <h2 className="font-semibold text-foreground">
@@ -69,7 +69,7 @@ export default function TermsPage() {
           <p>
             {isArabic
               ? "نحرص على أن تكون جميع المعلومات المعروضة دقيقة، ومع ذلك لا نتحمل مسؤولية أي أضرار غير مباشرة ناتجة عن استخدام الموقع أو المنتجات بما يتجاوز ما يسمح به القانون المصري لحماية المستهلك."
-              : "We strive to ensure all information displayed is accurate; however, we are not liable for any indirect damages arising from the use of the website or products beyond what is permitted under Egyptian consumer protection law."}
+              : "Nous nous efforçons d'assurer que toutes les informations affichées sont exactes ; cependant, nous ne sommes pas responsables des dommages indirects résultant de l'utilisation du site Web ou des produits au-delà de ce qui est autorisé par la loi marocaine sur la protection des consommateurs."}
           </p>
 
           <h2 className="font-semibold text-foreground">

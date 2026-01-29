@@ -12,8 +12,8 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 const almarai = Almarai({ subsets: ["arabic"], weight: ["300", "400", "700", "800"], variable: "--font-almarai" });
 
 export const metadata: Metadata = {
-  title: 'Diar Argan | Premium Moroccan Cosmetics',
-  description: 'Leader des produits cosmétiques. Discover luxurious argan oil skincare and beauty products crafted in Morocco.',
+  title: 'Azana | Boutique & Luxury Women\'s Clothing',
+  description: 'Azana is a boutique & luxury women\'s clothing store. Discover elegant dresses, timeless essentials, and statement pieces for every occasion.',
   icons: {
     icon: [
       {

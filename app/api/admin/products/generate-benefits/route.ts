@@ -8,7 +8,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Text is required' }, { status: 400 })
         }
 
-        const systemPrompt = `You are a professional copywriter for a high-end cosmetics brand in Egypt.
+        const systemPrompt = `You are a professional copywriter for a high-end women's clothing boutique in Morocco.
 Your task is to take a rough input about product benefits and generate exactly 4 distinct, short, punchy benefit titles in EGYPTIAN ARABIC (Masri).
 Language: Egyptian Arabic (Masri).
 Output Requirements:

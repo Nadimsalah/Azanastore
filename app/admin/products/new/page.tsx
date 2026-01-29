@@ -50,8 +50,7 @@ export default function NewProductPage() {
     const [price, setPrice] = useState("")
     const [compareAtPrice, setCompareAtPrice] = useState("")
     const [stock, setStock] = useState("")
-    const [ingredients, setIngredients] = useState("")
-    const [howToUse, setHowToUse] = useState("")
+    const [sizeGuide, setSizeGuide] = useState("")
     const [categories, setCategories] = useState<any[]>([])
 
     // AI Rewrite State
@@ -200,14 +199,16 @@ export default function NewProductPage() {
                 .from('products')
                 .insert({
                     title,
+                    description,
+                    sku: sku.trim(),
+                    category,
                     price: parseFloat(price),
                     compare_at_price: compareAtPrice ? parseFloat(compareAtPrice) : null,
                     stock: stock ? parseInt(stock) : 0,
                     status: status.toLowerCase(),
                     images,
                     benefits,
-                    ingredients,
-                    how_to_use: howToUse,
+                    size_guide: sizeGuide || null,
                 })
                 .select()
 
@@ -531,58 +532,29 @@ export default function NewProductPage() {
                                     </div>
                                 </div>
 
-                                {/* Ingredients */}
-                                {/* Ingredients & How to Use */}
-                                <div className="space-y-8">
-                                    {/* Ingredients section */}
-                                    <div className="space-y-4">
-                                        <div className="flex justify-between items-center px-1">
-                                            <label className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Ingredients</label>
-                                            <div className="flex items-center gap-2">
-                                                {ingredients.trim() && (
-                                                    <button
-                                                        onClick={() => handleRewrite('ingredients', ingredients, setIngredients)}
-                                                        disabled={rewriting === 'ingredients'}
-                                                        className="text-xs flex items-center gap-1 text-purple-500 hover:text-purple-700 transition-colors bg-purple-50 px-2 py-1 rounded-md"
-                                                    >
-                                                        {rewriting === 'ingredients' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                                        <span>Polish</span>
-                                                    </button>
-                                                )}
-                                            </div>
+                                {/* Size Guide */}
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center px-1">
+                                        <label className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Size Guide</label>
+                                        <div className="flex items-center gap-2">
+                                            {sizeGuide.trim() && (
+                                                <button
+                                                    onClick={() => handleRewrite('size_guide', sizeGuide, setSizeGuide)}
+                                                    disabled={rewriting === 'size_guide'}
+                                                    className="text-xs flex items-center gap-1 text-purple-500 hover:text-purple-700 transition-colors bg-purple-50 px-2 py-1 rounded-md"
+                                                >
+                                                    {rewriting === 'size_guide' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                                    <span>Polish</span>
+                                                </button>
+                                            )}
                                         </div>
-                                        <textarea
-                                            value={ingredients || ""}
-                                            onChange={(e) => setIngredients(e.target.value)}
-                                            className="w-full min-h-[120px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none shadow-sm"
-                                            placeholder="Comma separated ingredients (English)"
-                                        />
                                     </div>
-
-                                    {/* How to Use section */}
-                                    <div className="space-y-4">
-                                        <div className="flex justify-between items-center px-1">
-                                            <label className="text-sm font-semibold text-gray-700 uppercase tracking-wider">How to Use</label>
-                                            <div className="flex items-center gap-2">
-                                                {howToUse.trim() && (
-                                                    <button
-                                                        onClick={() => handleRewrite('how_to_use', howToUse, setHowToUse)}
-                                                        disabled={rewriting === 'how_to_use'}
-                                                        className="text-xs flex items-center gap-1 text-purple-500 hover:text-purple-700 transition-colors bg-purple-50 px-2 py-1 rounded-md"
-                                                    >
-                                                        {rewriting === 'how_to_use' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                                        <span>Polish</span>
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <textarea
-                                            value={howToUse || ""}
-                                            onChange={(e) => setHowToUse(e.target.value)}
-                                            className="w-full min-h-[120px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none shadow-sm"
-                                            placeholder="Step by step instructions (English)"
-                                        />
-                                    </div>
+                                    <textarea
+                                        value={sizeGuide || ""}
+                                        onChange={(e) => setSizeGuide(e.target.value)}
+                                        className="w-full min-h-[200px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none shadow-sm"
+                                        placeholder="Size guide information (e.g., XS: Bust 32-34, Waist 24-26, Hips 34-36...)"
+                                    />
                                 </div>
                             </div>
                         </section>
@@ -646,9 +618,9 @@ export default function NewProductPage() {
                             </div>
                             <div className="p-6 space-y-6">
                                 <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-gray-700">Price (EGP)</label>
+                                    <label className="text-sm font-semibold text-gray-700">Price (MAD)</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">EGP</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">MAD</span>
                                         <Input
                                             type="number"
                                             value={price || ""}
@@ -661,7 +633,7 @@ export default function NewProductPage() {
                                 <div className="space-y-3">
                                     <label className="text-sm font-semibold text-gray-700">Compare at Price (Optional)</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">EGP</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">MAD</span>
                                         <Input
                                             type="number"
                                             value={compareAtPrice || ""}

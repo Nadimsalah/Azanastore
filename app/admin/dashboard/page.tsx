@@ -29,8 +29,8 @@ export default function AdminDashboard() {
                             <Sparkles className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
-                            <p className="text-xs text-muted-foreground">Detailed overview</p>
+                            <h1 className="text-xl font-bold text-foreground">Tableau de bord</h1>
+                            <p className="text-xs text-muted-foreground">Vue d'ensemble détaillée</p>
                         </div>
                     </div>
 
@@ -38,7 +38,7 @@ export default function AdminDashboard() {
                         <div className="relative hidden md:block">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input
-                                placeholder="Search anything..."
+                                placeholder="Rechercher..."
                                 className="pl-9 w-64 rounded-full bg-background/50 border-white/10 focus:bg-background transition-all h-10"
                             />
                         </div>

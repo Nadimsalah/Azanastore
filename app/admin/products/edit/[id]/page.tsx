@@ -38,8 +38,7 @@ export default function EditProductPage() {
     const [sku, setSku] = useState("")
     const [status, setStatus] = useState("active")
     const [benefits, setBenefits] = useState<string[]>([])
-    const [ingredients, setIngredients] = useState("")
-    const [howToUse, setHowToUse] = useState("")
+    const [sizeGuide, setSizeGuide] = useState("")
 
     // AI Rewrite State
     const [rewriting, setRewriting] = useState<string | null>(null)
@@ -60,8 +59,7 @@ export default function EditProductPage() {
                 setSku(product.sku)
                 setStatus(product.status)
                 setBenefits(product.benefits || [])
-                setIngredients(product.ingredients || "")
-                setHowToUse(product.how_to_use || "")
+                setSizeGuide(product.size_guide || "")
             }
 
             setLoading(false)
@@ -121,8 +119,7 @@ export default function EditProductPage() {
                 sku,
                 status,
                 benefits,
-                ingredients,
-                how_to_use: howToUse,
+                size_guide: sizeGuide,
                 updated_at: new Date().toISOString()
             })
             .eq('id', productId)
@@ -307,47 +304,24 @@ export default function EditProductPage() {
 
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <label className="text-sm font-semibold text-gray-700">Ingredients</label>
+                                    <label className="text-sm font-semibold text-gray-700">Size Guide</label>
                                     <div className="flex gap-2">
-                                        {ingredients.trim() && (
+                                        {sizeGuide.trim() && (
                                             <button
-                                                onClick={() => handleRewrite('ingredients', ingredients, setIngredients)}
-                                                disabled={rewriting === 'ingredients'}
+                                                onClick={() => handleRewrite('size_guide', sizeGuide, setSizeGuide)}
+                                                disabled={rewriting === 'size_guide'}
                                                 className="text-xs text-purple-500 hover:text-purple-700 flex items-center gap-1"
                                             >
-                                                {rewriting === 'ingredients' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />} Polish
+                                                {rewriting === 'size_guide' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />} Polish
                                             </button>
                                         )}
                                     </div>
                                 </div>
                                 <Textarea
-                                    value={ingredients || ""}
-                                    onChange={(e) => setIngredients(e.target.value)}
-                                    placeholder="Ingredients (English)..."
-                                    className="min-h-[100px] text-sm bg-gray-50/50 border-gray-200 focus:bg-white transition-colors resize-none"
-                                />
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="flex justify-between items-center">
-                                    <label className="text-sm font-semibold text-gray-700">How to Use</label>
-                                    <div className="flex gap-2">
-                                        {howToUse.trim() && (
-                                            <button
-                                                onClick={() => handleRewrite('how_to_use', howToUse, setHowToUse)}
-                                                disabled={rewriting === 'how_to_use'}
-                                                className="text-xs text-purple-500 hover:text-purple-700 flex items-center gap-1"
-                                            >
-                                                {rewriting === 'how_to_use' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />} Polish
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                                <Textarea
-                                    value={howToUse || ""}
-                                    onChange={(e) => setHowToUse(e.target.value)}
-                                    placeholder="Usage Instructions (English)..."
-                                    className="min-h-[100px] text-sm bg-gray-50/50 border-gray-200 focus:bg-white transition-colors resize-none"
+                                    value={sizeGuide || ""}
+                                    onChange={(e) => setSizeGuide(e.target.value)}
+                                    placeholder="Size guide information (e.g., XS: Bust 32-34, Waist 24-26, Hips 34-36...)"
+                                    className="min-h-[200px] text-sm bg-gray-50/50 border-gray-200 focus:bg-white transition-colors resize-none"
                                 />
                             </div>
                         </section>
@@ -400,7 +374,7 @@ export default function EditProductPage() {
                             <h3 className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-4">Pricing</h3>
 
                             <div className="space-y-3">
-                                <label className="text-sm font-semibold text-gray-700">Price (EGP)</label>
+                                <label className="text-sm font-semibold text-gray-700">Price (MAD)</label>
                                 <Input
                                     type="number"
                                     value={price || ""}

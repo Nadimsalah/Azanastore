@@ -48,7 +48,7 @@ export default function SettingsPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     title: "Test Connection 📡",
-                    body: "System check: Your device is now connected to Diar Argan alerts!",
+                    body: "System check: Your device is now connected to Azana alerts!",
                     tag: 'test-push'
                 })
             })
@@ -146,7 +146,7 @@ export default function SettingsPage() {
                                         value={settings.currency || ""}
                                         onChange={(e) => handleChange("currency", e.target.value)}
                                         className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30"
-                                        placeholder="EGP"
+                                        placeholder="MAD"
                                     />
                                 </div>
                             </div>
@@ -169,7 +169,7 @@ export default function SettingsPage() {
                                         value={settings.announcement_bar || ""}
                                         onChange={(e) => handleChange("announcement_bar", e.target.value)}
                                         className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm resize-none placeholder:text-muted-foreground/30"
-                                        placeholder="Free shipping on orders over EGP 500 | Use code ARGAN20 for 20% off"
+                                        placeholder="Free shipping on orders over MAD 500 | Use code ARGAN20 for 20% off"
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -179,7 +179,7 @@ export default function SettingsPage() {
                                         value={settings.announcement_bar_ar || ""}
                                         onChange={(e) => handleChange("announcement_bar_ar", e.target.value)}
                                         className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm resize-none placeholder:text-muted-foreground/30 text-right font-arabic"
-                                        placeholder="شحن مجاني للطلبات فوق ٥٠٠ ج.م | استخدم كود ARGAN20 لخصم ٢٠٪"
+                                        placeholder="شحن مجاني للطلبات فوق ٥٠٠ د.م | استخدم كود ARGAN20 لخصم ٢٠٪"
                                         dir="rtl"
                                     />
                                 </div>

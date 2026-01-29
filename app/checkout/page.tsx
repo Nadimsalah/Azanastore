@@ -21,13 +21,12 @@ import {
 import { toast } from "sonner"
 import { CheckoutSummarySkeleton } from "@/components/ui/store-skeletons"
 
-const EGYPT_CITIES = [
-    "Cairo", "Alexandria", "Giza", "Shubra El Kheima", "Port Said", "Suez", "Luxor", "Mansoura",
-    "El-Mahalla El-Kubra", "Tanta", "Asyut", "Ismailia", "Faiyum", "Zagazig", "Aswan", "Damietta",
-    "Damanhur", "Minya", "Beni Suef", "Qena", "Sohag", "Hurghada", "6th of October", "Shibin El Kom",
-    "Banha", "Kafr El Sheikh", "Arish", "Mallawi", "10th of Ramadan", "Bilbais", "Marsa Matruh",
-    "Idfu", "Mit Ghamr", "Al-Hamidiyya", "Desouk", "Qalyub", "Abu Kabir", "Kafr el-Dawwar", "Girga",
-    "Akhmim", "Matareya"
+const MOROCCAN_CITIES = [
+    "Casablanca", "Rabat", "Fes", "Marrakech", "Tangier", "Agadir", "Meknes", "Oujda",
+    "Kenitra", "Tetouan", "Safi", "Mohammedia", "Khouribga", "El Jadida", "Beni Mellal", "Nador",
+    "Taza", "Settat", "Larache", "Ksar El Kebir", "Guelmim", "Berrechid", "Fkih Ben Salah", "Taourirt",
+    "Berkane", "Sidi Slimane", "Sidi Kacem", "Azrou", "Tifelt", "Sefrou", "Youssoufia", "Tan-Tan",
+    "Ouarzazate", "Sidi Ifni", "Errachidia", "Midelt", "Tiznit", "Taroudant", "Essaouira", "Chefchaouen"
 ].sort()
 
 export default function CheckoutPage() {
@@ -169,7 +168,7 @@ export default function CheckoutPage() {
             <header className="sticky top-0 z-50 glass-strong border-b border-border/50">
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                     <Link href="/" className="relative">
-                        <Image src="/logo.webp" alt="Diar Argan" width={100} height={50} className="h-8 w-auto" />
+                        <Image src="/logo.webp" alt="Azana" width={100} height={50} className="h-8 w-auto" />
                     </Link>
                     <Link href="/cart" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
                         <ArrowLeft className="w-4 h-4" /> {t('checkout.return_cart')}
@@ -196,7 +195,7 @@ export default function CheckoutPage() {
                                     name="fullName"
                                     value={formData.fullName}
                                     onChange={handleChange}
-                                    placeholder="Mohammed Kamal"
+                                    placeholder="Sara Alaoui"
                                     className={`bg-background/50 h-10 ${errors.fullName ? "border-destructive focus-visible:ring-destructive" : ""}`}
                                 />
                                 {errors.fullName && <p className="text-xs text-destructive">{errors.fullName}</p>}
@@ -207,8 +206,8 @@ export default function CheckoutPage() {
                                 <Label htmlFor="phone">{t('checkout.phone')} *</Label>
                                 <div className="relative">
                                     <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2 text-muted-foreground pointer-events-none z-10">
-                                        <span className="text-base">🇪🇬</span>
-                                        <span className="text-sm font-medium border-r border-border/50 pr-2 h-4 flex items-center">+20</span>
+                                        <span className="text-base">🇲🇦</span>
+                                        <span className="text-sm font-medium border-r border-border/50 pr-2 h-4 flex items-center">+212</span>
                                     </div>
                                     <Input
                                         id="phone"
@@ -247,7 +246,7 @@ export default function CheckoutPage() {
                                         <SelectValue placeholder="Select City" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {EGYPT_CITIES.map((city) => (
+                                        {MOROCCAN_CITIES.map((city) => (
                                             <SelectItem key={city} value={city}>
                                                 {city}
                                             </SelectItem>

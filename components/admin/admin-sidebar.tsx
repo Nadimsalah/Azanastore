@@ -21,17 +21,17 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import Image from "next/image"
 
 const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
-    { icon: ShoppingBag, label: "Orders", href: "/admin/orders" },
-    { icon: Package, label: "Products", href: "/admin/products" },
-    { icon: Users, label: "Customers", href: "/admin/customers" },
-    { icon: BarChart3, label: "Analytics", href: "/admin/analytics" },
-    { icon: ImageIcon, label: "Hero Carousel", href: "/admin/hero-carousel" },
+    { icon: LayoutDashboard, label: "Tableau de bord", href: "/admin/dashboard" },
+    { icon: ShoppingBag, label: "Commandes", href: "/admin/orders" },
+    { icon: Package, label: "Produits", href: "/admin/products" },
+    { icon: Users, label: "Clients", href: "/admin/customers" },
+    { icon: BarChart3, label: "Analyses", href: "/admin/analytics" },
+    { icon: ImageIcon, label: "Carrousel", href: "/admin/hero-carousel" },
     // CRM / Marketing
-    { icon: MessageCircle, label: "WhatsApp Leads", href: "/admin/whatsapp" },
-    { icon: Phone, label: "Contact Messages", href: "/admin/contacts" },
-    { icon: Briefcase, label: "Career Applications", href: "/admin/careers" },
-    { icon: Settings, label: "Settings", href: "/admin/settings" },
+    { icon: MessageCircle, label: "Prospects WhatsApp", href: "/admin/whatsapp" },
+    { icon: Phone, label: "Messages de contact", href: "/admin/contacts" },
+    { icon: Briefcase, label: "Candidatures", href: "/admin/careers" },
+    { icon: Settings, label: "Paramètres", href: "/admin/settings" },
 ]
 
 export function AdminSidebar() {
@@ -42,7 +42,7 @@ export function AdminSidebar() {
             <div className="p-6 flex items-center justify-center border-b border-white/10">
                 <Image
                     src="/logo.webp"
-                    alt="Diar Argan"
+                    alt="Azana boutique logo"
                     width={120}
                     height={60}
                     className="h-10 w-auto"
@@ -73,7 +73,7 @@ export function AdminSidebar() {
                 <Link href="/admin/login">
                     <Button variant="outline" className="w-full justify-start gap-3 h-12 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20">
                         <LogOut className="w-5 h-5" />
-                        <span className="font-medium">Logout</span>
+                        <span className="font-medium">Déconnexion</span>
                     </Button>
                 </Link>
             </div>

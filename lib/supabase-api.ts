@@ -15,10 +15,8 @@ export interface Product {
     images: string[]
     benefits: string[] | null
     benefits_ar: string[] | null
-    ingredients: string | null
-    ingredients_ar: string | null
-    how_to_use: string | null
-    how_to_use_ar: string | null
+    size_guide: string | null
+    size_guide_ar: string | null
     sales_count: number
     created_at: string
     updated_at: string
@@ -233,9 +231,12 @@ export async function getProducts(filters?: {
     limit?: number
     offset?: number
 }) {
+    // Explicitly select columns to avoid issues with schema mismatches
+    const selectColumns = 'id, title, title_ar, description, description_ar, sku, category, price, compare_at_price, stock, status, images, benefits, benefits_ar, size_guide, size_guide_ar, sales_count, created_at, updated_at'
+    
     let query = supabase
         .from('products')
-        .select('*')
+        .select(selectColumns)
         .order('created_at', { ascending: false })
 
     if (filters?.category) {
@@ -271,7 +272,7 @@ export async function getProducts(filters?: {
                 // Re-build clean query for fallback
                 let fallbackQueryBuilder = supabase
                     .from('products')
-                    .select('*')
+                    .select(selectColumns)
                     .order('created_at', { ascending: false })
 
                 if (filters?.category) fallbackQueryBuilder = fallbackQueryBuilder.eq('category', filters.category)
@@ -300,12 +301,49 @@ export async function getProducts(filters?: {
     const { data, error } = await query
 
     if (error) {
+        // If error is about missing size_guide columns, try fallback without them
+        if (error.message?.includes('column "size_guide') || error.message?.includes('column "size_guide_ar')) {
+            console.warn('Size guide columns not found, using fallback query without them. Please run migration to add size_guide support.')
+            
+            const fallbackColumns = 'id, title, title_ar, description, description_ar, sku, category, price, compare_at_price, stock, status, images, benefits, benefits_ar, sales_count, created_at, updated_at'
+            
+            let fallbackQuery = supabase
+                .from('products')
+                .select(fallbackColumns)
+                .order('created_at', { ascending: false })
+            
+            if (filters?.category) fallbackQuery = fallbackQuery.eq('category', filters.category)
+            if (filters?.status) fallbackQuery = fallbackQuery.eq('status', filters.status)
+            else fallbackQuery = fallbackQuery.eq('status', 'active')
+            if (filters?.limit) fallbackQuery = fallbackQuery.limit(filters.limit)
+            if (filters?.offset) fallbackQuery = fallbackQuery.range(filters.offset, filters.offset + (filters.limit || 10) - 1)
+            
+            const { data: fallbackData, error: fallbackError } = await fallbackQuery
+            
+            if (fallbackError) {
+                console.error('Fallback query also failed:', fallbackError)
+                return []
+            }
+            
+            // Map fallback data to include null size_guide fields
+            return (fallbackData || []).map((item: any) => ({
+                ...item,
+                size_guide: null,
+                size_guide_ar: null
+            })) as Product[]
+        }
+        
         console.error('Error fetching products:', {
-            message: error.message,
-            code: error.code,
-            details: error.details,
-            hint: error.hint
+            message: error.message || 'Unknown error',
+            code: error.code || 'NO_CODE',
+            details: error.details || 'No details',
+            hint: error.hint || 'No hint',
+            fullError: error
         })
+        // If error is about missing columns, provide helpful message
+        if (error.message?.includes('column') && error.message?.includes('does not exist')) {
+            console.error('Database schema mismatch detected. Please run the migration script: supabase/migrations/update_to_azana_schema.sql')
+        }
         return []
     }
 
@@ -313,9 +351,12 @@ export async function getProducts(filters?: {
 }
 
 export async function getProductById(id: string) {
+    // Explicitly select columns to avoid issues with schema mismatches
+    const selectColumns = 'id, title, title_ar, description, description_ar, sku, category, price, compare_at_price, stock, status, images, benefits, benefits_ar, size_guide, size_guide_ar, sales_count, created_at, updated_at'
+    
     const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select(selectColumns)
         .eq('id', id)
         .single()
 
@@ -465,7 +506,7 @@ export async function createOrder(data: {
             customer_phone: data.customer.phone,
             address_line1: data.customer.address_line1,
             city: data.customer.city,
-            governorate: 'Egypt', // Default for now
+            governorate: 'Morocco', // Default for now
             status: 'pending',
             subtotal: data.subtotal,
             shipping_cost: data.shipping_cost,
@@ -668,7 +709,7 @@ export async function updateAdminSettings(settings: Record<string, string>) {
 
 export interface HeroCarouselItem {
     id: string
-    position: number
+    position: number // Maps to sort_order in database
     image_url: string
     title: string
     subtitle: string | null
@@ -685,7 +726,7 @@ export async function getHeroCarouselItems(admin = false): Promise<HeroCarouselI
     let query = supabase
         .from('hero_carousel')
         .select('*')
-        .order('position', { ascending: true })
+        .order('sort_order', { ascending: true })
 
     if (!admin) {
         query = query.eq('is_active', true)
@@ -695,15 +736,49 @@ export async function getHeroCarouselItems(admin = false): Promise<HeroCarouselI
 
     if (error) {
         console.error('Error fetching hero carousel items:', {
-            message: error.message,
-            code: error.code,
-            details: error.details,
-            hint: error.hint
+            message: error.message || 'Unknown error',
+            code: error.code || 'NO_CODE',
+            details: error.details || 'No details',
+            hint: error.hint || 'No hint',
+            fullError: error
         })
+        
+        // If table doesn't exist, provide helpful message
+        if (error.message?.includes('relation "hero_carousel" does not exist') || 
+            error.message?.includes('does not exist')) {
+            console.error('❌ Hero carousel table not found! Please run the setup script: supabase/connect_hero_carousel.sql')
+            return []
+        }
+        
+        // If sort_order column doesn't exist, try with position as fallback
+        if (error.message?.includes('column "sort_order" does not exist')) {
+            console.warn('sort_order column not found, trying position column...')
+            let fallbackQuery = supabase
+                .from('hero_carousel')
+                .select('*')
+                .order('position', { ascending: true })
+            
+            if (!admin) {
+                fallbackQuery = fallbackQuery.eq('is_active', true)
+            }
+            
+            const { data: fallbackData, error: fallbackError } = await fallbackQuery
+            
+            if (fallbackError) {
+                console.error('Fallback query also failed:', fallbackError)
+                return []
+            }
+            
+            return (fallbackData || []) as HeroCarouselItem[]
+        }
         return []
     }
 
-    return data || []
+    // Map sort_order to position for interface compatibility
+    return (data || []).map((item: any) => ({
+        ...item,
+        position: item.sort_order ?? item.position ?? 0
+    })) as HeroCarouselItem[]
 }
 
 /**
@@ -711,11 +786,18 @@ export async function getHeroCarouselItems(admin = false): Promise<HeroCarouselI
  */
 export async function updateHeroCarouselItem(
     id: string,
-    updates: Partial<Pick<HeroCarouselItem, 'title' | 'subtitle' | 'image_url' | 'is_active' | 'link'>>
+    updates: Partial<Pick<HeroCarouselItem, 'title' | 'subtitle' | 'image_url' | 'is_active' | 'link' | 'position'>>
 ): Promise<{ success: boolean; error?: string }> {
+    // Map position to sort_order if provided
+    const dbUpdates: any = { ...updates }
+    if ('position' in updates && updates.position !== undefined) {
+        dbUpdates.sort_order = updates.position
+        delete dbUpdates.position
+    }
+    
     const { error } = await supabase
         .from('hero_carousel')
-        .update(updates)
+        .update(dbUpdates)
         .eq('id', id)
 
     if (error) {
@@ -740,7 +822,11 @@ export async function addHeroCarouselItem(item: {
     const { data, error } = await supabase
         .from('hero_carousel')
         .insert({
-            ...item,
+            title: item.title,
+            subtitle: item.subtitle || null,
+            image_url: item.image_url,
+            link: item.link || null,
+            sort_order: item.position, // Map position to sort_order
             is_active: item.is_active ?? true
         })
         .select()
@@ -751,7 +837,13 @@ export async function addHeroCarouselItem(item: {
         return { success: false, error: error.message }
     }
 
-    return { success: true, data: data as HeroCarouselItem }
+    // Map sort_order back to position for interface
+    const mappedData = data ? {
+        ...data,
+        position: data.sort_order ?? data.position ?? 0
+    } : null
+
+    return { success: true, data: mappedData as HeroCarouselItem }
 }
 
 /**
@@ -810,11 +902,11 @@ export async function reorderHeroCarousel(
     items: Array<{ id: string; position: number }>
 ): Promise<{ success: boolean; error?: string }> {
     try {
-        // Update each item's position
+        // Update each item's sort_order (mapped from position)
         const updates = items.map(item =>
             supabase
                 .from('hero_carousel')
-                .update({ position: item.position })
+                .update({ sort_order: item.position }) // Map position to sort_order
                 .eq('id', item.id)
         )
 

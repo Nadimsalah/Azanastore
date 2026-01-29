@@ -29,8 +29,8 @@ export function DashboardStats() {
 
     const stats = [
         {
-            label: "Total Revenue",
-            value: `EGP ${statsData?.totalRevenue?.toLocaleString()}`,
+            label: "Revenu total",
+            value: `MAD ${statsData?.totalRevenue?.toLocaleString()}`,
             change: "+12.5%", // Mock change for now
             trend: "up",
             icon: DollarSign,
@@ -38,7 +38,7 @@ export function DashboardStats() {
             textColor: "text-primary",
         },
         {
-            label: "Total Orders",
+            label: "Total des commandes",
             value: statsData?.totalOrders?.toString(),
             change: `+${statsData?.pendingOrders}`,
             trend: "up",
@@ -47,18 +47,18 @@ export function DashboardStats() {
             textColor: "text-blue-500",
         },
         {
-            label: "Total Products",
+            label: "Total des produits",
             value: statsData?.totalProducts?.toString(),
-            change: "Active",
+            change: "Actif",
             trend: "up",
             icon: Package,
             color: "from-orange-500/20 to-red-500/20",
             textColor: "text-orange-500",
         },
         {
-            label: "Total Customers",
+            label: "Total des clients",
             value: statsData?.totalCustomers?.toString(),
-            change: "Syncing",
+            change: "Synchronisation",
             trend: "up",
             icon: Users,
             color: "from-purple-500/20 to-pink-500/20",

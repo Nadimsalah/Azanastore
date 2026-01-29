@@ -40,9 +40,9 @@ export function RecentOrders() {
     return (
         <div className="glass rounded-2xl p-6 overflow-hidden">
             <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-bold text-foreground">Recent Orders</h3>
+                <h3 className="text-lg font-bold text-foreground">Commandes récentes</h3>
                 <Link href="/admin/orders">
-                    <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80">View All</Button>
+                    <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80">Voir tout</Button>
                 </Link>
             </div>
 
@@ -50,18 +50,18 @@ export function RecentOrders() {
                 <table className="w-full">
                     <thead>
                         <tr className="border-b border-border/50 text-left">
-                            <th className="pb-3 text-sm font-medium text-muted-foreground pl-2">Order ID</th>
-                            <th className="pb-3 text-sm font-medium text-muted-foreground hidden sm:table-cell">Customer</th>
+                            <th className="pb-3 text-sm font-medium text-muted-foreground pl-2">ID Commande</th>
+                            <th className="pb-3 text-sm font-medium text-muted-foreground hidden sm:table-cell">Client</th>
                             <th className="pb-3 text-sm font-medium text-muted-foreground hidden md:table-cell">Email</th>
-                            <th className="pb-3 text-sm font-medium text-muted-foreground">Amount</th>
-                            <th className="pb-3 text-sm font-medium text-muted-foreground">Status</th>
+                            <th className="pb-3 text-sm font-medium text-muted-foreground">Montant</th>
+                            <th className="pb-3 text-sm font-medium text-muted-foreground">Statut</th>
                             <th className="pb-3 text-sm font-medium text-muted-foreground text-right pr-2">Action</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-border/50">
                         {loading ? (
                             <tr>
-                                <td colSpan={6} className="py-8 text-center text-muted-foreground animate-pulse">Loading recent orders...</td>
+                                <td colSpan={6} className="py-8 text-center text-muted-foreground animate-pulse">Chargement des commandes récentes...</td>
                             </tr>
                         ) : orders.length > 0 ? (
                             orders.map((order) => (
@@ -69,7 +69,7 @@ export function RecentOrders() {
                                     <td className="py-4 pl-2 font-medium text-foreground text-xs sm:text-base">{order.order_number}</td>
                                     <td className="py-4 text-foreground/80 hidden sm:table-cell">{order.customer_name}</td>
                                     <td className="py-4 text-sm text-muted-foreground max-w-[200px] truncate hidden md:table-cell">{order.customer_email}</td>
-                                    <td className="py-4 font-semibold text-foreground text-xs sm:text-base">EGP {order.total}</td>
+                                    <td className="py-4 font-semibold text-foreground text-xs sm:text-base">MAD {order.total}</td>
                                     <td className="py-4">
                                         <Badge variant="outline" className={`border-0 ${getStatusColor(order.status)} text-[10px] sm:text-xs`}>
                                             {order.status}

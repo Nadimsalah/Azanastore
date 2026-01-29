@@ -246,33 +246,33 @@ function HeroCarousel({ products }: { products: Product[] }) {
           setCarouselItems([
             {
               image: '/hero-showcase-1.jpg',
-              title: 'The Secret of Moroccan Beauty',
-              subtitle: 'Pure • Natural • Timeless'
+              title: 'Effortless Women\'s Style',
+              subtitle: 'Boutique looks for every day'
             },
             {
               image: '/hero-showcase-2.jpg',
-              title: 'Handcrafted Excellence',
-              subtitle: 'From Morocco with Love'
+              title: 'Luxury Evening Dresses',
+              subtitle: 'Statement gowns for special nights'
             },
             {
               image: '/hero-showcase-3.jpg',
-              title: 'Liquid Gold',
-              subtitle: 'Cold Pressed Argan Oil'
+              title: 'Elevated Essentials',
+              subtitle: 'Perfect fits, premium fabrics'
             },
             {
               image: '/hero-showcase-4.jpg',
-              title: 'Natural Radiance',
-              subtitle: '100% Organic • Certified'
+              title: 'New Season Arrivals',
+              subtitle: 'Curated drops every week'
             },
             {
               image: '/hero-showcase-5.jpg',
-              title: 'Beauty Ritual',
-              subtitle: 'Ancient Wisdom • Modern Care'
+              title: 'Head‑to‑Toe Looks',
+              subtitle: 'From dresses to accessories'
             },
             {
               image: '/hero-showcase-6.jpg',
-              title: 'Diar Argan',
-              subtitle: 'Authentic Moroccan Skincare'
+              title: 'Azana',
+              subtitle: 'Boutique & luxury women\'s clothing'
             }
           ])
         }
@@ -405,8 +405,8 @@ export default function HomePage() {
       <div className="bg-primary text-primary-foreground py-2 text-center text-sm">
         <p>
           {language === 'ar'
-            ? (settings.announcement_bar_ar || settings.announcement_bar || "شحن مجاني للطلبات فوق ٥٠٠ ج.م | استخدم كود ARGAN20 لخصم ٢٠٪")
-            : (settings.announcement_bar || "Free shipping on orders over EGP 500 | Use code ARGAN20 for 20% off")
+            ? (settings.announcement_bar_ar || settings.announcement_bar || "شحن مجاني للطلبات فوق ٥٠٠ د.م | استخدم كود ARGAN20 لخصم ٢٠٪")
+            : (settings.announcement_bar || "Free shipping on orders over MAD 500 | Use code ARGAN20 for 20% off")
           }
         </p>
       </div>
@@ -422,7 +422,7 @@ export default function HomePage() {
             <Link href="/" className="flex-shrink-0 relative group">
               <Image
                 src="/logo.webp"
-                alt="Diar Argan"
+                alt="Azana boutique logo"
                 width={120}
                 height={60}
                 className="h-10 sm:h-12 w-auto transition-transform duration-300 group-hover:scale-105"
@@ -465,7 +465,7 @@ export default function HomePage() {
                     <div className="flex items-center justify-between p-6 border-b border-border/50">
                       <Image
                         src="/logo.webp"
-                        alt="Diar Argan"
+                        alt="Azana boutique logo"
                         width={100}
                         height={50}
                         className="h-10 w-auto"
@@ -778,7 +778,7 @@ export default function HomePage() {
               <Link href="/" className="inline-block">
                 <Image
                   src="/logo.webp"
-                  alt="Diar Argan"
+                  alt="Azana boutique logo"
                   width={150}
                   height={60}
                   className="h-10 w-auto opacity-90 hover:opacity-100 transition-opacity"
@@ -844,7 +844,7 @@ export default function HomePage() {
 
           {/* Bottom Bar */}
           <div className="border-t border-border pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-            <p>© {new Date().getFullYear()} Diar Argan. {t('footer.rights')}</p>
+            <p>© {new Date().getFullYear()} Azana. {t('footer.rights')}</p>
             <div className="flex items-center gap-6">
               <Link href="/privacy-policy" className="hover:text-foreground transition-colors">{t('footer.privacy_short')}</Link>
               <Link href="/terms" className="hover:text-foreground transition-colors">{t('footer.terms_short')}</Link>

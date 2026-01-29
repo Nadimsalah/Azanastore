@@ -96,8 +96,7 @@ export default function ProductPage() {
   const displayTitle = isArabic && product.title_ar ? product.title_ar : product.title
   const displayDescription = isArabic && product.description_ar ? product.description_ar : product.description || ""
   const displayBenefits = isArabic && product.benefits_ar ? product.benefits_ar : product.benefits || []
-  const displayIngredients = isArabic && product.ingredients_ar ? product.ingredients_ar : product.ingredients || ""
-  const displayHowToUse = isArabic && product.how_to_use_ar ? product.how_to_use_ar : product.how_to_use || ""
+  const displaySizeGuide = isArabic && product.size_guide_ar ? product.size_guide_ar : product.size_guide || ""
 
   const inStock = product.stock > 0
   const productImages = (product.images && product.images.length > 0) ? product.images : ["/placeholder.svg?height=600&width=600"]
@@ -113,7 +112,7 @@ export default function ProductPage() {
             <Link href="/" className="flex-shrink-0 relative group">
               <Image
                 src="/logo.webp"
-                alt="Diar Argan"
+                alt="Azana boutique logo"
                 width={120}
                 height={60}
                 className="h-10 sm:h-12 w-auto transition-transform duration-300 group-hover:scale-105"
@@ -308,24 +307,13 @@ export default function ProductPage() {
                 </AccordionItem>
               )}
 
-              {product.ingredients && (
-                <AccordionItem value="ingredients" className="glass rounded-3xl border-white/5 overflow-hidden shadow-sm">
+              {product.size_guide && (
+                <AccordionItem value="size-guide" className="glass rounded-3xl border-white/5 overflow-hidden shadow-sm">
                   <AccordionTrigger className="px-8 py-5 hover:no-underline font-bold text-xl text-foreground">
-                    {t('product.ingredients')}
+                    {t('product.size_guide')}
                   </AccordionTrigger>
-                  <AccordionContent className="px-8 pb-8 pt-2 text-muted-foreground leading-relaxed text-lg">
-                    {displayIngredients}
-                  </AccordionContent>
-                </AccordionItem>
-              )}
-
-              {product.how_to_use && (
-                <AccordionItem value="how-to-use" className="glass rounded-3xl border-white/5 overflow-hidden shadow-sm">
-                  <AccordionTrigger className="px-8 py-5 hover:no-underline font-bold text-xl text-foreground">
-                    {t('product.how_to_use')}
-                  </AccordionTrigger>
-                  <AccordionContent className="px-8 pb-8 pt-2 text-muted-foreground leading-relaxed text-lg">
-                    {displayHowToUse}
+                  <AccordionContent className="px-8 pb-8 pt-2 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
+                    {displaySizeGuide}
                   </AccordionContent>
                 </AccordionItem>
               )}

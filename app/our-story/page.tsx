@@ -25,7 +25,7 @@ export default function OurStoryPage() {
           <Link href="/" className="flex-shrink-0 relative group">
             <Image
               src="/logo.webp"
-              alt="Diar Argan"
+              alt="Azana boutique logo"
               width={120}
               height={60}
               className="h-10 w-auto transition-transform duration-300 group-hover:scale-105"
@@ -44,44 +44,44 @@ export default function OurStoryPage() {
           <div className="container mx-auto px-4 py-16 sm:py-24 relative z-10 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div className={`space-y-6 ${isArabic ? "text-right" : ""}`}>
             <p className="text-xs font-semibold tracking-[0.35em] uppercase text-primary/80">
-              {isArabic ? "منذ 1999 • خبرة في زيت الأرجان المغربي" : "Since 1999 • Moroccan Argan Expertise"}
+              {isArabic ? "منذ 2010 • أزياء نسائية راقية" : "Since 2010 • Boutique Women’s Fashion"}
             </p>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
               {isArabic ? (
                 <>
-                  حكايتنا في <span className="text-primary">ديار أرجان</span>
+                  حكايتنا في <span className="text-primary">أزانا</span>
                 </>
               ) : (
                 <>
-                  Our Story at <span className="text-primary">Diar Argan</span>
+                  Our Story at <span className="text-primary">Azana</span>
                 </>
               )}
             </h1>
             <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
               {isArabic
-                ? "ديار أرجان تصدّر زيت الأرجان المغربي النقي منذ عام 1999. لأكثر من عشرين عامًا، عملنا جنبًا إلى جنب مع التعاونيات والحرفيين المحليين لنحوّل هذا الزيت النادر إلى طقوس عناية فاخرة للبشرة والشعر."
-                : "Diar Argan has been exporting pure Moroccan argan oil since 1999. For more than two decades, we have worked hand in hand with local cooperatives and artisans to transform this rare oil into high‑performance skincare and haircare rituals."}
+                ? "أزانا بدأت كفكرة بسيطة: متجر صغير يقدم فساتين نسائية أنيقة ومريحة تناسب الحياة اليومية والمناسبات الخاصة. بمرور الوقت تحوّل هذا الشغف بالأقمشة والتفاصيل إلى علامة متخصصة في الأزياء الراقية للمرأة."
+                : "Azana began as a small boutique with one clear dream: create elegant, comfortable women’s clothing that feels special every day. Over time, that love for fabrics, fit, and detail grew into a dedicated brand for boutique & luxury women’s fashion."}
             </p>
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
               {isArabic
-                ? "اليوم نقدّم لك خلاصة أفضل منتجاتنا بجودة لا تُضاهى. نحن على ثقة أنك ستُحبينها وتعودين مرة أخرى، لأن الجودة والأصالة هما جوهر كل ما نقدّمه."
-                : "Today, we offer you the elixir of our best products, crafted with irreproachable quality. We are convinced you&apos;ll love them and come back again, because quality and authenticity are at the heart of everything we do."}
+                ? "اليوم نقدّم مجموعات متجددة من الفساتين والقطع الأساسية والقطع المميزة التي صُممت بعناية لتعبّر عن أسلوبك وتبرز ثقتك. في أزانا، الجودة والقصّة المريحة هما جوهر كل تصميم."
+                : "Today, we design curated drops of dresses, elevated basics, and statement pieces that help you express your style and feel confident. At Azana, thoughtful quality and a flattering fit sit at the heart of every design."}
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-[0.2em]">
                 <Droplets className="w-3.5 h-3.5" />
-                {isArabic ? "خبرة 100٪ في زيت الأرجان" : "100% Argan Expertise"}
+                {isArabic ? "خامات مختارة بعناية" : "Carefully selected fabrics"}
               </div>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 text-emerald-700 text-xs font-semibold uppercase tracking-[0.2em]">
                 <Sparkles className="w-3.5 h-3.5" />
-                {isArabic ? "أصالة ونقاء" : "Authentic &amp; Clean"}
+                {isArabic ? "تفاصيل أنثوية فاخرة" : "Feminine, luxury details"}
               </div>
             </div>
             <div className={`mt-4 space-y-2 ${isArabic ? "text-right" : ""}`}>
               <p className="text-xs sm:text-sm text-muted-foreground">
                 {isArabic
-                  ? "ديار أرجان حاصلة على عدة شهادات للجودة والنقاء من جهات رقابية دولية وإقليمية، تؤكد مصدر زيتنا وطريقة استخلاصه."
-                  : "Diar Argan holds multiple quality and purity certifications from international and regional bodies, confirming the origin of our oil and our extraction methods."}
+                  ? "نعمل مع مورّدين موثوقين وخياطات محترفات لنضمن أن كل قطعة تلتزم بمعايير عالية من الجودة والراحة."
+                  : "We partner with trusted fabric suppliers and experienced ateliers to ensure every piece meets our standards for comfort, quality, and longevity."}
               </p>
               <div className="flex flex-wrap items-center gap-4 opacity-80">
                 <div className="relative w-14 h-14 sm:w-16 sm:h-16">
@@ -161,27 +161,27 @@ export default function OurStoryPage() {
             <div className={`space-y-4 ${isArabic ? "text-right" : ""}`}>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-[0.2em]">
                 <Globe2 className="w-3.5 h-3.5" />
-                {isArabic ? "من المغرب إلى العالم" : "From Morocco to the World"}
+                {isArabic ? "من البوتيك إلى خزانتك" : "From our boutique to your wardrobe"}
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-                {isArabic ? "جذورنا في المغرب وثقتكم في كل مكان" : "Rooted in Morocco, trusted worldwide"}
+                {isArabic ? "نصمم أزياءً تعيش معك طويلاً" : "Designing pieces that live in your wardrobe"}
               </h2>
               <p className="text-muted-foreground leading-relaxed">
                 {isArabic
-                  ? "منذ عام 1999، تكرّس ديار أرجان لمشاركة أسرار الجمال المغربي مع العالم. ما بدأ كشغف بزيت الأرجان النقي تحوّل إلى مجموعة كاملة من منتجات العناية التي تحترم بشرتك والأرض التي تأتي منها."
-                  : "Since 1999, Diar Argan has been dedicated to sharing the secrets of Moroccan beauty with the world. What started as a passion for pure argan oil has grown into a full range of care products that respect both your skin and the land they come from."}
+                  ? "منذ انطلاقة أزانا، تركّزنا على تصميم قطع يمكن ارتداؤها بطرق متعددة وتبقى أنيقة عاماً بعد عام. ما بدأ بفستان واحد مميز أصبح اليوم مجموعات كاملة تناسب أسلوب حياة المرأة العصرية."
+                  : "Since the beginning, Azana has focused on clothing that can be styled many ways and still feel current season after season. What started as one signature dress has grown into full collections for the modern woman’s everyday life."}
               </p>
             </div>
             <div className={`space-y-4 text-sm sm:text-base text-muted-foreground leading-relaxed ${isArabic ? "text-right" : ""}`}>
               <p>
                 {isArabic
-                  ? "لأكثر من عشرين عامًا، أتقنّا كل خطوة في رحلتنا – من اختيار حبوب الأرجان بعناية إلى العصر البارد للزيت وصياغة تركيبات فعّالة. كل زجاجة هي ثمرة خبرة وصبر واحترام عميق للإرث المغربي."
-                  : "For more than 20 years, we have perfected every step of our process – from carefully selecting argan kernels to cold‑pressing the oil and formulating high‑performance treatments. Every bottle is the result of expertise, patience, and a deep respect for Moroccan heritage."}
+                  ? "نراجع كل تفصيلة – من اختيار القصّة والقماش إلى اللمسات النهائية – لنضمن أن القطعة مريحة بقدر ما هي أنيقة. هدفنا أن تشعري أنك ترتدين شيئاً صُمم خصيصاً لك."
+                  : "We obsess over every detail – from the cut and fabric to the finishing touches – to make sure each piece feels as comfortable as it is beautiful. Our goal is for every item to feel like it was made just for you."}
               </p>
               <p>
                 {isArabic
-                  ? "شركاؤنا والتعاونيات النسائية في المغرب هم قلب هذه الحكاية. معًا نضمن أن يحتفظ كل قطرة من زيت الأرجان بخصائصه الفريدة في التغذية والإصلاح وإضفاء الإشراقة على البشرة والشعر."
-                  : "Our partners and cooperatives are at the center of this story. Together, we ensure that each drop of argan oil keeps its exceptional virtues: nourishing, repairing, and illuminating your skin and hair."}
+                  ? "فِرق التصميم والخياطة التي نعمل معها هي قلب الحكاية. معاً نبتكر مجموعات تمنحك إحساس البوتيك الخاص أينما كنت."
+                  : "The design and tailoring teams we partner with are at the heart of our story. Together, we create collections that bring the feeling of a personal boutique to your everyday wardrobe."}
               </p>
             </div>
           </div>
@@ -190,41 +190,41 @@ export default function OurStoryPage() {
             <div className={`space-y-4 ${isArabic ? "text-right" : ""}`}>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-semibold uppercase tracking-[0.2em]">
                 <MapPin className="w-3.5 h-3.5" />
-                {isArabic ? "الآن في السوق المصري" : "Now in Egypt"}
+                {isArabic ? "أزانا أقرب إليك" : "Azana, closer to you"}
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-                {isArabic ? "ديار أرجان تصل إلى السوق المصري" : "Diar Argan arrives in the Egyptian market"}
+                {isArabic ? "أزياء بوتيك بلمسة عصرية" : "Boutique fashion with a modern touch"}
               </h2>
               <p className="text-muted-foreground leading-relaxed">
                 {isArabic
-                  ? "بعد سنوات من خدمة العملاء حول العالم، أصبحت ديار أرجان اليوم حاضرة في مصر. تظل رسالتنا واحدة: أن نقدّم لك عناية مغربية أصيلة بزيت الأرجان، تناسب روتينك اليومي وطبيعة المناخ من حولك."
-                  : "After years of serving customers around the world, Diar Argan is now present in Egypt. Our mission remains the same: to offer you authentic Moroccan argan care, adapted to your daily rituals and climate."}
+                  ? "سواء كنتِ تبحثين عن فستان سهرة لافت أو إطلالة يومية أنيقة، نقدّم لك مجموعات تجمع بين الراحة والرقي وتناسب مختلف المناسبات."
+                  : "Whether you are dressing for a special evening or your everyday routine, our collections blend comfort and polish so you always feel put together."}
               </p>
               <p className="text-muted-foreground leading-relaxed">
                 {isArabic
-                  ? "من القاهرة إلى الإسكندرية وما بعدها، نلتزم بتقديم منتجات أرجان عالية الجودة، حتى تعيشي نفس تجربة الفخامة والنتائج الموثوقة التي صنعت اسم ديار أرجان منذ 1999."
-                  : "From Cairo to Alexandria and beyond, we are committed to making premium argan‑based products accessible, so you can experience the same luxurious textures and results that made Diar Argan a trusted name since 1999."}
+                  ? "من أول زيارة لك حتى كل طلبية جديدة، وعدنا أن تبقي أزانا مساحة لاكتشاف أزياء جديدة تعبّر عنك وتمنحك شعور البوتيك الخاص أينما كنت."
+                  : "From your first visit to every new order, our promise is that Azana remains a place to discover new styles that feel like you and bring the boutique experience closer to home."}
               </p>
             </div>
             <div className={`glass-subtle rounded-3xl p-6 space-y-3 text-sm sm:text-base ${isArabic ? "text-right" : ""}`}>
               <p className="font-semibold text-foreground">
-                {isArabic ? "وعدنا لك" : "Our Promise"}
+                {isArabic ? "وعدنا لك" : "Our Style Promise"}
               </p>
               <ul className="space-y-2 text-muted-foreground">
                 <li>
                   {isArabic
-                    ? "• زيت أرجان مختار بعناية من تعاونيات مغربية موثوقة"
-                    : "• Carefully selected argan oil from Moroccan cooperatives"}
+                    ? "• أقمشة وقصّات مختارة بعناية لتلائم جسمك وتمنحك الثقة"
+                    : "• Carefully chosen fabrics and cuts that flatter your shape and feel good all day"}
                 </li>
                 <li>
                   {isArabic
-                    ? "• تركيبات توازن بين الجودة والأمان والفعالية"
-                    : "• Formulas focused on quality, safety, and performance"}
+                    ? "• تصميمات تجمع بين الراحة والأناقة في كل قطعة"
+                    : "• Designs that balance comfort and elegance in every piece"}
                 </li>
                 <li>
                   {isArabic
-                    ? "• التزام طويل الأمد بالأصالة والشفافية"
-                    : "• A long‑term commitment to authenticity and transparency"}
+                    ? "• التزام طويل الأمد بالجودة والشفافية في كل خطوة"
+                    : "• A long‑term commitment to quality, transparency, and thoughtful design"}
                 </li>
               </ul>
             </div>
@@ -236,12 +236,12 @@ export default function OurStoryPage() {
       <section className="py-16 sm:py-20 bg-secondary/5 border-t border-border/40">
         <div className={`container mx-auto px-4 max-w-3xl text-center space-y-6 ${isArabic ? "rtl" : ""}`}>
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-            {isArabic ? "عيشي طقس العناية مع ديار أرجان" : "Experience the Diar Argan ritual"}
+            {isArabic ? "اكتشفي إطلالتك المفضلة مع أزانا" : "Find your new favorite outfit with Azana"}
           </h2>
           <p className="text-muted-foreground leading-relaxed">
             {isArabic
-              ? "اكتشفي مجموعتنا من منتجات العناية المعززة بزيت الأرجان والمصمّمة بخبرة تزيد عن 20 عامًا. من كريمات الوجه إلى إكسير الشعر، كل منتج مصمم ليكشف عن إشراقتك الطبيعية."
-              : "Discover our collection of argan‑based treatments crafted with over 20 years of expertise. From face creams to hair elixirs, every product is designed to reveal your natural glow."}
+              ? "استمتعي بمجموعتنا من الفساتين والقطع اليومية والقطع المميزة المصممة لترافقك في كل مناسبة. من الإطلالات الكلاسيكية إلى العصرية، كل قطعة تهدف لإبراز أناقتك الطبيعية."
+              : "Explore our collection of dresses, everyday staples, and statement pieces designed to move with you through every occasion. From timeless classics to trend‑led looks, each piece is made to highlight your natural elegance."}
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild size="lg" className="rounded-full shadow-lg shadow-primary/25">
