@@ -15,6 +15,7 @@ import {
     MessageCircle,
     Phone,
     Briefcase,
+    Globe,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -23,7 +24,7 @@ import { useLanguage } from "@/components/language-provider"
 
 export function AdminSidebar() {
     const pathname = usePathname()
-    const { t, language } = useLanguage()
+    const { t, language, toggleLanguage } = useLanguage()
 
     const menuItems = [
         { icon: LayoutDashboard, label: t('admin.nav.dashboard'), href: "/admin/dashboard" },
@@ -71,7 +72,16 @@ export function AdminSidebar() {
                 })}
             </nav>
 
-            <div className="p-4 border-t border-white/10">
+            <div className="p-4 border-t border-white/10 space-y-2">
+                <Button
+                    variant="outline"
+                    onClick={toggleLanguage}
+                    className="w-full justify-start gap-3 h-12 rounded-xl border-white/10 hover:bg-white/5"
+                >
+                    <Globe className="w-5 h-5" />
+                    <span className="font-medium">{language === 'fr' ? 'العربية' : 'Français'}</span>
+                </Button>
+
                 <Link href="/admin/login">
                     <Button variant="outline" className="w-full justify-start gap-3 h-12 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20">
                         <LogOut className="w-5 h-5" />
