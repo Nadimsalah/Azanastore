@@ -55,8 +55,7 @@ export default function NewProductPage() {
     const [sizeGuide, setSizeGuide] = useState("")
     const [categories, setCategories] = useState<any[]>([])
 
-    // AI Rewrite State
-    const [rewriting, setRewriting] = useState<string | null>(null)
+    // AI Rewrite State Removed
     const [relatedProducts, setRelatedProducts] = useState<any[]>([])
 
     // Fetch related products & categories
@@ -81,99 +80,6 @@ export default function NewProductPage() {
         }
         fetchData()
     })
-
-    const handleRewrite = async (field: string, currentText: string, setter: (val: string) => void) => {
-        if (!currentText.trim()) return
-
-        setRewriting(field)
-        try {
-            const res = await fetch('/api/admin/products/rewrite', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: currentText, field })
-            })
-
-            const data = await res.json()
-
-            if (!res.ok) {
-                // Smart Error Handling
-                if (data.error_code === "RATE_LIMIT_DAILY") {
-                    alert("⚠️ Daily Free AI Quota Exceeded\n\nPlease wait until tomorrow or add your own OpenRouter key in settings.")
-                    return
-                }
-                throw new Error(data.message || data.error || "Unknown error")
-            }
-
-            if (data.text) {
-                setter(data.text)
-            }
-        } catch (error: any) {
-            console.error('Rewrite error:', error)
-            // Only show alert for non-rate-limit errors if truly needed, or keep silent for better UX
-            if (error.message !== "Unknown error") {
-                alert(`AI Assistant: ${error.message}`)
-            }
-        } finally {
-            setRewriting(null)
-        }
-    }
-
-    const handleAutoRecommend = async () => {
-        if (!title && !description) {
-            alert("Please add a title or description first so AI can understand the product.")
-            return
-        }
-
-        setRewriting('recommend')
-        try {
-            const res = await fetch('/api/admin/products/recommend', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title,
-                    description,
-                    category,
-                    availableProducts: relatedProducts
-                })
-            })
-
-            const data = await res.json()
-            if (data.recommendedIds && Array.isArray(data.recommendedIds)) {
-                setSelectedRelated(data.recommendedIds)
-            }
-        } catch (error) {
-            console.error(error)
-            alert("Failed to get recommendations")
-        } finally {
-            setRewriting(null)
-        }
-    }
-
-    const handleGenerateBenefits = async () => {
-        if (!newBenefit.trim()) return
-
-        setRewriting('benefits')
-        try {
-            const res = await fetch('/api/admin/products/generate-benefits', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: newBenefit })
-            })
-
-            const data = await res.json()
-            if (data.benefits && Array.isArray(data.benefits)) {
-                // Add unique new benefits
-                const newBenefits = data.benefits.filter((b: string) => !benefits.includes(b))
-                setBenefits([...benefits, ...newBenefits])
-                setNewBenefit("") // Clear input
-            }
-        } catch (error) {
-            console.error('Generate benefits error:', error)
-            alert("Failed to generate benefits")
-        } finally {
-            setRewriting(null)
-        }
-    }
 
     const handlePublish = async () => {
         // Validation
@@ -329,7 +235,7 @@ export default function NewProductPage() {
 
 
 
-                    <div className="flex items-center gap-3">
+                    <div className="hidden sm:flex items-center gap-3">
                         <Link href="/admin/products">
                             <Button variant="ghost" className="rounded-full hover:bg-gray-100 text-gray-600 hover:text-gray-900">
                                 {t('admin.products.discard')}
@@ -401,20 +307,8 @@ export default function NewProductPage() {
                                             value={title || ""}
                                             onChange={(e) => setTitle(e.target.value)}
                                             placeholder={t('admin.products.title_placeholder')}
-                                            className="bg-white border-gray-200 h-12 text-base focus:ring-blue-500/20 focus:border-blue-500 rounded-xl shadow-sm text-gray-900 placeholder:text-gray-400 pr-12"
+                                            className="bg-white border-gray-200 h-12 text-base focus:ring-blue-500/20 focus:border-blue-500 rounded-xl shadow-sm text-gray-900 placeholder:text-gray-400 pr-4"
                                         />
-                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                                            {title.trim() && (
-                                                <button
-                                                    onClick={() => handleRewrite('title', title, setTitle)}
-                                                    disabled={rewriting === 'title'}
-                                                    className="text-purple-400 hover:text-purple-600 p-1 rounded-full transition-all"
-                                                    title="Improve with AI"
-                                                >
-                                                    {rewriting === 'title' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                                </button>
-                                            )}
-                                        </div>
                                     </div>
                                 </div>
                                 <div className="space-y-3">
@@ -426,18 +320,6 @@ export default function NewProductPage() {
                                             className="w-full min-h-[180px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none placeholder:text-gray-400 transition-all shadow-sm"
                                             placeholder={t('admin.products.description_placeholder')}
                                         />
-                                        <div className="absolute right-2 top-2 flex flex-col gap-2">
-                                            {description.trim() && (
-                                                <button
-                                                    onClick={() => handleRewrite('description', description, setDescription)}
-                                                    disabled={rewriting === 'description'}
-                                                    className="text-purple-400 hover:text-purple-600 p-1 rounded-full transition-all bg-white/50 backdrop-blur-sm shadow-sm"
-                                                    title="Improve with AI"
-                                                >
-                                                    {rewriting === 'description' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                                </button>
-                                            )}
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -489,68 +371,12 @@ export default function NewProductPage() {
                                 </h3>
                             </div>
                             <div className="p-6 space-y-8">
-                                {/* Key Benefits */}
-                                <div>
-                                    <label className="text-sm font-semibold text-gray-700 block mb-3">{t('admin.products.key_benefits')}</label>
-                                    <div className="flex gap-2 mb-4">
-                                        <div className="relative flex-1">
-                                            <Input
-                                                value={newBenefit || ""}
-                                                onChange={(e) => setNewBenefit(e.target.value)}
-                                                placeholder={t('admin.products.benefit_placeholder')}
-                                                className="bg-white border-gray-200 h-11 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm"
-                                                onKeyDown={(e) => e.key === 'Enter' && addBenefit()}
-                                            />
-                                        </div>
-                                        <Button onClick={addBenefit} className="h-11 w-11 bg-blue-600 hover:bg-blue-700 text-white shrink-0 shadow-sm">
-                                            <Plus className="w-5 h-5" />
-                                        </Button>
-                                        {newBenefit.trim() && (
-                                            <Button
-                                                onClick={handleGenerateBenefits}
-                                                disabled={rewriting === 'benefits'}
-                                                className="h-11 px-4 bg-purple-600 hover:bg-purple-700 text-white shadow-sm flex items-center gap-2"
-                                            >
-                                                {rewriting === 'benefits' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                                {rewriting === 'benefits' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                                {t('admin.products.polish')}
-                                            </Button>
-                                        )}
-                                    </div>
-                                    <div className="grid grid-cols-1 gap-3">
-                                        {benefits.map((benefit, i) => (
-                                            <div key={i} className="flex flex-col gap-1 p-3 px-4 rounded-xl bg-gray-50 border border-gray-200 group hover:border-gray-300 transition-colors relative">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                                                        <Check className="w-3 h-3 text-emerald-600" />
-                                                    </div>
-                                                    <span className="text-sm text-gray-700 flex-1">{benefit}</span>
-                                                </div>
-                                                <button onClick={() => removeBenefit(i)} className="absolute top-3 right-3 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
-                                                    <X className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        ))}
-                                        {benefits.length === 0 && <div className="col-span-full p-6 rounded-xl border border-dashed border-gray-200 text-center text-sm text-gray-500 bg-gray-50/50">{t('admin.products.no_benefits')}</div>}
-                                    </div>
-                                </div>
+
 
                                 {/* Size Guide */}
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-center px-1">
                                         <label className="text-sm font-semibold text-gray-700 uppercase tracking-wider">{t('admin.products.size_guide')}</label>
-                                        <div className="flex items-center gap-2">
-                                            {sizeGuide.trim() && (
-                                                <button
-                                                    onClick={() => handleRewrite('size_guide', sizeGuide, setSizeGuide)}
-                                                    disabled={rewriting === 'size_guide'}
-                                                    className="text-xs flex items-center gap-1 text-purple-500 hover:text-purple-700 transition-colors bg-purple-50 px-2 py-1 rounded-md"
-                                                >
-                                                    {rewriting === 'size_guide' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                                    <span>{t('admin.products.polish')}</span>
-                                                </button>
-                                            )}
-                                        </div>
                                     </div>
                                     <textarea
                                         value={sizeGuide || ""}
@@ -690,14 +516,7 @@ export default function NewProductPage() {
                                     <RefreshCw className="w-4 h-4 text-pink-500" />
                                     {t('admin.products.cross_sells')}
                                 </h3>
-                                <button
-                                    onClick={handleAutoRecommend}
-                                    disabled={rewriting === 'recommend'}
-                                    className="text-xs flex items-center gap-1 text-pink-600 hover:text-pink-700 font-medium px-2 py-1 rounded-lg hover:bg-pink-50 transition-colors"
-                                >
-                                    {rewriting === 'recommend' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                    {t('admin.products.auto_select')}
-                                </button>
+
                             </div>
                             <div className="p-6">
                                 <p className="text-xs text-gray-500 mb-4">{t('admin.products.recommended_desc')}</p>
@@ -728,6 +547,25 @@ export default function NewProductPage() {
                         </section>
 
                     </div>
+                </div>
+
+                {/* Mobile Publish Button (Bottom) */}
+                <div className="sm:hidden mt-8 pb-8 sticky bottom-0 bg-white/80 backdrop-blur-md p-4 -mx-4 border-t border-gray-100 z-30">
+                    <Button
+                        onClick={handlePublish}
+                        disabled={isPublishing || showSuccess}
+                        className="w-full rounded-2xl h-14 text-lg font-bold shadow-xl shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 text-white border-none transition-all"
+                    >
+                        {isPublishing ? (
+                            <>
+                                <Loader2 className="w-5 h-5 mr-2 animate-spin" /> {t('admin.products.uploading')}
+                            </>
+                        ) : (
+                            <>
+                                <Save className="w-5 h-5 mr-2" /> {t('admin.products.publish')}
+                            </>
+                        )}
+                    </Button>
                 </div>
             </main>
         </div>

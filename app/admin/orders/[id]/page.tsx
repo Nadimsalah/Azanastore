@@ -183,138 +183,101 @@ export default function OrderDetailsPage() {
                             </div>
                         </div>
 
-                        {/* Professional Invoice Layout (Print Only) */}
-                        <div className="hidden print:block bg-white text-black p-0 min-h-screen" style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' } as any}>
+                        {/* Professional Invoice Layout (Print Only) - Ticket Style */}
+                        <div className="hidden print:block bg-white text-black p-0 min-h-screen font-mono text-[10px]" style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' } as any}>
                             <style dangerouslySetInnerHTML={{
                                 __html: `
                                 @media print {
-                                    @page { margin: 10mm; }
-                                    body { -webkit-print-color-adjust: exact !important; }
+                                    @page { size: 148mm 210mm; margin: 0; }
+                                    body { margin: 0; padding: 0; width: 148mm; }
+                                    .ticket-container { width: 100%; padding: 5mm; }
                                 }
                             `}} />
 
-                            {/* Invoice Header */}
-                            <div className="flex justify-between items-start border-b-2 border-[#1a1a1a] pb-8 mb-8">
-                                <div>
-                                    <div className="relative w-56 h-24 mb-4">
+                            <div className="ticket-container">
+                                {/* Ticket Header */}
+                                <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
+                                    <div className="w-16 h-16 relative mx-auto mb-2 grayscale">
                                         <Image
                                             src="/logo.webp"
-                                            alt="Azana boutique logo"
+                                            alt="Azana"
                                             fill
-                                            className="object-contain object-left"
+                                            className="object-contain"
                                             priority
                                         />
                                     </div>
-                                    <div className="space-y-0.5">
-                                        <p className="text-sm font-black text-[#1a1a1a]">Azana</p>
-                                        <p className="text-xs text-black/70 italic">Boutique & Luxury Clothing</p>
-                                        <p className="text-xs text-black/60">Casablanca, Morocco</p>
-                                        <p className="text-xs text-black/60">Email: contact@azana.com</p>
-                                    </div>
+                                    <h1 className="text-xl font-black uppercase mb-1">AZANA BOUTIQUE</h1>
+                                    <p className="text-[9px] uppercase">Boutique & Luxury Clothing</p>
+                                    <p className="text-[9px]">Casablanca, Morocco</p>
+                                    <p className="text-[9px]">contact@azana.com</p>
                                 </div>
-                                <div className="text-right">
-                                    <h1 className="text-5xl font-black text-[#1a1a1a] uppercase mb-2 tracking-tighter">FACTURE</h1>
-                                    <div className="space-y-1">
-                                        <p className="text-sm font-bold text-black/90">N° Commande: {order.order_number}</p>
-                                        <p className="text-xs text-black/60">Date: {new Date(order.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
-                                        <p className="text-xs text-black/60">Statut: <span className="uppercase font-bold text-green-600">{order.status}</span></p>
-                                    </div>
-                                </div>
-                            </div>
 
-                            {/* Billing & Shipping Info */}
-                            <div className="grid grid-cols-2 gap-16 mb-12">
-                                <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                                    <h3 className="text-[10px] font-black text-black/40 uppercase tracking-[0.2em] mb-4">Facturé à</h3>
-                                    <div className="space-y-1">
-                                        <p className="font-black text-lg text-[#1a1a1a]">{order.customer_name}</p>
-                                        <p className="text-sm text-black/80">{order.customer_email}</p>
-                                        <p className="text-sm text-black/80">{order.customer_phone}</p>
-                                    </div>
+                                {/* Order Info */}
+                                <div className="mb-4 text-center">
+                                    <h2 className="text-lg font-black uppercase mb-1">REÇU DE COMMANDE</h2>
+                                    <p className="font-bold text-sm">#{order.order_number}</p>
+                                    <p className="text-[9px]">{new Date(order.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                                 </div>
-                                <div className="p-6">
-                                    <h3 className="text-[10px] font-black text-black/40 uppercase tracking-[0.2em] mb-4 text-right">Adresse de livraison</h3>
-                                    <div className="text-right space-y-1">
-                                        <p className="font-black text-lg text-[#1a1a1a]">{order.customer_name}</p>
-                                        <p className="text-sm text-black/80">{order.address_line1}</p>
-                                        {order.address_line2 && <p className="text-sm text-black/80">{order.address_line2}</p>}
-                                        <p className="text-sm text-black/80 font-bold">{order.city}, {order.governorate}</p>
-                                        {order.postal_code && <p className="text-sm text-black/80">{order.postal_code}</p>}
-                                    </div>
-                                </div>
-                            </div>
 
-                            {/* Items Table */}
-                            <div className="mb-12">
-                                <table className="w-full border-collapse">
-                                    <thead>
-                                        <tr className="border-b-2 border-black">
-                                            <th className="py-4 px-2 text-left text-[10px] uppercase font-black tracking-wider w-[50%]">Produit & Description</th>
-                                            <th className="py-4 px-2 text-center text-[10px] uppercase font-black tracking-wider w-[15%]">Quantité</th>
-                                            <th className="py-4 px-2 text-right text-[10px] uppercase font-black tracking-wider w-[15%]">Prix Unitaire</th>
-                                            <th className="py-4 px-2 text-right text-[10px] uppercase font-black tracking-wider w-[20%]">Total HT</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {order.order_items.map((item, i) => (
-                                            <tr key={i} className="border-b border-gray-100">
-                                                <td className="py-5 px-2">
-                                                    <p className="font-bold text-sm text-[#1a1a1a]">{item.product_title}</p>
-                                                    <p className="text-[10px] text-black/40 font-mono mt-1">SKU: {item.product_sku || 'N/A'}</p>
-                                                    {item.variant_name && <p className="text-[10px] text-black/60 italic mt-1 bg-gray-50 inline-block px-2 py-0.5 rounded-md">{item.variant_name}</p>}
-                                                </td>
-                                                <td className="py-5 px-2 text-center font-bold text-sm">{item.quantity}</td>
-                                                <td className="py-5 px-2 text-right text-sm">{(item.price || 0).toLocaleString('fr-FR')} MAD</td>
-                                                <td className="py-5 px-2 text-right font-black text-sm">{(item.subtotal || 0).toLocaleString('fr-FR')} MAD</td>
+                                {/* Customer Info */}
+                                <div className="mb-4 border-b border-black pb-2">
+                                    <p className="font-bold uppercase text-[9px] mb-1">CLIENT:</p>
+                                    <p className="font-bold">{order.customer_name}</p>
+                                    <p>{order.customer_phone}</p>
+                                    <p>{order.address_line1}</p>
+                                    <p>{order.city} - {order.governorate}</p>
+                                </div>
+
+                                {/* Items */}
+                                <div className="mb-4">
+                                    <table className="w-full text-left">
+                                        <thead>
+                                            <tr className="border-b border-black text-[9px]">
+                                                <th className="py-1 w-[50%]">PRODUIT</th>
+                                                <th className="py-1 text-center">QTÉ</th>
+                                                <th className="py-1 text-right">TOTAL</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {/* Footer Summary */}
-                            <div className="flex justify-end mb-20">
-                                <div className="w-96 space-y-3">
-                                    <div className="flex justify-between items-center py-2 border-b border-gray-100 px-2">
-                                        <span className="text-xs font-bold text-black/60">Sous-total</span>
-                                        <span className="text-sm font-medium">{(order.subtotal || 0).toLocaleString('fr-FR')} MAD</span>
-                                    </div>
-                                    <div className="flex justify-between items-center py-2 border-b border-gray-100 px-2">
-                                        <span className="text-xs font-bold text-black/60">Frais de livraison</span>
-                                        <span className="text-sm font-medium">{(order.shipping_cost || 0).toLocaleString('fr-FR')} MAD</span>
-                                    </div>
-                                    <div className="flex justify-between items-center py-4 bg-[#1a1a1a] text-white rounded-xl px-6 shadow-xl">
-                                        <span className="text-sm font-black uppercase tracking-wider">Total à payer</span>
-                                        <span className="text-2xl font-black font-mono">{(order.total || 0).toLocaleString('fr-FR')} MAD</span>
-                                    </div>
-                                    {order.status !== 'delivered' && (
-                                        <div className="text-right pt-2">
-                                            <p className="text-[10px] font-bold text-red-600 uppercase tracking-tight">Paiement à la livraison (COD)</p>
-                                        </div>
-                                    )}
+                                        </thead>
+                                        <tbody className="text-[10px]">
+                                            {order.order_items.map((item, i) => (
+                                                <tr key={i} className="border-b border-dotted border-gray-400">
+                                                    <td className="py-2 pr-1">
+                                                        <span className="font-bold block">{item.product_title}</span>
+                                                        {item.variant_name && <span className="text-[9px] italic">{item.variant_name}</span>}
+                                                    </td>
+                                                    <td className="py-2 text-center align-top">{item.quantity}</td>
+                                                    <td className="py-2 text-right font-bold align-top">{(item.subtotal || 0).toLocaleString('fr-FR')} MAD</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
-                            </div>
 
-                            {/* Notes / Legal */}
-                            <div className="grid grid-cols-2 gap-12 pt-12 border-t border-black/10">
-                                <div>
-                                    <h4 className="text-[10px] font-black text-[#1a1a1a] uppercase tracking-widest mb-4">Informations Importantes</h4>
-                                    <p className="text-[10px] text-black/50 leading-relaxed">
-                                        Merci de conserver cette facture. Pour toute question concernant votre commande,
-                                        veuillez nous contacter par téléphone au (+212) 6 00 00 00 00 ou par email.
-                                        Les retours sont acceptés sous 15 jours si l'emballage n'est pas ouvert.
-                                    </p>
-                                </div>
-                                <div className="flex flex-col items-end justify-center">
-                                    <div className="text-center">
-                                        <p className="text-[10px] text-black/40 font-black uppercase tracking-[0.3em] mb-4">Cachet & Signature</p>
-                                        <div className="w-48 h-24 border-2 border-dashed border-gray-200 rounded-2xl"></div>
+                                {/* Totals */}
+                                <div className="mb-6 space-y-1 text-right">
+                                    <div className="flex justify-between">
+                                        <span>Sous-total:</span>
+                                        <span>{(order.subtotal || 0).toLocaleString('fr-FR')} MAD</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>Livraison:</span>
+                                        <span>{(order.shipping_cost || 0).toLocaleString('fr-FR')} MAD</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm font-black border-t-2 border-black pt-1 mt-1">
+                                        <span>TOTAL:</span>
+                                        <span>{(order.total || 0).toLocaleString('fr-FR')} MAD</span>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="fixed bottom-10 left-0 right-0 text-center">
-                                <p className="text-[10px] text-black/30 font-bold uppercase tracking-[0.2em]">Azana Boutique — RC: 123456 — ICE: 0000000000000000</p>
+                                {/* Footer */}
+                                <div className="text-center space-y-2 pt-4 border-t-2 border-dashed border-black text-[9px]">
+                                    <p className="font-bold uppercase">MERCI DE VOTRE VISITE !</p>
+                                    <p>Les retours sont acceptés sous 15 jours.</p>
+                                    <div className="pt-2">
+                                        <p>AZANA BOUTIQUE</p>
+                                        <p>RC: 123456 | ICE: 000000000000</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
