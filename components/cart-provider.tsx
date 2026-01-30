@@ -11,14 +11,15 @@ export interface CartItem {
     image: string
     quantity: number
     size?: string
+    color?: string
     inStock: boolean
 }
 
 interface CartContextType {
     items: CartItem[]
     addItem: (item: CartItem) => void
-    removeItem: (id: string, size?: string) => void
-    updateQuantity: (id: string, quantity: number, size?: string) => void
+    removeItem: (id: string, size?: string, color?: string) => void
+    updateQuantity: (id: string, quantity: number, size?: string, color?: string) => void
     clearCart: () => void
     cartCount: number
     isInitialized: boolean
@@ -53,7 +54,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const addItem = (newItem: CartItem) => {
         setItems((currentItems) => {
             const existingItemIndex = currentItems.findIndex(
-                (item) => item.id === newItem.id && item.size === newItem.size
+                (item) => item.id === newItem.id && item.size === newItem.size && item.color === newItem.color
             )
 
             if (existingItemIndex > -1) {
@@ -72,18 +73,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         })
     }
 
-    const removeItem = (id: string, size?: string) => {
+    const removeItem = (id: string, size?: string, color?: string) => {
         setItems((currentItems) =>
-            currentItems.filter((item) => !(item.id === id && item.size === size))
+            currentItems.filter((item) => !(item.id === id && item.size === size && item.color === color))
         )
         toast.info("Item removed from cart")
     }
 
-    const updateQuantity = (id: string, quantity: number, size?: string) => {
+    const updateQuantity = (id: string, quantity: number, size?: string, color?: string) => {
         if (quantity < 1) return
         setItems((currentItems) =>
             currentItems.map((item) =>
-                item.id === id && item.size === size ? { ...item, quantity } : item
+                item.id === id && item.size === size && item.color === color ? { ...item, quantity } : item
             )
         )
     }

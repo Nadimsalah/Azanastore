@@ -109,6 +109,8 @@ const translations = {
         "product.in_stock": "En stock",
         "product.out_of_stock": "Rupture de stock",
         "product.select_size": "Sélectionner la taille",
+        "product.size": "Taille",
+        "product.color": "Couleur",
         "product.quantity": "Quantité",
         "product.key_benefits": "Avantages clés",
         "product.size_guide": "Guide des tailles",
@@ -283,7 +285,7 @@ const translations = {
         "checkout.return_cart": "Retour au panier",
         "checkout.retry": "Réessayer le paiement",
         "validation.required": "Ce champ est obligatoire",
-        "validation.phone": "Veuillez entrer un numéro de téléphone valide (min 10 caractères)",
+        "validation.phone": "Veuillez entrer un numéro de téléphone valide (min 9 caractères)",
         "validation.email": "Veuillez entrer une adresse email valide",
 
         // Success Page
@@ -429,6 +431,8 @@ const translations = {
         "product.in_stock": "متوفر",
         "product.out_of_stock": "غير متوفر",
         "product.select_size": "اختر الحجم",
+        "product.size": "المقاس",
+        "product.color": "اللون",
         "product.quantity": "الكمية",
         "product.key_benefits": "الفوائد الرئيسية",
         "product.size_guide": "دليل المقاسات",
@@ -601,7 +605,7 @@ const translations = {
         "checkout.return_cart": "العودة للسلة",
         "checkout.retry": "إعادة المحاولة",
         "validation.required": "هذا الحقل مطلوب",
-        "validation.phone": "يرجى إدخال رقم هاتف صحيح (أكثر من 10 أرقام)",
+        "validation.phone": "يرجى إدخال رقم هاتف صحيح (أكثر من 9 أرقام)",
         "validation.email": "يرجى إدخال بريد إلكتروني صحيح",
 
         // Success Page

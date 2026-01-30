@@ -57,7 +57,7 @@ export default function CartPage() {
     <div className="min-h-screen bg-background">
       {/* Announcement Bar */}
       <div className="bg-primary text-primary-foreground text-center py-2 px-4 text-sm font-medium">
-        Free Shipping on Orders Over EGP 750 • Use Code ARGAN20 for 20% Off
+        Free Shipping on Orders Over MAD 750 • Use Code ARGAN20 for 20% Off
       </div>
 
       {/* Header */}
@@ -169,13 +169,14 @@ export default function CartPage() {
                             <h3 className="font-semibold text-foreground text-base sm:text-lg mb-1 line-clamp-2">
                               {language === 'ar' && item.nameAr ? item.nameAr : item.name}
                             </h3>
-                            {item.size && <p className="text-xs sm:text-sm text-muted-foreground">Size: {item.size}</p>}
+                            {item.size && <p className="text-xs sm:text-sm text-muted-foreground">{t('product.size') || 'Size'}: {item.size}</p>}
+                            {item.color && <p className="text-xs sm:text-sm text-muted-foreground">{t('product.color') || 'Color'}: {item.color}</p>}
                           </div>
                           <Button
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 sm:h-9 sm:w-9 rounded-full hover:bg-destructive/10 hover:text-destructive transition-all flex-shrink-0"
-                            onClick={() => removeItem(item.id, item.size)}
+                            onClick={() => removeItem(item.id, item.size, item.color)}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -188,7 +189,7 @@ export default function CartPage() {
                               variant="outline"
                               size="icon"
                               className="h-8 w-8 rounded-full bg-transparent"
-                              onClick={() => updateQuantity(item.id, item.quantity - 1, item.size)}
+                              onClick={() => updateQuantity(item.id, item.quantity - 1, item.size, item.color)}
                               disabled={item.quantity <= 1}
                             >
                               <Minus className="w-3 h-3" />
@@ -198,7 +199,7 @@ export default function CartPage() {
                               variant="outline"
                               size="icon"
                               className="h-8 w-8 rounded-full bg-transparent"
-                              onClick={() => updateQuantity(item.id, item.quantity + 1, item.size)}
+                              onClick={() => updateQuantity(item.id, item.quantity + 1, item.size, item.color)}
                             >
                               <Plus className="w-3 h-3" />
                             </Button>

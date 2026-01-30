@@ -29,6 +29,7 @@ export async function POST(request: Request) {
                 product_title: item.name,
                 product_sku: item.sku || 'N/A',
                 product_image: item.image || null,
+                variant_name: [item.size, item.color].filter(Boolean).join(' / ') || null,
                 quantity: item.quantity,
                 price: item.price,
                 subtotal: item.price * item.quantity
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
         // Send push notification and wait for it
         await sendPushNotification({
             title: "New Order! 🛍️",
-            body: `Order ${order.order_number} received from ${customer.fullName} for EGP ${cart.total}`,
+            body: `Order ${order.order_number} received from ${customer.fullName} for MAD ${cart.total}`,
             url: `/admin/orders/${order.id}`,
             tag: 'new-order'
         }).catch(err => console.error("Push notify failed:", err))

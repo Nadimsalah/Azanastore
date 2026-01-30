@@ -29,8 +29,21 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useLanguage } from "@/components/language-provider" // Import translation hook
 
-// Mock Data for "You May Also Like"
-// replaced by DB call
+// Predefined Options
+const COMMON_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "36", "38", "40", "42", "44"]
+const COMMON_COLORS = [
+    { name: "Black", hex: "#000000" },
+    { name: "White", hex: "#FFFFFF" },
+    { name: "Navy", hex: "#000080" },
+    { name: "Beige", hex: "#F5F5DC" },
+    { name: "Pink", hex: "#FFC0CB" },
+    { name: "Red", hex: "#FF0000" },
+    { name: "Green", hex: "#008000" },
+    { name: "Blue", hex: "#0000FF" },
+    { name: "Grey", hex: "#808080" },
+    { name: "Gold", hex: "#FFD700" },
+    { name: "Silver", hex: "#C0C0C0" }
+]
 
 export default function NewProductPage() {
     const { t } = useLanguage() // Initialize translation hook
@@ -57,6 +70,11 @@ export default function NewProductPage() {
 
     // AI Rewrite State Removed
     const [relatedProducts, setRelatedProducts] = useState<any[]>([])
+
+    // Variants State
+    const [variants, setVariants] = useState<any[]>([])
+    const [selectedSizes, setSelectedSizes] = useState<string[]>([])
+    const [selectedColors, setSelectedColors] = useState<string[]>([])
 
     // Fetch related products & categories
     useEffect(() => {
@@ -125,6 +143,44 @@ export default function NewProductPage() {
                 alert('Error creating product: ' + error.message)
                 setIsPublishing(false)
                 return
+            }
+
+            const productId = data[0].id
+
+            // Insert Variants
+            if (variants.length > 0) {
+                // Filter out invalid variants (e.g. empty ones that might cause SKU collisions)
+                const validVariants = variants.filter(v =>
+                    (v.size || v.color || v.name) &&
+                    !isNaN(parseFloat(v.price || price))
+                )
+
+                const variantsToInsert = validVariants.map((v, idx) => {
+                    const vPrice = parseFloat(v.price)
+                    const mainPrice = parseFloat(price)
+                    const vStock = parseInt(v.stock)
+
+                    return {
+                        product_id: productId,
+                        name: v.name || `${v.size || ""} ${v.color || ""}`.trim() || `Variant ${idx + 1}`,
+                        size: v.size || null,
+                        color: v.color || null,
+                        price: isNaN(vPrice) ? (isNaN(mainPrice) ? 0 : mainPrice) : vPrice,
+                        stock: isNaN(vStock) ? 0 : vStock,
+                        sku: v.sku || `${sku}-${v.size || idx}-${v.color || ''}`.replace(/-+$/, "")
+                    }
+                })
+
+                if (variantsToInsert.length > 0) {
+                    const { error: variantError } = await supabase
+                        .from('product_variants')
+                        .insert(variantsToInsert)
+
+                    if (variantError) {
+                        console.error('Error inserting variants:', variantError.message, variantError.details, variantError.hint)
+                        alert(`Error saving variants: ${variantError.message}`)
+                    }
+                }
             }
 
             setShowSuccess(true)
@@ -206,6 +262,62 @@ export default function NewProductPage() {
         const base = title.trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 4) || "PROD"
         const random = Math.floor(1000 + Math.random() * 9000)
         setSku(`${base}-${random}`)
+    }
+
+    const addVariant = () => {
+        setVariants([...variants, { name: "", size: "", color: "", price: price, stock: "0", sku: "" }])
+    }
+
+    const updateVariant = (index: number, field: string, value: string) => {
+        const newVariants = [...variants]
+        newVariants[index] = { ...newVariants[index], [field]: value }
+        setVariants(newVariants)
+    }
+
+    const removeVariant = (index: number) => {
+        setVariants(variants.filter((_, i) => i !== index))
+    }
+
+    const toggleSizeSelection = (size: string) => {
+        setSelectedSizes(prev =>
+            prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
+        )
+    }
+
+    const toggleColorSelection = (colorName: string) => {
+        setSelectedColors(prev =>
+            prev.includes(colorName) ? prev.filter(c => c !== colorName) : [...prev, colorName]
+        )
+    }
+
+    const generateCombinations = () => {
+        if (selectedSizes.length === 0 && selectedColors.length === 0) return
+
+        const newVariants: any[] = []
+        const sizes = selectedSizes.length > 0 ? selectedSizes : [""]
+        const colors = selectedColors.length > 0 ? selectedColors : [""]
+
+        sizes.forEach(size => {
+            colors.forEach(color => {
+                // Check if this variant already exists
+                const exists = variants.some(v => v.size === size && v.color === color)
+                if (!exists) {
+                    newVariants.push({
+                        name: `${size} ${color}`.trim(),
+                        size: size || null,
+                        color: color || null,
+                        price: price,
+                        stock: "10",
+                        sku: `${sku}-${size}-${color}`.replace(/-+$/, "")
+                    })
+                }
+            })
+        })
+
+        setVariants([...variants, ...newVariants])
+        // Reset selections
+        setSelectedSizes([])
+        setSelectedColors([])
     }
 
     return (
@@ -329,35 +441,186 @@ export default function NewProductPage() {
                         <section className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                             <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
                                 <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
-                                    <ImageIcon className="w-4 h-4 text-purple-500" />
-                                    {t('admin.products.media_gallery')}
+                                    <ImageIcon className="w-4 h-4 text-blue-500" />
+                                    Product Media
                                 </h3>
+                                <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">{images.length} Images</Badge>
+                            </div>
+                            <div className="p-6 space-y-6">
+                                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
+                                    {images.map((url, index) => (
+                                        <div key={index} className="group relative aspect-square rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shadow-sm transition-all hover:shadow-md">
+                                            <Image src={url} alt={`Product ${index}`} fill className="object-cover" />
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => removeImage(index)}
+                                                    className="h-8 w-8 rounded-full bg-white/20 hover:bg-red-500 text-white transition-colors"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                            {index === 0 && (
+                                                <div className="absolute top-2 left-2 px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded-full shadow-sm">
+                                                    Primary
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                    <label className="aspect-square rounded-2xl border-2 border-dashed border-gray-200 hover:border-blue-400 hover:bg-blue-50/30 transition-all flex flex-col items-center justify-center cursor-pointer group">
+                                        <div className="w-10 h-10 rounded-full bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors mb-2">
+                                            {uploading ? <Loader2 className="w-5 h-5 text-blue-600 animate-spin" /> : <Upload className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />}
+                                        </div>
+                                        <span className="text-xs font-bold text-gray-400 group-hover:text-blue-600 uppercase tracking-wider">Upload</span>
+                                        <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
+                                    </label>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Variants */}
+                        <section className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                            <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
+                                <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
+                                    <Layers className="w-4 h-4 text-indigo-500" />
+                                    Product Variants (Sizes & Colors)
+                                </h3>
+                                <Button
+                                    type="button"
+                                    onClick={addVariant}
+                                    variant="outline"
+                                    size="sm"
+                                    className="rounded-full border-indigo-200 text-indigo-600 hover:bg-indigo-50"
+                                >
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Add Variant
+                                </Button>
                             </div>
                             <div className="p-6">
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                    {images.map((img, i) => (
-                                        <div key={i} className="relative aspect-square rounded-2xl overflow-hidden group border border-gray-200 bg-gray-50">
-                                            <Image src={img} alt="Product" fill className="object-cover" />
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                                                <button onClick={() => removeImage(i)} className="p-3 bg-white text-red-500 shadow-lg rounded-full hover:bg-red-50 transition-all transform hover:scale-110">
-                                                    <X className="w-4 h-4" />
-                                                </button>
+                                <div className="mb-8 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 space-y-6">
+                                    <div className="space-y-3">
+                                        <label className="text-sm font-bold text-indigo-900 flex items-center gap-2">
+                                            1. Select Sizes
+                                            <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">Multiple</span>
+                                        </label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {COMMON_SIZES.map(s => {
+                                                const isSelected = selectedSizes.includes(s)
+                                                return (
+                                                    <button
+                                                        key={s}
+                                                        type="button"
+                                                        onClick={() => toggleSizeSelection(s)}
+                                                        className={`px-4 py-2 rounded-xl border text-sm font-medium transition-all ${isSelected ? "bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200" : "bg-white border-gray-200 text-gray-600 hover:border-indigo-400 hover:text-indigo-600"}`}
+                                                    >
+                                                        {s}
+                                                    </button>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <label className="text-sm font-bold text-indigo-900 flex items-center gap-2">
+                                            2. Select Colors
+                                            <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">Visual Selection</span>
+                                        </label>
+                                        <div className="flex flex-wrap gap-3">
+                                            {COMMON_COLORS.map(c => {
+                                                const isSelected = selectedColors.includes(c.name)
+                                                return (
+                                                    <button
+                                                        key={c.name}
+                                                        type="button"
+                                                        onClick={() => toggleColorSelection(c.name)}
+                                                        className={`group relative flex flex-col items-center gap-1 p-1 rounded-xl transition-all ${isSelected ? "bg-white shadow-sm ring-2 ring-indigo-500" : "hover:bg-white"}`}
+                                                    >
+                                                        <div
+                                                            className="w-10 h-10 rounded-full border border-gray-100 shadow-inner flex items-center justify-center transition-transform group-hover:scale-110"
+                                                            style={{ backgroundColor: c.hex }}
+                                                        >
+                                                            {isSelected && <Check className={`w-5 h-5 ${c.name === 'White' || c.name === 'Silver' ? 'text-black' : 'text-white'}`} />}
+                                                        </div>
+                                                        <span className={`text-[10px] font-bold ${isSelected ? 'text-indigo-600' : 'text-gray-400'}`}>{c.name}</span>
+                                                    </button>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    <Button
+                                        type="button"
+                                        onClick={generateCombinations}
+                                        disabled={selectedSizes.length === 0 && selectedColors.length === 0}
+                                        className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-100 disabled:bg-gray-200"
+                                    >
+                                        <RefreshCw className="w-4 h-4 mr-2" />
+                                        Generate {selectedSizes.length > 0 && selectedColors.length > 0 ? selectedSizes.length * selectedColors.length : Math.max(selectedSizes.length, selectedColors.length)} Combinations
+                                    </Button>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between px-1">
+                                        <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Active Variants ({variants.length})</h4>
+                                    </div>
+                                    {variants.map((v, i) => (
+                                        <div key={i} className="p-4 rounded-2xl border border-gray-100 bg-gray-50/50 space-y-4 relative group hover:bg-white hover:shadow-xl hover:shadow-gray-100 transition-all">
+                                            <button
+                                                onClick={() => removeVariant(i)}
+                                                className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                            >
+                                                <X className="w-5 h-5" />
+                                            </button>
+                                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                                <div className="space-y-1.5">
+                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Size</label>
+                                                    <Input
+                                                        placeholder="e.g. XL"
+                                                        value={v.size || ""}
+                                                        onChange={(e) => updateVariant(i, "size", e.target.value)}
+                                                        className="h-10 bg-white border-gray-200 font-bold"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Color</label>
+                                                    <Input
+                                                        placeholder="e.g. Navy"
+                                                        value={v.color || ""}
+                                                        onChange={(e) => updateVariant(i, "color", e.target.value)}
+                                                        className="h-10 bg-white border-gray-200 font-bold"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Price (MAD)</label>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder={price || "0.00"}
+                                                        value={v.price}
+                                                        onChange={(e) => updateVariant(i, "price", e.target.value)}
+                                                        className="h-10 bg-white border-gray-200 font-mono"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Stock</label>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="0"
+                                                        value={v.stock}
+                                                        onChange={(e) => updateVariant(i, "stock", e.target.value)}
+                                                        className="h-10 bg-white border-gray-200 font-mono"
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
-                                    <label className="aspect-square rounded-2xl border-2 border-dashed border-gray-200 hover:border-blue-500 hover:bg-blue-50/50 transition-all flex flex-col items-center justify-center cursor-pointer text-gray-400 hover:text-blue-600 group">
-                                        <div className="p-4 rounded-full bg-gray-50 group-hover:bg-blue-100 transition-colors mb-3">
-                                            {uploading ? (
-                                                <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
-                                            ) : (
-                                                <Upload className="w-6 h-6 text-gray-400 group-hover:text-blue-600" />
-                                            )}
+                                    {variants.length === 0 && (
+                                        <div className="text-center py-12 border-2 border-dashed border-gray-100 rounded-2xl text-gray-400">
+                                            <Layers className="w-8 h-8 mx-auto mb-3 opacity-20" />
+                                            <p className="text-sm">No variants added yet. Add variants if this product has different sizes or colors.</p>
                                         </div>
-                                        <span className="text-xs font-bold uppercase tracking-wide">
-                                            {uploading ? t('admin.products.uploading') : t('admin.products.upload_image')}
-                                        </span>
-                                        <input type="file" className="hidden" multiple onChange={handleImageUpload} accept="image/*" disabled={uploading} />
-                                    </label>
+                                    )}
                                 </div>
                             </div>
                         </section>

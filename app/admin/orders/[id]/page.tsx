@@ -158,6 +158,7 @@ export default function OrderDetailsPage() {
                                         </div>
                                         <div className="flex-1">
                                             <h4 className="font-semibold text-foreground">{item.product_title}</h4>
+                                            {item.variant_name && <p className="text-xs text-primary font-medium">{item.variant_name}</p>}
                                             <p className="text-sm text-muted-foreground">Qty: {item.quantity} × MAD {item.price.toLocaleString('en-US')}</p>
                                         </div>
                                         <div className="text-right">

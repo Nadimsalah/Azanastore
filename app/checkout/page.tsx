@@ -90,8 +90,8 @@ export default function CheckoutPage() {
         if (!formData.city.trim()) newErrors.city = t('validation.required')
         if (!formData.address.trim()) newErrors.address = t('validation.required')
 
-        // Phone validation (min 10 chars, rudimentary check)
-        if (!formData.phone.trim() || formData.phone.length < 10) {
+        // Phone validation (min 9 chars, rudimentary check)
+        if (!formData.phone.trim() || formData.phone.length < 9) {
             newErrors.phone = t('validation.phone')
         }
 
@@ -305,7 +305,7 @@ export default function CheckoutPage() {
 
                                 <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                     {items.map((item) => (
-                                        <div key={`${item.id}-${item.size}`} className="flex gap-4 py-2">
+                                        <div key={`${item.id}-${item.size || ''}-${item.color || ''}`} className="flex gap-4 py-2">
                                             <div className="relative w-16 h-16 bg-muted rounded-xl overflow-hidden flex-shrink-0 border border-border/50">
                                                 <Image
                                                     src={item.image || "/placeholder.svg"}
@@ -321,7 +321,8 @@ export default function CheckoutPage() {
                                                 <h4 className="font-medium text-sm text-foreground line-clamp-1">
                                                     {language === 'ar' && item.nameAr ? item.nameAr : item.name}
                                                 </h4>
-                                                {item.size && <p className="text-xs text-muted-foreground">{item.size}</p>}
+                                                {item.size && <p className="text-xs text-muted-foreground">{t('product.size') || 'Size'}: {item.size}</p>}
+                                                {item.color && <p className="text-xs text-muted-foreground">{t('product.color') || 'Color'}: {item.color}</p>}
                                                 <p className="text-sm font-semibold text-primary mt-1">
                                                     {t('common.currency')} {(item.price * item.quantity).toFixed(2)}
                                                 </p>

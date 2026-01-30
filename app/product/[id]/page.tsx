@@ -29,6 +29,9 @@ export default function ProductPage() {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
+  const [selectedSize, setSelectedSize] = useState<string | null>(null)
+  const [selectedColor, setSelectedColor] = useState<string | null>(null)
+
   useEffect(() => {
     async function loadData() {
       setLoading(true)
@@ -52,6 +55,15 @@ export default function ProductPage() {
       loadData()
     }
   }, [productId])
+
+  // Set default selections
+  useEffect(() => {
+    if (product?.variants && product.variants.length > 0) {
+      const firstVariant = product.variants[0]
+      setSelectedSize(firstVariant.size)
+      setSelectedColor(firstVariant.color)
+    }
+  }, [product])
 
   // Scroll to top on mount or product change
   useEffect(() => {
@@ -98,14 +110,40 @@ export default function ProductPage() {
   const displayBenefits = isArabic && product.benefits_ar ? product.benefits_ar : product.benefits || []
   const displaySizeGuide = isArabic && product.size_guide_ar ? product.size_guide_ar : product.size_guide || ""
 
-  const inStock = product.stock > 0
   const productImages = (product.images && product.images.length > 0) ? product.images : ["/placeholder.svg?height=600&width=600"]
   const rating = 5.0
   const reviewsCount = 127 // Placeholder
 
+  const sizes = Array.from(new Set(product.variants?.map(v => v.size).filter(s => s !== null && s !== "") as string[]))
+  const colors = Array.from(new Set(product.variants?.map(v => v.color).filter(c => c !== null && c !== "") as string[]))
+
+  const COMMON_COLORS_MAP: Record<string, string> = {
+    "Black": "#000000",
+    "White": "#FFFFFF",
+    "Navy": "#000080",
+    "Beige": "#F5F5DC",
+    "Pink": "#FFC0CB",
+    "Red": "#FF0000",
+    "Green": "#008000",
+    "Blue": "#0000FF",
+    "Grey": "#808080",
+    "Gold": "#FFD700",
+    "Silver": "#C0C0C0"
+  }
+
+  const selectedVariant = product.variants?.find(v => {
+    const sizeMatch = selectedSize ? v.size === selectedSize : (v.size === null || v.size === "")
+    const colorMatch = selectedColor ? v.color === selectedColor : (v.color === null || v.color === "")
+    return sizeMatch && colorMatch
+  })
+
+  const displayPrice = selectedVariant ? selectedVariant.price : product.price
+  const displayStock = selectedVariant ? selectedVariant.stock : product.stock
+  const currentInStock = displayStock > 0
+
   return (
     <div className="min-h-screen bg-background pb-32 lg:pb-20">
-      {/* Header */}
+      {/* Header code ... */}
       <header className="sticky top-0 z-50 glass-strong py-3">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
@@ -206,13 +244,13 @@ export default function ProductPage() {
                 <span className="text-sm text-muted-foreground font-medium flex items-center gap-1">
                   {rating} <span className="text-xs opacity-50">/ 5.0</span>
                   <span className="mx-2">•</span>
-                  {reviewsCount} {t('product.reviews')}
+                  {reviewsCount} reviews
                 </span>
 
-                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${inStock ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-destructive/10 text-destructive border border-destructive/20"
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${currentInStock ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-destructive/10 text-destructive border border-destructive/20"
                   }`}>
-                  {inStock ? (
-                    <><Check className="w-3 h-3" /> {t('order.success.status') || 'In Stock'}</>
+                  {currentInStock ? (
+                    <><Check className="w-3 h-3" /> In Stock</>
                   ) : (
                     'Out of Stock'
                   )}
@@ -220,15 +258,68 @@ export default function ProductPage() {
               </div>
 
               <div className="flex items-baseline gap-4 mb-8">
-                <span className="text-4xl sm:text-5xl font-bold text-primary">{t('common.currency')} {product.price}</span>
+                <span className="text-4xl sm:text-5xl font-bold text-primary">{t('common.currency')} {displayPrice}</span>
                 {product.compare_at_price && (
                   <span className="text-2xl text-muted-foreground line-through decoration-destructive/30">
                     {t('common.currency')} {product.compare_at_price}
                   </span>
                 )}
-                {/* Discount Badge Removed */}
               </div>
             </div>
+
+            {sizes.length > 0 && (
+              <div className="mb-8">
+                <label className="block text-sm font-bold text-foreground mb-4 uppercase tracking-widest text-primary/80">
+                  Select Size
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {sizes.map(size => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      className={`h-12 min-w-[3rem] px-4 rounded-xl border-2 transition-all font-bold ${selectedSize === size
+                        ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                        : "border-secondary bg-secondary/30 text-foreground hover:border-primary/50"
+                        }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {colors.length > 0 && (
+              <div className="mb-8">
+                <label className="block text-sm font-bold text-foreground mb-4 uppercase tracking-widest text-primary/80">
+                  Select Color
+                </label>
+                <div className="flex flex-wrap gap-4">
+                  {colors.map(color => {
+                    const hex = COMMON_COLORS_MAP[color] || '#CCCCCC';
+                    const isSelected = selectedColor === color;
+                    return (
+                      <button
+                        key={color}
+                        onClick={() => setSelectedColor(color)}
+                        className={`group relative flex flex-col items-center gap-2 transition-all`}
+                      >
+                        <div
+                          className={`w-12 h-12 rounded-full border-2 transition-all flex items-center justify-center ${isSelected ? 'border-primary scale-110 shadow-lg' : 'border-transparent hover:scale-105'
+                            }`}
+                          style={{ backgroundColor: hex }}
+                        >
+                          {isSelected && <Check className={`w-6 h-6 ${color === 'White' || color === 'Silver' ? 'text-black' : 'text-white'}`} />}
+                        </div>
+                        <span className={`text-[10px] font-bold uppercase tracking-tighter ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
+                          {color}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             <p className="text-muted-foreground leading-relaxed mb-10 text-lg border-l-4 border-primary/20 pl-6 italic">
               {displayDescription}
@@ -271,10 +362,12 @@ export default function ProductPage() {
                     id: product.id,
                     name: product.title,
                     nameAr: product.title_ar || undefined,
-                    price: Number(product.price),
+                    price: Number(displayPrice),
                     image: productImages[0],
                     quantity: quantity,
-                    inStock: inStock,
+                    size: selectedSize || undefined,
+                    color: selectedColor || undefined,
+                    inStock: currentInStock,
                   })
                   router.push("/cart")
                 }}
@@ -366,7 +459,6 @@ export default function ProductPage() {
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    {/* Discount Badge Removed */}
                   </div>
                   <h3 className="font-bold text-foreground text-sm sm:text-lg mb-2 line-clamp-1 group-hover:text-primary transition-colors">
                     {isArabic && item.title_ar ? item.title_ar : item.title}
@@ -424,16 +516,18 @@ export default function ProductPage() {
                 id: product.id,
                 name: product.title,
                 nameAr: product.title_ar || undefined,
-                price: Number(product.price),
+                price: Number(displayPrice),
                 image: productImages[0],
                 quantity: quantity,
-                inStock: inStock,
+                size: selectedSize || undefined,
+                color: selectedColor || undefined,
+                inStock: currentInStock,
               })
               router.push("/cart")
             }}
           >
             <ShoppingBag className="w-5 h-5 mr-2" />
-            {t('product.add_to_cart')} • {t('common.currency')} {(product.price * quantity).toFixed(2)}
+            {t('product.add_to_cart')} • {t('common.currency')} {(displayPrice * quantity).toFixed(2)}
           </Button>
         </div>
       </div>
