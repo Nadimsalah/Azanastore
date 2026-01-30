@@ -143,7 +143,7 @@ function ProductCard(product: Product) {
           ))}
           <span className="text-xs text-muted-foreground ml-1">({rating}.0)</span>
         </div>
-        <div className="flex items-center justify-between pt-2">
+        <div className="hidden sm:flex items-center justify-between pt-2">
           <span className="text-lg font-bold text-foreground">{t('common.currency')} {product.price}</span>
           <Button size="icon" className="rounded-full w-8 h-8 pointer-events-none">
             <ShoppingBag className="w-4 h-4" />
