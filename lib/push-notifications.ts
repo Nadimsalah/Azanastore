@@ -1,11 +1,6 @@
 import webpush from 'web-push'
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdmin as supabase } from './supabase-admin'
 import { getAdminSettings } from './supabase-api'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-const supabase = createClient(supabaseUrl, supabaseServiceRole)
 
 // Configure VAPID keys
 if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {

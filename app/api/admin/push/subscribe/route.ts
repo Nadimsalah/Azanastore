@@ -1,11 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-// Use service role for backend operations
-const supabase = createClient(supabaseUrl, supabaseServiceRole)
+import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
 
 export async function POST(req: Request) {
     try {
