@@ -145,8 +145,8 @@ function ProductCard(product: Product) {
         </div>
         <div className="flex items-center justify-between pt-2">
           <span className="text-lg font-bold text-foreground">{t('common.currency')} {product.price}</span>
-          <Button size="sm" className="rounded-full text-xs pointer-events-none">
-            {t('product.add_to_cart')}
+          <Button size="icon" className="rounded-full w-8 h-8 pointer-events-none">
+            <ShoppingBag className="w-4 h-4" />
           </Button>
         </div>
       </div>
