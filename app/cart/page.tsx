@@ -57,7 +57,7 @@ export default function CartPage() {
     <div className="min-h-screen bg-background">
       {/* Announcement Bar */}
       <div className="bg-primary text-primary-foreground text-center py-2 px-4 text-sm font-medium">
-        Free Shipping on Orders Over MAD 750 • Use Code ARGAN20 for 20% Off
+        {t('cart.announcement')}
       </div>
 
       {/* Header */}
@@ -157,7 +157,7 @@ export default function CartPage() {
                         </div>
                         {!item.inStock && (
                           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                            <span className="text-white text-xs font-semibold">Out of Stock</span>
+                            <span className="text-white text-xs font-semibold">{t('product.out_of_stock')}</span>
                           </div>
                         )}
                       </div>
@@ -208,7 +208,7 @@ export default function CartPage() {
                           {/* Price */}
                           <div className="text-right">
                             <p className="text-base sm:text-lg font-bold text-foreground">{t('common.currency')} {(item.price * item.quantity).toFixed(2)}</p>
-                            <p className="text-xs sm:text-sm text-muted-foreground">{t('common.currency')} {item.price.toFixed(2)} each</p>
+                            <p className="text-xs sm:text-sm text-muted-foreground">{t('common.currency')} {item.price.toFixed(2)} {t('product.each')}</p>
                           </div>
                         </div>
                       </div>
@@ -260,7 +260,7 @@ export default function CartPage() {
                   </div>
                   {promoApplied && (
                     <div className="flex items-center justify-between text-primary">
-                      <span>Discount (20%)</span>
+                      <span>{t('cart.discount_label')}</span>
                       <span className="font-medium">-{t('common.currency')} {discount.toFixed(2)}</span>
                     </div>
                   )}

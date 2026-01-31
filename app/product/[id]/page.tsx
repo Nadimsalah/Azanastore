@@ -95,9 +95,9 @@ export default function ProductPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Product not found</h2>
+          <h2 className="text-2xl font-bold mb-2">{t('product.not_found')}</h2>
           <Button asChild variant="outline">
-            <Link href="/">Return to Home</Link>
+            <Link href="/">{t('product.return_home')}</Link>
           </Button>
         </div>
       </div>
@@ -183,9 +183,9 @@ export default function ProductPage() {
       <main className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
-          <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+          <Link href="/" className="hover:text-primary transition-colors">{t('breadcrumb.home')}</Link>
           <span>/</span>
-          <Link href="/#shop" className="hover:text-primary transition-colors">Shop</Link>
+          <Link href="/#shop" className="hover:text-primary transition-colors">{t('breadcrumb.shop')}</Link>
           <span>/</span>
           <span className="text-foreground font-medium truncate">{displayTitle}</span>
         </div>
@@ -244,15 +244,15 @@ export default function ProductPage() {
                 <span className="text-sm text-muted-foreground font-medium flex items-center gap-1">
                   {rating} <span className="text-xs opacity-50">/ 5.0</span>
                   <span className="mx-2">•</span>
-                  {reviewsCount} reviews
+                  {reviewsCount} {t('product.reviews')}
                 </span>
 
                 <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${currentInStock ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-destructive/10 text-destructive border border-destructive/20"
                   }`}>
                   {currentInStock ? (
-                    <><Check className="w-3 h-3" /> In Stock</>
+                    <><Check className="w-3 h-3" /> {t('product.in_stock')}</>
                   ) : (
-                    'Out of Stock'
+                    t('product.out_of_stock')
                   )}
                 </div>
               </div>
@@ -270,7 +270,7 @@ export default function ProductPage() {
             {sizes.length > 0 && (
               <div className="mb-8">
                 <label className="block text-sm font-bold text-foreground mb-4 uppercase tracking-widest text-primary/80">
-                  Select Size
+                  {t('product.select_size')}
                 </label>
                 <div className="flex flex-wrap gap-3">
                   {sizes.map(size => (
@@ -292,7 +292,7 @@ export default function ProductPage() {
             {colors.length > 0 && (
               <div className="mb-8">
                 <label className="block text-sm font-bold text-foreground mb-4 uppercase tracking-widest text-primary/80">
-                  Select Color
+                  {t('product.select_color')}
                 </label>
                 <div className="flex flex-wrap gap-4">
                   {colors.map(color => {
@@ -328,7 +328,7 @@ export default function ProductPage() {
             {/* Quantity */}
             <div className="mb-8">
               <label className="block text-sm font-bold text-foreground mb-4 uppercase tracking-widest text-primary/80">
-                Quantity
+                {t('product.quantity')}
               </label>
               <div className="flex items-center gap-4 bg-secondary/30 w-fit p-1.5 rounded-2xl border border-white/5 backdrop-blur-sm">
                 <Button
@@ -437,11 +437,11 @@ export default function ProductPage() {
                   {t('product.you_may_also_like')}
                 </h2>
                 <p className="text-muted-foreground max-w-xl text-lg">
-                  Elevate your routine with these carefully selected companions from our collection.
+                  {t('product.related_description')}
                 </p>
               </div>
               <Button variant="ghost" className="hidden sm:flex rounded-full text-primary hover:bg-primary/5" asChild>
-                <Link href="/#shop">View All Products</Link>
+                <Link href="/#shop">{t('product.view_all')}</Link>
               </Button>
             </div>
 

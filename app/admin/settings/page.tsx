@@ -5,6 +5,7 @@ import { Save, Loader2, RotateCcw, Globe, Bell, Mail, Shield, Smartphone, Send }
 import { toast } from "sonner"
 import { getAdminSettings, updateAdminSettings } from "@/lib/supabase-api"
 import { AdminSidebar } from "@/components/admin/admin-sidebar"
+import { useLanguage } from "@/components/language-provider"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 
@@ -13,6 +14,7 @@ export default function SettingsPage() {
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [testing, setTesting] = useState(false)
+    const { t } = useLanguage()
 
     useEffect(() => {
         loadSettings()
@@ -29,9 +31,9 @@ export default function SettingsPage() {
         setSaving(true)
         const result = await updateAdminSettings(settings)
         if (result.success) {
-            toast.success("Settings updated successfully")
+            toast.success(t('admin.settings.saved'))
         } else {
-            toast.error("Failed to update settings")
+            toast.error(t('admin.settings.save_failed'))
         }
         setSaving(false)
     }
@@ -54,12 +56,12 @@ export default function SettingsPage() {
             })
             const data = await response.json()
             if (data.sent > 0) {
-                toast.success(`Sent to ${data.sent} device(s)`)
+                toast.success(t('admin.settings.test_sent').replace('{count}', data.sent))
             } else {
-                toast.error("No active subscriptions found for this store.")
+                toast.error(t('admin.settings.no_subscriptions'))
             }
         } catch (error) {
-            toast.error("Failed to trigger test notification")
+            toast.error(t('admin.settings.test_failed'))
         } finally {
             setTesting(false)
         }
@@ -83,10 +85,10 @@ export default function SettingsPage() {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                                Store Settings
+                                {t('admin.settings.title')}
                             </h1>
                             <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-                                Manage your store information, promotional text, and system configurations.
+                                {t('admin.settings.subtitle')}
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
@@ -95,7 +97,7 @@ export default function SettingsPage() {
                                 className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center justify-center gap-2 text-sm font-medium whitespace-nowrap"
                             >
                                 <RotateCcw className="w-4 h-4" />
-                                Reset
+                                {t('admin.settings.reset')}
                             </button>
                             <button
                                 onClick={handleSave}
@@ -103,7 +105,7 @@ export default function SettingsPage() {
                                 className="px-6 py-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground transition-all flex items-center justify-center gap-2 text-sm font-semibold shadow-lg shadow-primary/20"
                             >
                                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                                Save Changes
+                                {t('admin.settings.save')}
                             </button>
                         </div>
                     </div>
@@ -115,12 +117,12 @@ export default function SettingsPage() {
                                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                                     <Globe className="w-5 h-5 text-primary" />
                                 </div>
-                                <h2 className="text-lg font-bold">Store Information</h2>
+                                <h2 className="text-lg font-bold">{t('admin.settings.store_info')}</h2>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">Store Name</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.store_name')}</label>
                                     <input
                                         type="text"
                                         value={settings.store_name || ""}
@@ -130,7 +132,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">Support Email</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.support_email')}</label>
                                     <input
                                         type="email"
                                         value={settings.support_email || ""}
@@ -140,7 +142,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">Currency</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.currency')}</label>
                                     <input
                                         type="text"
                                         value={settings.currency || ""}
@@ -158,12 +160,12 @@ export default function SettingsPage() {
                                 <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center">
                                     <Bell className="w-5 h-5 text-secondary" />
                                 </div>
-                                <h2 className="text-lg font-bold">Promotions & Text</h2>
+                                <h2 className="text-lg font-bold">{t('admin.settings.promotions')}</h2>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">Announcement Bar Text</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.announcement_bar')}</label>
                                     <textarea
                                         rows={3}
                                         value={settings.announcement_bar || ""}
@@ -173,7 +175,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">Announcement Bar (Arabic)</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.announcement_bar_ar')}</label>
                                     <textarea
                                         rows={3}
                                         value={settings.announcement_bar_ar || ""}
@@ -184,7 +186,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">Promo Code</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.promo_code')}</label>
                                     <input
                                         type="text"
                                         value={settings.promo_code || ""}
@@ -194,7 +196,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">Hero Title</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.hero_title')}</label>
                                     <input
                                         type="text"
                                         value={settings.hero_title || ""}
@@ -204,7 +206,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">Hero Subtitle</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.hero_subtitle')}</label>
                                     <textarea
                                         rows={2}
                                         value={settings.hero_subtitle || ""}
@@ -214,7 +216,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">Hero Title (Arabic)</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.hero_title_ar')}</label>
                                     <input
                                         type="text"
                                         value={settings.hero_title_ar || ""}
@@ -225,7 +227,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">Hero Subtitle (Arabic)</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.hero_subtitle_ar')}</label>
                                     <textarea
                                         rows={2}
                                         value={settings.hero_subtitle_ar || ""}
@@ -244,12 +246,12 @@ export default function SettingsPage() {
                                 <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
                                     <Smartphone className="w-5 h-5 text-green-500" />
                                 </div>
-                                <h2 className="text-lg font-bold">WhatsApp & Contact</h2>
+                                <h2 className="text-lg font-bold">{t('admin.settings.whatsapp_contact')}</h2>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">WhatsApp Number</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.whatsapp_number')}</label>
                                     <input
                                         type="text"
                                         value={settings.whatsapp_number || ""}
@@ -259,7 +261,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">Contact Phone</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.contact_phone')}</label>
                                     <input
                                         type="text"
                                         value={settings.contact_phone || ""}
@@ -277,12 +279,12 @@ export default function SettingsPage() {
                                 <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
                                     <Shield className="w-5 h-5 text-red-500" />
                                 </div>
-                                <h2 className="text-lg font-bold">Admin Security</h2>
+                                <h2 className="text-lg font-bold">{t('admin.settings.admin_security')}</h2>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">Admin Access PIN</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.admin_pin')}</label>
                                     <input
                                         type="password"
                                         value={settings.admin_pin || ""}
@@ -290,7 +292,7 @@ export default function SettingsPage() {
                                         className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30"
                                         placeholder="••••••"
                                     />
-                                    <p className="text-[10px] text-muted-foreground mt-1 ml-1">used for dashboard entry verification</p>
+                                    <p className="text-[10px] text-muted-foreground mt-1 ml-1">{t('admin.settings.admin_pin_desc')}</p>
                                 </div>
                             </div>
                         </div>
@@ -301,14 +303,14 @@ export default function SettingsPage() {
                                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                                     <Bell className="w-5 h-5 text-primary" />
                                 </div>
-                                <h2 className="text-lg font-bold">System Notifications</h2>
+                                <h2 className="text-lg font-bold">{t('admin.settings.system_notifications')}</h2>
                             </div>
 
                             <div className="space-y-6">
                                 <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] border border-white/5">
                                     <div className="space-y-0.5">
-                                        <label className="text-sm font-semibold text-foreground">Mobile Push Notifications</label>
-                                        <p className="text-xs text-muted-foreground">Receive real-time alerts for new orders on your mobile device.</p>
+                                        <label className="text-sm font-semibold text-foreground">{t('admin.settings.push_notifications')}</label>
+                                        <p className="text-xs text-muted-foreground">{t('admin.settings.push_notifications_desc')}</p>
                                     </div>
                                     <Switch
                                         checked={settings.push_notifications_enabled === "true"}
@@ -319,8 +321,8 @@ export default function SettingsPage() {
                                 <div className="space-y-3 p-4 rounded-xl bg-white/[0.03] border border-white/5">
                                     <div className="flex items-center justify-between">
                                         <div className="space-y-0.5">
-                                            <p className="text-sm font-semibold text-foreground">Device Status</p>
-                                            <p className="text-[10px] text-muted-foreground">Subscribe your current phone/PC to receive alerts.</p>
+                                            <p className="text-sm font-semibold text-foreground">{t('admin.settings.device_status')}</p>
+                                            <p className="text-[10px] text-muted-foreground">{t('admin.settings.device_status_desc')}</p>
                                         </div>
                                         <Button
                                             variant="outline"
@@ -328,7 +330,7 @@ export default function SettingsPage() {
                                             className="h-8 rounded-lg text-[10px] border-white/10 hover:bg-white/5"
                                             onClick={() => window.dispatchEvent(new CustomEvent('show-push-prompt'))}
                                         >
-                                            Subscribe Device
+                                            {t('admin.settings.subscribe_device')}
                                         </Button>
                                     </div>
                                     <Button
@@ -339,18 +341,18 @@ export default function SettingsPage() {
                                         disabled={testing}
                                     >
                                         {testing ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <Send className="w-3 h-3 mr-2" />}
-                                        Send Test Notification
+                                        {t('admin.settings.test_notification')}
                                     </Button>
                                 </div>
 
                                 <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
                                     <h4 className="text-[10px] font-bold text-blue-500 mb-1 flex items-center gap-1">
-                                        <Shield className="w-3 h-3" /> Mobile Requirements
+                                        <Shield className="w-3 h-3" /> {t('admin.settings.mobile_requirements')}
                                     </h4>
                                     <ul className="text-[9px] text-blue-400/80 list-disc list-inside space-y-1 leading-normal">
-                                        <li><b>Android</b>: Works in modern Chrome.</li>
-                                        <li><b>iOS (iPhone)</b>: You MUST "Add to Home Screen" first.</li>
-                                        <li>Subscriptions are device-specific; you must enable them on each phone.</li>
+                                        <li>{t('admin.settings.android_info')}</li>
+                                        <li>{t('admin.settings.ios_info')}</li>
+                                        <li>{t('admin.settings.device_specific')}</li>
                                     </ul>
                                 </div>
                             </div>

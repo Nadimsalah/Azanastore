@@ -149,7 +149,7 @@ export default function CheckoutPage() {
             }
         } catch (error) {
             console.error("Checkout Error:", error)
-            toast.error("Failed to process checkout. Please try again.")
+            toast.error(t('checkout.error'))
             setLoading(false)
         }
     }
@@ -243,7 +243,7 @@ export default function CheckoutPage() {
                                 <Label htmlFor="city">{t('checkout.city')} *</Label>
                                 <Select onValueChange={handleCityChange} value={formData.city}>
                                     <SelectTrigger className={`bg-background/50 h-10 ${errors.city ? "border-destructive ring-destructive" : ""}`}>
-                                        <SelectValue placeholder="Select City" />
+                                        <SelectValue placeholder={t('checkout.select_city')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {MOROCCAN_CITIES.map((city) => (
@@ -264,7 +264,7 @@ export default function CheckoutPage() {
                                     name="address"
                                     value={formData.address}
                                     onChange={handleChange}
-                                    placeholder="Street address, apartment, suite, etc."
+                                    placeholder={t('checkout.address_placeholder')}
                                     className={`bg-background/50 min-h-[100px] resize-none ${errors.address ? "border-destructive focus-visible:ring-destructive" : ""}`}
                                 />
                                 {errors.address && <p className="text-xs text-destructive">{errors.address}</p>}

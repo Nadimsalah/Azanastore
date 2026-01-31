@@ -27,7 +27,7 @@ export default function FaqPage() {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{isArabic ? "العودة إلى الرئيسية" : "Back to Home"}</span>
+            <span>{isArabic ? "العودة إلى الرئيسية" : "Retour à l'accueil"}</span>
           </Link>
           <span className="text-xs text-muted-foreground uppercase tracking-[0.25em]">
             {isArabic ? "أسئلة شائعة" : "FAQ"}
