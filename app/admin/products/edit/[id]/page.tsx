@@ -31,6 +31,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { getProductById } from "@/lib/supabase-api"
 import { supabase } from "@/lib/supabase"
+import { useLanguage } from "@/components/language-provider"
 
 // Predefined Options
 const COMMON_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "36", "38", "40", "42", "44"]
@@ -52,6 +53,8 @@ export default function EditProductPage() {
     const router = useRouter()
     const params = useParams()
     const productId = params.id as string
+    const { t, language } = useLanguage()
+    const isArabic = language === 'ar'
 
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
@@ -143,7 +146,7 @@ export default function EditProductPage() {
 
             if (!res.ok) {
                 if (data.error_code === "RATE_LIMIT_DAILY") {
-                    alert("⚠️ Daily Free AI Quota Exceeded\n\nPlease wait until tomorrow or add your own OpenRouter key in settings.")
+                    alert(t('admin.products.ai_quota_exceeded'))
                     return
                 }
                 throw new Error(data.message || data.error || "Unknown error")
@@ -165,15 +168,15 @@ export default function EditProductPage() {
     const handleSave = async () => {
         // Validation
         if (!title.trim()) {
-            alert('Please enter a product title')
+            alert(t('admin.products.error_title_required'))
             return
         }
         if (!category) {
-            alert('Please select a category')
+            alert(t('admin.products.error_category_required'))
             return
         }
         if (!price || parseFloat(price) < 0) {
-            alert('Please enter a valid price')
+            alert(t('admin.products.error_price_required'))
             return
         }
 
@@ -200,7 +203,7 @@ export default function EditProductPage() {
         setSaving(false)
 
         if (error) {
-            alert('Error updating product: ' + error.message)
+            alert(t('admin.products.error_updating').replace('{message}', error.message))
         } else {
             // Sync Variants
             // 1. Delete existing variants not in the current list
@@ -330,7 +333,7 @@ export default function EditProductPage() {
             setImages([...images, ...uploadedUrls])
         } catch (error) {
             console.error('Upload error:', error)
-            alert('Error uploading images')
+            alert(t('admin.products.error_uploading'))
         } finally {
             setUploading(false)
         }
@@ -409,7 +412,7 @@ export default function EditProductPage() {
             <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
                 <AdminSidebar />
                 <div className="text-center">
-                    <p className="text-gray-500">Loading product...</p>
+                    <p className="text-gray-500">{t('admin.products.loading_product')}</p>
                 </div>
             </div>
         )
@@ -434,15 +437,15 @@ export default function EditProductPage() {
                             </Button>
                         </Link>
                         <div>
-                            <h1 className="text-xl font-bold text-gray-900">Edit Product</h1>
-                            <p className="text-xs text-gray-500 font-medium">Update product information</p>
+                            <h1 className="text-xl font-bold text-gray-900">{t('admin.products.edit_title')}</h1>
+                            <p className="text-xs text-gray-500 font-medium">{t('admin.products.edit_subtitle')}</p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-3">
                         <Link href="/admin/products">
                             <Button variant="outline" className="rounded-full border-gray-200 hover:bg-gray-100 text-gray-600">
-                                Discard
+                                {t('admin.products.discard')}
                             </Button>
                         </Link>
                         <Button
@@ -450,7 +453,7 @@ export default function EditProductPage() {
                             disabled={saving}
                             className="rounded-full px-6 shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 text-white border-none transition-all"
                         >
-                            {saving ? "Saving..." : <><Save className="w-4 h-4 mr-2" /> Save Changes</>}
+                            {saving ? t('admin.products.saving') : <><Save className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2" /> {t('admin.products.save_changes')}</>}
                         </Button>
                     </div>
                 </header>
@@ -463,10 +466,10 @@ export default function EditProductPage() {
 
                         {/* General Information */}
                         <section className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 space-y-6">
-                            <h3 className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-4">General Information</h3>
+                            <h3 className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-4">{t('admin.products.general_info')}</h3>
 
                             <div className="space-y-3">
-                                <label className="text-sm font-semibold text-gray-700">Product Title</label>
+                                <label className="text-sm font-semibold text-gray-700">{t('admin.products.product_title')}</label>
                                 <div className="relative">
                                     <Input
                                         value={title || ""}
@@ -490,7 +493,7 @@ export default function EditProductPage() {
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-sm font-semibold text-gray-700">Description</label>
+                                <label className="text-sm font-semibold text-gray-700">{t('admin.products.description')}</label>
                                 <div className="relative">
                                     <Textarea
                                         value={description || ""}
@@ -519,14 +522,14 @@ export default function EditProductPage() {
                             <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
                                 <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
                                     <Sparkles className="w-4 h-4 text-emerald-500" />
-                                    Product Attributes
+                                    {t('admin.products.product_attributes')}
                                 </h3>
                             </div>
                             <div className="p-6 space-y-8">
                                 {/* Key Benefits */}
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-center px-1">
-                                        <label className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Key Benefits</label>
+                                        <label className="text-sm font-semibold text-gray-700 uppercase tracking-wider">{t('admin.products.key_benefits')}</label>
                                         <Button
                                             type="button"
                                             onClick={addBenefit}
@@ -534,7 +537,7 @@ export default function EditProductPage() {
                                             size="sm"
                                             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full h-8"
                                         >
-                                            <Plus className="w-4 h-4 mr-1" /> Add Benefit
+                                            <Plus className="w-4 h-4 mr-1 rtl:mr-0 rtl:ml-1" /> {t('admin.products.add_benefit_button')}
                                         </Button>
                                     </div>
                                     <div className="space-y-3">
@@ -561,7 +564,7 @@ export default function EditProductPage() {
                                         ))}
                                         {benefits.length === 0 && (
                                             <div className="text-center py-8 border-2 border-dashed border-gray-100 rounded-2xl text-gray-400">
-                                                <p className="text-xs">No benefits added yet. Highlight what makes this product special.</p>
+                                                <p className="text-xs">{t('admin.products.no_benefits_message')}</p>
                                             </div>
                                         )}
                                     </div>
@@ -570,13 +573,13 @@ export default function EditProductPage() {
                                 {/* Size Guide */}
                                 <div className="space-y-4 pt-4 border-t border-gray-50">
                                     <div className="flex justify-between items-center px-1">
-                                        <label className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Size Guide / Additional Info</label>
+                                        <label className="text-sm font-semibold text-gray-700 uppercase tracking-wider">{t('admin.products.size_guide_label')}</label>
                                     </div>
                                     <Textarea
                                         value={sizeGuide || ""}
                                         onChange={(e) => setSizeGuide(e.target.value)}
                                         className="w-full min-h-[150px] rounded-xl bg-white border border-gray-200 p-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-700 resize-none shadow-sm"
-                                        placeholder="Add size measurements or specific product instructions..."
+                                        placeholder={t('admin.products.size_guide_placeholder')}
                                     />
                                 </div>
                             </div>
@@ -587,9 +590,9 @@ export default function EditProductPage() {
                             <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
                                 <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
                                     <ImageIcon className="w-4 h-4 text-blue-500" />
-                                    Product Media
+                                    {t('admin.products.product_media')}
                                 </h3>
-                                <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">{images.length} Images</Badge>
+                                <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">{images.length} {t('admin.products.images_count')}</Badge>
                             </div>
                             <div className="p-6 space-y-6">
                                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -609,7 +612,7 @@ export default function EditProductPage() {
                                             </div>
                                             {index === 0 && (
                                                 <div className="absolute top-2 left-2 px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded-full shadow-sm">
-                                                    Primary
+                                                    {t('admin.products.primary')}
                                                 </div>
                                             )}
                                         </div>
@@ -618,7 +621,7 @@ export default function EditProductPage() {
                                         <div className="w-10 h-10 rounded-full bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors mb-2">
                                             {uploading ? <Loader2 className="w-5 h-5 text-blue-600 animate-spin" /> : <Upload className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />}
                                         </div>
-                                        <span className="text-xs font-bold text-gray-400 group-hover:text-blue-600 uppercase tracking-wider">Upload</span>
+                                        <span className="text-xs font-bold text-gray-400 group-hover:text-blue-600 uppercase tracking-wider">{t('admin.products.upload')}</span>
                                         <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
                                     </label>
                                 </div>
@@ -630,7 +633,7 @@ export default function EditProductPage() {
                             <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
                                 <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
                                     <Layers className="w-4 h-4 text-indigo-500" />
-                                    Product Variants (Sizes & Colors)
+                                    {t('admin.products.variants_section')}
                                 </h3>
                                 <Button
                                     type="button"
@@ -639,8 +642,8 @@ export default function EditProductPage() {
                                     size="sm"
                                     className="rounded-full border-indigo-200 text-indigo-600 hover:bg-indigo-50"
                                 >
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    Add Variant
+                                    <Plus className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                                    {t('admin.products.add_variant')}
                                 </Button>
                             </div>
 
@@ -648,8 +651,8 @@ export default function EditProductPage() {
                                 <div className="mb-8 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 space-y-6">
                                     <div className="space-y-3">
                                         <label className="text-sm font-bold text-indigo-900 flex items-center gap-2">
-                                            1. Select Sizes
-                                            <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">Multiple</span>
+                                            {t('admin.products.select_sizes')}
+                                            <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">{t('admin.products.multiple')}</span>
                                         </label>
                                         <div className="flex flex-wrap gap-2">
                                             {COMMON_SIZES.map(s => {
@@ -670,8 +673,8 @@ export default function EditProductPage() {
 
                                     <div className="space-y-3">
                                         <label className="text-sm font-bold text-indigo-900 flex items-center gap-2">
-                                            2. Select Colors
-                                            <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">Visual Selection</span>
+                                            {t('admin.products.select_colors')}
+                                            <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">{t('admin.products.visual_selection')}</span>
                                         </label>
                                         <div className="flex flex-wrap gap-3">
                                             {COMMON_COLORS.map(c => {
@@ -702,14 +705,14 @@ export default function EditProductPage() {
                                         disabled={selectedSizes.length === 0 && selectedColors.length === 0}
                                         className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-100 disabled:bg-gray-200"
                                     >
-                                        <RefreshCw className="w-4 h-4 mr-2" />
-                                        Generate {selectedSizes.length > 0 && selectedColors.length > 0 ? selectedSizes.length * selectedColors.length : Math.max(selectedSizes.length, selectedColors.length)} Combinations
+                                        <RefreshCw className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                                        {t('admin.products.generate_combinations').replace('{count}', String(selectedSizes.length > 0 && selectedColors.length > 0 ? selectedSizes.length * selectedColors.length : Math.max(selectedSizes.length, selectedColors.length)))}
                                     </Button>
                                 </div>
 
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between px-1">
-                                        <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Active Variants ({variants.length})</h4>
+                                        <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">{t('admin.products.active_variants').replace('{count}', String(variants.length))}</h4>
                                     </div>
                                     {variants.map((v, i) => (
                                         <div key={i} className="p-4 rounded-2xl border border-gray-100 bg-gray-50/50 space-y-4 relative group hover:bg-white hover:shadow-xl hover:shadow-gray-100 transition-all">
@@ -721,7 +724,7 @@ export default function EditProductPage() {
                                             </button>
                                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                                 <div className="space-y-1.5">
-                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Size</label>
+                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t('admin.products.variant_size')}</label>
                                                     <Input
                                                         placeholder="e.g. XL"
                                                         value={v.size || ""}
@@ -730,7 +733,7 @@ export default function EditProductPage() {
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Color</label>
+                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t('admin.products.variant_color')}</label>
                                                     <Input
                                                         placeholder="e.g. Navy"
                                                         value={v.color || ""}
@@ -739,7 +742,7 @@ export default function EditProductPage() {
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Price (MAD)</label>
+                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t('admin.products.variant_price')}</label>
                                                     <Input
                                                         type="number"
                                                         placeholder={price || "0.00"}
@@ -749,7 +752,7 @@ export default function EditProductPage() {
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Stock</label>
+                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t('admin.products.variant_stock')}</label>
                                                     <Input
                                                         type="number"
                                                         placeholder="0"
@@ -765,7 +768,7 @@ export default function EditProductPage() {
                             </div>
                             {variants.length === 0 && (
                                 <div className="text-center py-6 border-2 border-dashed border-gray-100 rounded-2xl text-gray-400 text-sm">
-                                    No variants added yet.
+                                    {t('admin.products.no_variants')}
                                 </div>
                             )}
                         </section>
@@ -777,16 +780,16 @@ export default function EditProductPage() {
 
                         {/* Organization */}
                         <section className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 space-y-6">
-                            <h3 className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-4">Organization</h3>
+                            <h3 className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-4">{t('admin.products.organization')}</h3>
 
                             <div className="space-y-3">
-                                <label className="text-sm font-semibold text-gray-700">Category</label>
+                                <label className="text-sm font-semibold text-gray-700">{t('admin.products.category')}</label>
                                 <div className="relative">
                                     <select
                                         value={category || ""}
                                         onChange={(e) => setCategory(e.target.value)}
                                         className="w-full h-12 rounded-xl border border-gray-200 bg-white px-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-gray-700 appearance-none shadow-sm">
-                                        <option value="" disabled>Select Category</option>
+                                        <option value="" disabled>{t('admin.products.select_category_placeholder')}</option>
                                         {categories.map((cat) => (
                                             <option key={cat.id} value={cat.slug || cat.id}>{cat.name}</option>
                                         ))}
@@ -796,15 +799,15 @@ export default function EditProductPage() {
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-sm font-semibold text-gray-700">Status</label>
+                                <label className="text-sm font-semibold text-gray-700">{t('admin.products.status')}</label>
                                 <div className="relative">
                                     <select
                                         value={status || "draft"}
                                         onChange={(e) => setStatus(e.target.value)}
                                         className="w-full h-12 rounded-xl border border-gray-200 bg-white px-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-gray-700 appearance-none shadow-sm"
                                     >
-                                        <option value="draft">Draft</option>
-                                        <option value="active">Active</option>
+                                        <option value="draft">{t('admin.products.status_draft')}</option>
+                                        <option value="active">{t('admin.products.status_active')}</option>
                                     </select>
                                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                                 </div>
@@ -813,10 +816,10 @@ export default function EditProductPage() {
 
                         {/* Pricing */}
                         <section className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 space-y-6">
-                            <h3 className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-4">Pricing</h3>
+                            <h3 className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-4">{t('admin.products.pricing_section')}</h3>
 
                             <div className="space-y-3">
-                                <label className="text-sm font-semibold text-gray-700">Price (MAD)</label>
+                                <label className="text-sm font-semibold text-gray-700">{t('admin.products.price_mad')}</label>
                                 <Input
                                     type="number"
                                     value={price || ""}
@@ -827,7 +830,7 @@ export default function EditProductPage() {
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-sm font-semibold text-gray-700">Compare at Price (Optional)</label>
+                                <label className="text-sm font-semibold text-gray-700">{t('admin.products.compare_at_price')}</label>
                                 <Input
                                     type="number"
                                     value={compareAtPrice || ""}
@@ -840,10 +843,10 @@ export default function EditProductPage() {
 
                         {/* Inventory */}
                         <section className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 space-y-6">
-                            <h3 className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-4">Inventory</h3>
+                            <h3 className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-4">{t('admin.products.inventory')}</h3>
 
                             <div className="space-y-3">
-                                <label className="text-sm font-semibold text-gray-700">Stock Quantity</label>
+                                <label className="text-sm font-semibold text-gray-700">{t('admin.products.stock_quantity')}</label>
                                 <Input
                                     type="number"
                                     value={stock || ""}

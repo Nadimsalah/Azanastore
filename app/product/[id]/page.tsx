@@ -138,7 +138,15 @@ export default function ProductPage() {
   })
 
   const displayPrice = selectedVariant ? selectedVariant.price : product.price
-  const displayStock = selectedVariant ? selectedVariant.stock : product.stock
+
+  // Calculate display stock: if a variant is selected, show its stock. 
+  // Otherwise, show the sum of all variant stocks (or the product stock if no variants exist).
+  const displayStock = selectedVariant
+    ? selectedVariant.stock
+    : (product.variants && product.variants.length > 0)
+      ? product.variants.reduce((acc, v) => acc + (v.stock || 0), 0)
+      : product.stock || 0
+
   const currentInStock = displayStock > 0
 
   return (

@@ -89,12 +89,12 @@ export default function CustomersPage() {
                 <div className="space-y-6">
                     <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-background/40 backdrop-blur-md p-4 rounded-3xl border border-white/5">
                         <div className="relative w-full sm:w-96">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground rtl:left-auto rtl:right-3" />
+                            <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input
                                 placeholder={t('admin.customers.search')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 rtl:pl-3 rtl:pr-9 rounded-full bg-white/5 border-white/10"
+                                className="pl-9 rtl:pr-9 rtl:pl-3 rounded-full bg-white/5 border-white/10 text-left rtl:text-right"
                             />
                         </div>
                         <Button variant="outline" className="rounded-full h-10 bg-white/5 border-white/10">
@@ -106,7 +106,7 @@ export default function CustomersPage() {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left rtl:text-right border-collapse">
                                 <thead>
-                                    <tr className="border-b border-white/10 bg-white/5 font-semibold text-muted-foreground uppercase tracking-wider text-[10px] sm:text-xs">
+                                    <tr className="border-b border-white/10 bg-white/5 font-semibold text-muted-foreground uppercase tracking-wider text-[10px] sm:text-xs text-left rtl:text-right">
                                         <th className="py-4 px-6 text-left rtl:text-right">{t('admin.customers.table_customer')}</th>
                                         <th className="py-4 px-6 text-left rtl:text-right">{t('status.all')}</th>
                                         <th className="py-4 px-6 hidden md:table-cell text-left rtl:text-right">{t('admin.customers.table_orders')}</th>

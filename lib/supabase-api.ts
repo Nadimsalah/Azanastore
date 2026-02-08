@@ -35,6 +35,17 @@ export interface ProductVariant {
     created_at: string
 }
 
+export interface CartItem {
+    id: string
+    product_id: string
+    title: string
+    variant_name?: string | null
+    sku: string
+    price: number
+    image?: string | null
+    quantity: number
+}
+
 export interface Customer {
     id: string
     name: string
@@ -63,6 +74,7 @@ export interface Order {
     subtotal: number
     shipping_cost: number
     total: number
+    source: 'online' | 'pos'
     ip_address: string | null
     notes: string | null
     created_at: string
@@ -418,7 +430,12 @@ export async function getOrders(filters?: {
     const { data, error, count } = await query
 
     if (error) {
-        console.error('Error fetching orders:', error)
+        console.error('Error fetching orders:', {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint
+        })
         return { data: [], count: 0 }
     }
 
@@ -466,6 +483,8 @@ export async function createOrder(data: {
     subtotal: number
     shipping_cost: number
     total: number
+    source?: 'online' | 'pos'
+    status?: string
 }) {
     // 1. Create or get customer
     const { data: customer, error: customerError } = await supabase
@@ -483,28 +502,51 @@ export async function createOrder(data: {
     }
 
     // 2. Insert order
-    const orderNumber = `ORD-${Math.floor(1000 + Math.random() * 9000)}`
-    const { data: order, error: orderError } = await supabase
+    const orderNumber = `ORD-${Math.floor(1000 + Math.random() * 9000).toString().padStart(4, '0')}`
+    const orderPayload: any = {
+        order_number: orderNumber,
+        customer_id: customer?.id || null,
+        customer_name: data.customer.name,
+        customer_email: data.customer.email,
+        customer_phone: data.customer.phone,
+        address_line1: data.customer.address_line1,
+        city: data.customer.city,
+        governorate: 'Morocco',
+        status: data.status || 'pending',
+        source: data.source || 'online',
+        subtotal: data.subtotal,
+        shipping_cost: data.shipping_cost,
+        total: data.total
+    }
+
+    let { data: order, error: orderError } = await supabase
         .from('orders')
-        .insert({
-            order_number: orderNumber,
-            customer_id: customer?.id || null,
-            customer_name: data.customer.name,
-            customer_email: data.customer.email,
-            customer_phone: data.customer.phone,
-            address_line1: data.customer.address_line1,
-            city: data.customer.city,
-            governorate: 'Morocco', // Default for now
-            status: 'pending',
-            subtotal: data.subtotal,
-            shipping_cost: data.shipping_cost,
-            total: data.total
-        })
+        .insert(orderPayload)
         .select()
         .single()
 
+    // Fallback if 'source' column doesn't exist yet in the DB
+    if (orderError && (orderError.message?.includes('column "source" does not exist') || orderError.code === '42703')) {
+        console.warn('Database "orders" table is missing "source" column. Retrying without it...')
+        delete orderPayload.source
+        const retryResult = await supabase
+            .from('orders')
+            .insert(orderPayload)
+            .select()
+            .single()
+
+        order = retryResult.data
+        orderError = retryResult.error
+    }
+
     if (orderError) {
-        console.error('Error creating order:', orderError)
+        console.error('Error creating order:', {
+            message: orderError.message,
+            code: orderError.code,
+            details: orderError.details,
+            hint: orderError.hint,
+            payload: orderPayload
+        })
         return { error: orderError }
     }
 
@@ -935,4 +977,61 @@ export async function getCategories() {
     }
 
     return data as { id: string, name: string, slug: string, name_ar?: string }[]
+}
+
+/**
+ * Update stock level for a product variant
+ */
+export async function updateVariantStock(variantId: string, stock: number) {
+    const { error } = await supabase
+        .from('product_variants')
+        .update({ stock })
+        .eq('id', variantId)
+
+    if (error) {
+        console.error('Error updating variant stock:', error)
+        return { success: false, error: error.message }
+    }
+    return { success: true }
+}
+
+/**
+ * Update stock level for a main product
+ */
+export async function updateProductStock(productId: string, stock: number) {
+    const { error } = await supabase
+        .from('products')
+        .update({ stock })
+        .eq('id', productId)
+
+    if (error) {
+        console.error('Error updating product stock:', error)
+        return { success: false, error: error.message }
+    }
+    return { success: true }
+}
+
+/**
+ * Create a new variant for a product
+ */
+export async function createProductVariant(variant: {
+    product_id: string;
+    name: string;
+    size: string | null;
+    color: string | null;
+    price: number;
+    stock: number;
+    sku: string;
+}) {
+    const { data, error } = await supabase
+        .from('product_variants')
+        .insert(variant)
+        .select()
+        .single()
+
+    if (error) {
+        console.error('Error creating product variant:', error)
+        return { success: false, error: error.message }
+    }
+    return { success: true, data }
 }

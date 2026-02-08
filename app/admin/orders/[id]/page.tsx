@@ -118,11 +118,16 @@ export default function OrderDetailsPage() {
                         <div>
                             <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
                                 {order.order_number}
-                                <Badge variant="outline" className={`ml-2 border-primary/20 ${getStatusColor(order.status)}`}>
-                                    {order.status}
+                                <Badge variant="outline" className={`ml-2 rtl:ml-0 rtl:mr-2 border-primary/20 ${getStatusColor(order.status)}`}>
+                                    {t(`status.${order.status.toLowerCase()}`)}
                                 </Badge>
+                                {order.source === 'pos' && (
+                                    <Badge variant="outline" className="ml-2 rtl:ml-0 rtl:mr-2 bg-orange-500/10 text-orange-500 border-orange-500/20 font-bold uppercase">
+                                        {t('admin.order.pos_sale')}
+                                    </Badge>
+                                )}
                             </h1>
-                            <p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleString('en-US')}</p>
+                            <p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleString(isArabic ? 'ar-MA' : 'fr-FR')}</p>
                         </div>
                     </div>
 
@@ -218,14 +223,14 @@ export default function OrderDetailsPage() {
 
                                 {/* Order Info */}
                                 <div className="mb-4 text-center">
-                                    <h2 className="text-lg font-black uppercase mb-1">REÇU DE COMMANDE</h2>
+                                    <h2 className="text-lg font-black uppercase mb-1">{t('admin.order.print_receipt')}</h2>
                                     <p className="font-bold text-sm">#{order.order_number}</p>
-                                    <p className="text-[9px]">{new Date(order.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                                    <p className="text-[9px]">{new Date(order.created_at).toLocaleDateString(isArabic ? 'ar-MA' : 'fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                                 </div>
 
                                 {/* Customer Info */}
                                 <div className="mb-4 border-b border-black pb-2">
-                                    <p className="font-bold uppercase text-[9px] mb-1">CLIENT:</p>
+                                    <p className="font-bold uppercase text-[9px] mb-1">{t('admin.order.client')}:</p>
                                     <p className="font-bold">{order.customer_name}</p>
                                     <p>{order.customer_phone}</p>
                                     <p>{order.address_line1}</p>
@@ -237,9 +242,9 @@ export default function OrderDetailsPage() {
                                     <table className="w-full text-left">
                                         <thead>
                                             <tr className="border-b border-black text-[9px]">
-                                                <th className="py-1 w-[50%]">PRODUIT</th>
-                                                <th className="py-1 text-center">QTÉ</th>
-                                                <th className="py-1 text-right">TOTAL</th>
+                                                <th className="py-1 w-[50%]">{t('admin.order.product')}</th>
+                                                <th className="py-1 text-center">{t('admin.order.qty')}</th>
+                                                <th className="py-1 text-right">{t('admin.order.total')}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="text-[10px]">
@@ -260,23 +265,23 @@ export default function OrderDetailsPage() {
                                 {/* Totals */}
                                 <div className="mb-6 space-y-1 text-right">
                                     <div className="flex justify-between">
-                                        <span>Sous-total:</span>
-                                        <span>{(order.subtotal || 0).toLocaleString('fr-FR')} MAD</span>
+                                        <span>{t('admin.order.subtotal')}:</span>
+                                        <span>{(order.subtotal || 0).toLocaleString(isArabic ? 'ar-MA' : 'fr-FR')} MAD</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span>Livraison:</span>
-                                        <span>{(order.shipping_cost || 0).toLocaleString('fr-FR')} MAD</span>
+                                        <span>{t('admin.order.shipping')}:</span>
+                                        <span>{(order.shipping_cost || 0).toLocaleString(isArabic ? 'ar-MA' : 'fr-FR')} MAD</span>
                                     </div>
                                     <div className="flex justify-between text-sm font-black border-t-2 border-black pt-1 mt-1">
-                                        <span>TOTAL:</span>
-                                        <span>{(order.total || 0).toLocaleString('fr-FR')} MAD</span>
+                                        <span>{t('admin.order.total')}:</span>
+                                        <span>{(order.total || 0).toLocaleString(isArabic ? 'ar-MA' : 'fr-FR')} MAD</span>
                                     </div>
                                 </div>
 
                                 {/* Footer */}
                                 <div className="text-center space-y-2 pt-4 border-t-2 border-dashed border-black text-[9px]">
-                                    <p className="font-bold uppercase">MERCI DE VOTRE VISITE !</p>
-                                    <p>Les retours sont acceptés sous 15 jours.</p>
+                                    <p className="font-bold uppercase">{t('admin.order.thanks')}</p>
+                                    <p>{t('admin.order.returns_policy')}</p>
                                     <div className="pt-2">
                                         <p>AZANA BOUTIQUE</p>
                                         <p>RC: 123456 | ICE: 000000000000</p>
@@ -290,26 +295,28 @@ export default function OrderDetailsPage() {
                     {/* Right Column: Customer & Status */}
                     <div className="space-y-6 print:hidden">
 
-                        {/* Status Card */}
-                        <div className="glass-strong rounded-3xl p-6 border-l-4 border-primary">
-                            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">{t('admin.order.update_status')}</h3>
-                            <div className="space-y-3">
-                                {["Pending", "Processing", "Shipped", "Delivered", "Cancelled"].map((s) => (
-                                    <button
-                                        key={s}
-                                        disabled={updating}
-                                        onClick={() => handleStatusChange(s)}
-                                        className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center justify-between ${order.status === s.toLowerCase()
-                                            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                                            : "hover:bg-white/5 text-foreground"
-                                            } ${updating ? "opacity-50 cursor-not-allowed" : ""}`}
-                                    >
-                                        <span className="font-medium">{s}</span>
-                                        {order.status === s.toLowerCase() && <CheckCircle2 className="w-4 h-4" />}
-                                    </button>
-                                ))}
+                        {/* Status Card - Hide for POS */}
+                        {order.source !== 'pos' && (
+                            <div className="glass-strong rounded-3xl p-6 border-l-4 border-primary">
+                                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">{t('admin.order.update_status')}</h3>
+                                <div className="space-y-3">
+                                    {["Pending", "Processing", "Shipped", "Delivered", "Cancelled"].map((s) => (
+                                        <button
+                                            key={s}
+                                            disabled={updating}
+                                            onClick={() => handleStatusChange(s)}
+                                            className={`w-full text-left rtl:text-right px-4 py-3 rounded-xl transition-all flex items-center justify-between ${order.status === s.toLowerCase()
+                                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                                                : "hover:bg-white/5 text-foreground"
+                                                } ${updating ? "opacity-50 cursor-not-allowed" : ""}`}
+                                        >
+                                            <span className="font-medium">{t(`status.${s.toLowerCase()}`)}</span>
+                                            {order.status === s.toLowerCase() && <CheckCircle2 className="w-4 h-4" />}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Customer Details */}
                         <div className="glass-strong rounded-3xl p-6">
@@ -356,26 +363,28 @@ export default function OrderDetailsPage() {
                             </div>
                         </div>
 
-                        {/* Delivery Info */}
-                        <div className="glass-strong rounded-3xl p-6">
-                            <h3 className="text-lg font-bold text-foreground mb-4">{t('admin.order.delivery_info')}</h3>
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3 text-sm">
-                                    <Truck className="w-4 h-4 text-primary" />
-                                    <div>
-                                        <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">{t('admin.order.method')}</p>
-                                        <p className="text-foreground font-medium">{t('admin.order.standard_delivery')}</p>
+                        {/* Delivery Info - Hide for POS */}
+                        {order.source !== 'pos' && (
+                            <div className="glass-strong rounded-3xl p-6">
+                                <h3 className="text-lg font-bold text-foreground mb-4">{t('admin.order.delivery_info')}</h3>
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3 text-sm">
+                                        <Truck className="w-4 h-4 text-primary" />
+                                        <div>
+                                            <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">{t('admin.order.method')}</p>
+                                            <p className="text-foreground font-medium">{t('admin.order.standard_delivery')}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-3 text-sm">
-                                    <MapPin className="w-4 h-4 text-primary" />
-                                    <div>
-                                        <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">{t('admin.order.destination')}</p>
-                                        <p className="text-foreground font-medium">{order.city}, Morocco</p>
+                                    <div className="flex items-center gap-3 text-sm">
+                                        <MapPin className="w-4 h-4 text-primary" />
+                                        <div>
+                                            <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">{t('admin.order.destination')}</p>
+                                            <p className="text-foreground font-medium">{order.city}, Morocco</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Payment Info */}
                         <div className="glass-strong rounded-3xl p-6">

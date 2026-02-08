@@ -53,10 +53,8 @@ export default function AdminProductsPage() {
     const [searchQuery, setSearchQuery] = useState("")
     const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
-    const [categories, setCategories] = useState<{ id: string, name: string, slug: string, name_ar?: string }[]>([])
+    const [categories, setCategories] = useState<{ id: string, name: string, slug: string }[]>([])
     const [newCategoryName, setNewCategoryName] = useState("")
-    const [newCategoryNameAr, setNewCategoryNameAr] = useState("")
-    const [isTranslating, setIsTranslating] = useState(false)
     const [showCategoryDialog, setShowCategoryDialog] = useState(false)
 
     // Fetch products from Supabase
@@ -76,27 +74,7 @@ export default function AdminProductsPage() {
         }
     }
 
-    // Auto-translate when English name changes (debounced or on blur)
-    async function handleAutoTranslate() {
-        if (!newCategoryName.trim() || newCategoryNameAr.trim()) return
 
-        setIsTranslating(true)
-        try {
-            const response = await fetch('/api/admin/translate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: newCategoryName, targetLang: 'ar' })
-            })
-            const data = await response.json()
-            if (data.translatedText) {
-                setNewCategoryNameAr(data.translatedText)
-            }
-        } catch (error) {
-            console.error("Translation failed", error)
-        } finally {
-            setIsTranslating(false)
-        }
-    }
 
     async function handleAddCategory() {
         if (!newCategoryName.trim()) return
@@ -107,15 +85,13 @@ export default function AdminProductsPage() {
             .from('categories')
             .insert({
                 name: newCategoryName,
-                slug,
-                name_ar: newCategoryNameAr || newCategoryName // Fallback to English if no Arabic provided
+                slug
             })
 
         if (error) {
             alert('Error adding category: ' + error.message)
         } else {
             setNewCategoryName("")
-            setNewCategoryNameAr("")
             loadCategories()
         }
     }
@@ -164,7 +140,7 @@ export default function AdminProductsPage() {
         if (slug === "All") return t('status.all')
         const category = categories.find(c => c.slug === slug)
         if (!category) return slug
-        return (language === 'ar' && category.name_ar) ? category.name_ar : category.name
+        return category.name
     }
 
     const filteredProducts = products.filter(product => {
@@ -172,6 +148,13 @@ export default function AdminProductsPage() {
         const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase())
         return matchesTab && matchesSearch
     })
+
+    const getProductStock = (product: Product) => {
+        if (product.variants && product.variants.length > 0) {
+            return product.variants.reduce((acc, v) => acc + (v.stock || 0), 0)
+        }
+        return product.stock || 0
+    }
 
     const getStockStatus = (stock: number) => {
         if (stock === 0) return t('admin.products.out_of_stock')
@@ -213,7 +196,7 @@ export default function AdminProductsPage() {
                         <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
                             <DialogTrigger asChild>
                                 <Button variant="outline" className="rounded-full h-9">
-                                    <Tag className="w-4 h-4 sm:mr-2" />
+                                    <Tag className="w-4 h-4 sm:mr-2 rtl:mr-0 rtl:ml-2" />
                                     <span className="hidden sm:inline">{t('admin.products.manage_categories')}</span>
                                 </Button>
                             </DialogTrigger>
@@ -223,35 +206,16 @@ export default function AdminProductsPage() {
                                 </DialogHeader>
                                 <div className="space-y-4">
                                     {/* Add Category */}
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex gap-2">
-                                            <Input
-                                                placeholder="Category Name (English)"
-                                                value={newCategoryName}
-                                                onChange={(e) => setNewCategoryName(e.target.value)}
-                                                onBlur={handleAutoTranslate}
-                                                className="flex-1"
-                                            />
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <div className="relative flex-1">
-                                                <Input
-                                                    placeholder="اسم القسم (Arabic)"
-                                                    value={newCategoryNameAr}
-                                                    onChange={(e) => setNewCategoryNameAr(e.target.value)}
-                                                    className="flex-1 text-right"
-                                                    dir="rtl"
-                                                />
-                                                {isTranslating && (
-                                                    <div className="absolute left-2 top-1/2 -translate-y-1/2">
-                                                        <span className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin block" />
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <Button onClick={handleAddCategory}>
-                                                <Plus className="w-4 h-4 mr-1" /> {t('cart.apply')}
-                                            </Button>
-                                        </div>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            placeholder="Category Name"
+                                            value={newCategoryName}
+                                            onChange={(e) => setNewCategoryName(e.target.value)}
+                                            className="flex-1"
+                                        />
+                                        <Button onClick={handleAddCategory}>
+                                            <Plus className="w-4 h-4" />
+                                        </Button>
                                     </div>
 
                                     {/* Categories List */}
@@ -260,7 +224,6 @@ export default function AdminProductsPage() {
                                             <div key={category.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                                 <div>
                                                     <p className="font-medium text-sm">{category.name}</p>
-                                                    {category.name_ar && <p className="text-xs text-muted-foreground font-arabic">{category.name_ar}</p>}
                                                     <p className="text-[10px] text-muted-foreground/70">{category.slug}</p>
                                                 </div>
                                                 <Button
@@ -280,7 +243,7 @@ export default function AdminProductsPage() {
 
                         <Link href="/admin/products/new">
                             <Button className="rounded-full h-9 shadow-lg shadow-primary/20">
-                                <Plus className="w-4 h-4 sm:mr-2" />
+                                <Plus className="w-4 h-4 sm:mr-2 rtl:mr-0 rtl:ml-2" />
                                 <span className="hidden sm:inline">{t('admin.products.add_product')}</span>
                             </Button>
                         </Link>
@@ -297,19 +260,22 @@ export default function AdminProductsPage() {
                     <div className="glass-strong rounded-2xl p-4 flex flex-col">
                         <span className="text-sm text-muted-foreground font-medium">{t('admin.products.total_inventory')}</span>
                         <span className="text-2xl font-bold text-foreground mt-1">
-                            {products.reduce((acc, curr) => acc + curr.stock, 0).toLocaleString()}
+                            {products.reduce((acc, curr) => acc + getProductStock(curr), 0).toLocaleString()}
                         </span>
                     </div>
                     <div className="glass-strong rounded-2xl p-4 flex flex-col">
                         <span className="text-sm text-muted-foreground font-medium">{t('admin.products.low_stock')}</span>
                         <span className="text-2xl font-bold text-orange-500 mt-1">
-                            {products.filter(p => p.stock < 10 && p.stock > 0).length}
+                            {products.filter(p => {
+                                const s = getProductStock(p)
+                                return s < 10 && s > 0
+                            }).length}
                         </span>
                     </div>
                     <div className="glass-strong rounded-2xl p-4 flex flex-col">
                         <span className="text-sm text-muted-foreground font-medium">{t('admin.products.out_of_stock')}</span>
                         <span className="text-2xl font-bold text-red-500 mt-1">
-                            {products.filter(p => p.stock === 0).length}
+                            {products.filter(p => getProductStock(p) === 0).length}
                         </span>
                     </div>
                 </div>
@@ -335,12 +301,12 @@ export default function AdminProductsPage() {
 
                         {/* Search */}
                         <div className="relative w-full sm:w-64">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input
                                 placeholder="Search products..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 rounded-xl bg-white/5 border-white/10 focus:bg-white/10 h-10"
+                                className="pl-9 rtl:pr-9 rtl:pl-3 rounded-xl bg-white/5 border-white/10 focus:bg-white/10 h-10 text-left rtl:text-right"
                             />
                         </div>
                     </div>
@@ -348,22 +314,22 @@ export default function AdminProductsPage() {
                     {/* Products Grid/List */}
                     <div className="glass-strong rounded-3xl overflow-hidden min-h-[500px] flex flex-col">
                         <div className="overflow-x-auto flex-1">
-                            <table className="w-full">
+                            <table className="w-full text-left rtl:text-right">
                                 <thead>
-                                    <tr className="border-b border-white/10 bg-white/5 text-left">
-                                        <th className="py-4 pl-4 sm:pl-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('admin.products.product_title')}</th>
+                                    <tr className="border-b border-white/10 bg-white/5 text-left rtl:text-right">
+                                        <th className="py-4 pl-4 rtl:pl-0 rtl:pr-4 sm:pl-6 sm:rtl:pr-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('admin.products.product_title')}</th>
                                         <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden sm:table-cell">{t('admin.products.category')}</th>
                                         <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('admin.products.pricing')}</th>
                                         <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">{t('admin.products.stock')}</th>
                                         <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('admin.products.status')}</th>
-                                        <th className="py-4 pr-6 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
+                                        <th className="py-4 pr-6 rtl:pr-0 rtl:pl-6 text-right rtl:text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
                                     {filteredProducts.length > 0 ? (
                                         filteredProducts.map((product) => (
                                             <tr key={product.id} className="group hover:bg-white/5 transition-colors">
-                                                <td className="py-4 pl-4 sm:pl-6">
+                                                <td className="py-4 pl-4 sm:pl-6 rtl:pl-0 rtl:pr-4 sm:rtl:pr-6">
                                                     <div className="flex items-center gap-3">
                                                         <div className="h-12 w-12 bg-white rounded-lg overflow-hidden flex-shrink-0 relative">
                                                             {product.images && product.images.length > 0 ? (
@@ -390,15 +356,15 @@ export default function AdminProductsPage() {
                                                 <td className="py-4 px-4 text-sm text-foreground/80 hidden sm:table-cell">{product.category}</td>
                                                 <td className="py-4 px-4 text-sm font-bold text-foreground">MAD {product.price?.toLocaleString('en-US')}</td>
                                                 <td className="py-4 px-4 text-sm text-muted-foreground hidden md:table-cell font-medium">
-                                                    {product.stock?.toLocaleString('en-US')} units
+                                                    {getProductStock(product).toLocaleString('en-US')} units
                                                 </td>
                                                 <td className="py-4 px-4">
-                                                    <Badge className={getStatusColor(getStockStatus(product.stock))}>
-                                                        {getStockStatus(product.stock)}
+                                                    <Badge className={getStatusColor(getStockStatus(getProductStock(product)))}>
+                                                        {getStockStatus(getProductStock(product))}
                                                     </Badge>
                                                 </td>
-                                                <td className="py-4 pr-6 text-right">
-                                                    <div className="flex items-center justify-end gap-2">
+                                                <td className="py-4 pr-6 rtl:pr-0 rtl:pl-6 text-right rtl:text-left">
+                                                    <div className="flex items-center justify-end rtl:justify-start gap-2">
                                                         <Link href={`/admin/products/edit/${product.id}`}>
                                                             <Button size="icon" variant="ghost" className="h-8 w-8 text-foreground/60 hover:text-blue-500 hover:bg-blue-500/10">
                                                                 <Edit className="w-4 h-4" />

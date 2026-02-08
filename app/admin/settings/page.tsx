@@ -122,7 +122,7 @@ export default function SettingsPage() {
 
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.store_name')}</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.store_name')}</label>
                                     <input
                                         type="text"
                                         value={settings.store_name || ""}
@@ -132,7 +132,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.support_email')}</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.support_email')}</label>
                                     <input
                                         type="email"
                                         value={settings.support_email || ""}
@@ -142,7 +142,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.currency')}</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.currency')}</label>
                                     <input
                                         type="text"
                                         value={settings.currency || ""}
@@ -165,7 +165,7 @@ export default function SettingsPage() {
 
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.announcement_bar')}</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.announcement_bar')}</label>
                                     <textarea
                                         rows={3}
                                         value={settings.announcement_bar || ""}
@@ -175,7 +175,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.announcement_bar_ar')}</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.announcement_bar_ar')}</label>
                                     <textarea
                                         rows={3}
                                         value={settings.announcement_bar_ar || ""}
@@ -186,7 +186,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.promo_code')}</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.promo_code')}</label>
                                     <input
                                         type="text"
                                         value={settings.promo_code || ""}
@@ -196,7 +196,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.hero_title')}</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.hero_title')}</label>
                                     <input
                                         type="text"
                                         value={settings.hero_title || ""}
@@ -206,7 +206,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.hero_subtitle')}</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.hero_subtitle')}</label>
                                     <textarea
                                         rows={2}
                                         value={settings.hero_subtitle || ""}
@@ -216,7 +216,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.hero_title_ar')}</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.hero_title_ar')}</label>
                                     <input
                                         type="text"
                                         value={settings.hero_title_ar || ""}
@@ -227,7 +227,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.hero_subtitle_ar')}</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.hero_subtitle_ar')}</label>
                                     <textarea
                                         rows={2}
                                         value={settings.hero_subtitle_ar || ""}
@@ -251,7 +251,7 @@ export default function SettingsPage() {
 
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.whatsapp_number')}</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.whatsapp_number')}</label>
                                     <input
                                         type="text"
                                         value={settings.whatsapp_number || ""}
@@ -261,7 +261,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.contact_phone')}</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.contact_phone')}</label>
                                     <input
                                         type="text"
                                         value={settings.contact_phone || ""}
@@ -284,7 +284,7 @@ export default function SettingsPage() {
 
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1">{t('admin.settings.admin_pin')}</label>
+                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.admin_pin')}</label>
                                     <input
                                         type="password"
                                         value={settings.admin_pin || ""}
@@ -292,7 +292,7 @@ export default function SettingsPage() {
                                         className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30"
                                         placeholder="••••••"
                                     />
-                                    <p className="text-[10px] text-muted-foreground mt-1 ml-1">{t('admin.settings.admin_pin_desc')}</p>
+                                    <p className="text-[10px] text-muted-foreground mt-1 ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.admin_pin_desc')}</p>
                                 </div>
                             </div>
                         </div>

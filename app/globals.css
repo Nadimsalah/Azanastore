@@ -1,6 +1,46 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+@layer base {
+  @media print {
+
+    /* Global print concealment */
+    body * {
+      visibility: hidden;
+    }
+
+    /* Reveal only stickers or receipts when printing labels */
+    .sticker-container,
+    .sticker-container *,
+    .receipt-container,
+    .receipt-container * {
+      visibility: visible !important;
+    }
+
+    .sticker-container,
+    .receipt-container {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+
+    /* Hide all notifications and toasts during printing */
+    [data-sonner-toaster],
+    .sonner-toast,
+    #sonner-hook {
+      display: none !important;
+      visibility: hidden !important;
+    }
+
+    /* Reset margins for label printers */
+    @page {
+      margin: 0;
+      size: auto;
+    }
+  }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {

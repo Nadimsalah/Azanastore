@@ -28,6 +28,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useLanguage } from "@/components/language-provider" // Import translation hook
+import { generateSKU } from "@/lib/sku-utils"
+import { toast } from "sonner"
 
 // Predefined Options
 const COMMON_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "36", "38", "40", "42", "44"]
@@ -48,7 +50,6 @@ const COMMON_COLORS = [
 export default function NewProductPage() {
     const { t } = useLanguage() // Initialize translation hook
     const [title, setTitle] = useState("")
-    const [sku, setSku] = useState("")
     const [images, setImages] = useState<string[]>([])
     const [uploading, setUploading] = useState(false)
     const [benefits, setBenefits] = useState<string[]>([])
@@ -64,7 +65,6 @@ export default function NewProductPage() {
     const [description, setDescription] = useState("")
     const [price, setPrice] = useState("")
     const [compareAtPrice, setCompareAtPrice] = useState("")
-    const [stock, setStock] = useState("")
     const [sizeGuide, setSizeGuide] = useState("")
     const [categories, setCategories] = useState<any[]>([])
 
@@ -113,10 +113,6 @@ export default function NewProductPage() {
             alert('Please enter a valid price')
             return
         }
-        if (!sku.trim()) {
-            alert('Please enter a SKU')
-            return
-        }
 
         setIsPublishing(true)
 
@@ -126,11 +122,11 @@ export default function NewProductPage() {
                 .insert({
                     title,
                     description,
-                    sku: sku.trim(),
+                    sku: generateSKU(category, title, "NA", "NA"),
                     category,
                     price: parseFloat(price),
                     compare_at_price: compareAtPrice ? parseFloat(compareAtPrice) : null,
-                    stock: stock ? parseInt(stock) : 0,
+                    stock: 0,
                     status: status.toLowerCase(),
                     images,
                     benefits,
@@ -140,7 +136,7 @@ export default function NewProductPage() {
 
             if (error) {
                 console.error('Error creating product:', error)
-                alert('Error creating product: ' + error.message)
+                alert(`Error creating product: ${error.message || 'Unknown error'} (${error.code || 'no code'})`)
                 setIsPublishing(false)
                 return
             }
@@ -167,7 +163,7 @@ export default function NewProductPage() {
                         color: v.color || null,
                         price: isNaN(vPrice) ? (isNaN(mainPrice) ? 0 : mainPrice) : vPrice,
                         stock: isNaN(vStock) ? 0 : vStock,
-                        sku: v.sku || `${sku}-${v.size || idx}-${v.color || ''}`.replace(/-+$/, "")
+                        sku: v.sku || generateSKU(category, title, v.color, v.size)
                     }
                 })
 
@@ -258,12 +254,6 @@ export default function NewProductPage() {
         }
     }
 
-    const generateSku = () => {
-        const base = title.trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 4) || "PROD"
-        const random = Math.floor(1000 + Math.random() * 9000)
-        setSku(`${base}-${random}`)
-    }
-
     const addVariant = () => {
         setVariants([...variants, { name: "", size: "", color: "", price: price, stock: "0", sku: "" }])
     }
@@ -308,7 +298,7 @@ export default function NewProductPage() {
                         color: color || null,
                         price: price,
                         stock: "10",
-                        sku: `${sku}-${size}-${color}`.replace(/-+$/, "")
+                        sku: generateSKU(category, title, color, size)
                     })
                 }
             })
@@ -738,39 +728,7 @@ export default function NewProductPage() {
                             </div>
                         </section>
 
-                        {/* Inventory */}
-                        <section className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-                            <div className="p-6 border-b border-gray-50 bg-gray-50/30">
-                                <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
-                                    <Package className="w-4 h-4 text-blue-500" />
-                                    {t('admin.products.inventory')}
-                                </h3>
-                            </div>
-                            <div className="p-6 space-y-6">
-                                <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-gray-700">{t('admin.products.stock')}</label>
-                                    <Input
-                                        type="number"
-                                        value={stock || ""}
-                                        onChange={(e) => setStock(e.target.value)}
-                                        placeholder="0" className="bg-white border-gray-200 h-12 text-lg font-mono rounded-xl shadow-sm focus:ring-blue-500/20 focus:border-blue-500 text-gray-900" />
-                                </div>
-                                <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-gray-700">{t('admin.products.sku')}</label>
-                                    <div className="flex gap-2">
-                                        <Input
-                                            value={sku || ""}
-                                            onChange={(e) => setSku(e.target.value)}
-                                            placeholder={t('admin.products.auto_generated')}
-                                            className="bg-white border-gray-200 h-12 text-base font-mono rounded-xl uppercase tracking-wider shadow-sm focus:ring-blue-500/20 focus:border-blue-500 text-gray-900"
-                                        />
-                                        <Button onClick={generateSku} type="button" className="h-12 w-12 shrink-0 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl text-indigo-600">
-                                            <Wand2 className="w-5 h-5" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
+                        {/* Pricing */}
 
                         {/* Cross-Sell */}
                         <section className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">

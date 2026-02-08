@@ -184,6 +184,11 @@ export default function AnalyticsPage() {
                                 <div className="py-12 text-center text-muted-foreground italic">No sales data yet</div>
                             )}
                         </div>
+                        {/* Assuming 'Input' and 't' are defined elsewhere or need to be imported/mocked for this snippet to be valid */}
+                        {/* <Input
+                            placeholder={t('admin.dashboard.search')}
+                            className="pl-9 rtl:pl-3 rtl:pr-9 w-64 rounded-full bg-background/50 border-white/10 focus:bg-background transition-all h-10 text-left rtl:text-right"
+                        /> */}
                     </div>
                 </div>
 

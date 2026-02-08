@@ -2,9 +2,7 @@ import React from "react"
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono, Almarai } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
-import { CartProvider } from "@/components/cart-provider"
-import { LanguageProvider } from "@/components/language-provider"
-import { Toaster } from "sonner"
+import { Providers } from "./providers"
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -40,13 +38,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans antialiased ${almarai.variable}`}>
-        <LanguageProvider>
-          <CartProvider>
-            {children}
-          </CartProvider>
-        </LanguageProvider>
+        <Providers>
+          {children}
+        </Providers>
         <Analytics />
-        <Toaster />
       </body>
     </html>
   )

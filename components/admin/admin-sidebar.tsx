@@ -16,6 +16,8 @@ import {
     Phone,
     Briefcase,
     Globe,
+    Zap,
+    Layers,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -28,8 +30,10 @@ export function AdminSidebar() {
 
     const menuItems = [
         { icon: LayoutDashboard, label: t('admin.nav.dashboard'), href: "/admin/dashboard" },
+        { icon: Zap, label: "POS", href: "/admin/pos" },
         { icon: ShoppingBag, label: t('admin.nav.orders'), href: "/admin/orders" },
         { icon: Package, label: t('admin.nav.products'), href: "/admin/products" },
+        { icon: Layers, label: t('admin.nav.inventory'), href: "/admin/inventory" },
         { icon: Users, label: t('admin.nav.customers'), href: "/admin/customers" },
         { icon: BarChart3, label: t('admin.nav.analytics'), href: "/admin/analytics" },
         { icon: ImageIcon, label: t('admin.nav.carousel'), href: "/admin/hero-carousel" },
