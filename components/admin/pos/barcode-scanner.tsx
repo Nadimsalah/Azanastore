@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { X, Camera, AlertCircle, Loader2 } from "lucide-react"
+import { X, Camera, AlertCircle, Loader2, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -19,7 +19,7 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
     const [libLoaded, setLibLoaded] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [lastScanned, setLastScanned] = useState<string>("")
-    const [lastScanTime, setLastScanTime] = useState<number>(0)
+    const [hasScanned, setHasScanned] = useState(false)
     const [showSuccess, setShowSuccess] = useState(false)
 
     // ... Load library effect (unchanged)
@@ -63,18 +63,16 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
             }
 
             const onScanSuccess = (decodedText: string) => {
-                const now = Date.now()
-                // Cooldown: 2 seconds for the SAME barcode to prevent duplicates
-                // Different barcodes can be scanned instantly
-                if (decodedText !== lastScanned || now - lastScanTime > 2000) {
-                    setLastScanned(decodedText)
-                    setLastScanTime(now)
-                    onScan(decodedText)
+                // Ignore if we already have a pending scan confirmation
+                if (hasScanned) return
 
-                    // Visual feedback
-                    setShowSuccess(true)
-                    setTimeout(() => setShowSuccess(false), 500)
-                }
+                setLastScanned(decodedText)
+                setHasScanned(true)
+                setShowSuccess(true)
+                onScan(decodedText)
+
+                // Keep success flash briefly
+                setTimeout(() => setShowSuccess(false), 500)
             }
 
             try {
@@ -105,6 +103,11 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                 console.error("Error stopping scanner:", err)
             }
         }
+    }
+
+    const resetForNextScan = () => {
+        setHasScanned(false)
+        setLastScanned("")
     }
 
     return (
@@ -140,8 +143,8 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                                 <Camera className="w-8 h-8" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-black text-white tracking-tight uppercase">Batch Scan</h2>
-                                <p className="text-sm text-white/50 font-medium whitespace-nowrap">Scan multiple items smoothly</p>
+                                <h2 className="text-2xl font-black text-white tracking-tight uppercase">Product Scanner</h2>
+                                <p className="text-sm text-white/50 font-medium whitespace-nowrap">Scan items one by one</p>
                             </div>
                         </div>
                         <Button
@@ -168,16 +171,40 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                         <div id="barcode-reader" className="w-full h-full" />
 
                         {/* Custom Overlay */}
-                        {isScanning && (
+                        {isScanning && !hasScanned && (
                             <div className="absolute inset-0 pointer-events-none">
                                 <div className="absolute inset-0 border-[4rem] border-black/40" />
-                                <div className={`absolute top-1/2 left-0 w-full h-[2px] transition-all duration-300 ${showSuccess ? 'bg-white h-[4px] shadow-[0_0_30px_#fff]' : 'bg-primary/50 shadow-[0_0_15px_rgba(var(--primary),0.5)]'} animate-scan`} />
-                                <div className={`absolute inset-[4rem] border-2 transition-all duration-300 ${showSuccess ? 'border-white scale-105 border-solid opacity-100' : 'border-primary border-dashed opacity-50'} rounded-2xl`} />
+                                <div className="absolute top-1/2 left-0 w-full h-[2px] bg-primary/50 shadow-[0_0_15px_rgba(var(--primary),0.5)] animate-scan" />
+                                <div className="absolute inset-[4rem] border-2 border-primary border-dashed opacity-50 rounded-2xl" />
                             </div>
                         )}
 
+                        {/* Scan Next Product Overlay */}
+                        <AnimatePresence>
+                            {hasScanned && (
+                                <motion.div
+                                    initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                                    animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
+                                    className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-6 text-center z-20"
+                                >
+                                    <div className="p-5 bg-primary/20 rounded-full text-primary mb-6 animate-bounce">
+                                        <ShoppingBag className="w-12 h-12" />
+                                    </div>
+                                    <h3 className="text-2xl font-black text-white mb-2">PRODUCT ADDED!</h3>
+                                    <p className="text-white/60 mb-8 font-medium">SKU: <span className="text-primary font-bold">{lastScanned}</span></p>
+
+                                    <Button
+                                        onClick={resetForNextScan}
+                                        className="h-20 w-full max-w-sm rounded-[2rem] bg-primary hover:bg-primary/90 text-white font-black text-xl uppercase tracking-widest shadow-2xl shadow-primary/30 active:scale-95 transition-all"
+                                    >
+                                        Scan Next Product
+                                    </Button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
                         {/* Status Badge */}
-                        {isScanning && (
+                        {isScanning && !hasScanned && (
                             <div className="absolute top-6 left-1/2 -translate-x-1/2 px-5 py-2.5 bg-primary rounded-2xl text-white text-xs font-black uppercase tracking-widest shadow-xl flex items-center gap-2">
                                 <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                                 Active
@@ -204,9 +231,9 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                     )}
 
                     {/* Instructions */}
-                    <div className={`mt-8 p-6 transition-all duration-500 rounded-[2rem] border ${showSuccess ? 'bg-primary/10 border-primary/20 translate-y-[-4px]' : 'bg-white/5 border-white/5'} text-center`}>
-                        <p className={`text-sm font-bold tracking-wide transition-colors duration-500 ${showSuccess ? 'text-primary' : 'text-white/40'}`}>
-                            {showSuccess ? "✓ ITEM ADDED TO CART" : "KEEP SCANNING TO ADD MORE PRODUCTS"}
+                    <div className="mt-8 p-6 bg-white/5 rounded-[2rem] border border-white/5 text-center">
+                        <p className="text-sm text-white/40 font-medium">
+                            {hasScanned ? "Tapping 'Scan Next' will re-enable the camera." : "The scanner will capture the product automatically."}
                         </p>
                     </div>
                 </motion.div>
