@@ -196,23 +196,23 @@ export default function POSPage() {
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
                         <div>
-                            <h1 className="text-xl lg:text-2xl font-bold flex items-center gap-2">
+                            <h1 className="text-xl md:text-2xl lg:text-2xl font-bold flex items-center gap-2">
                                 <span className="p-2 bg-primary/10 rounded-xl text-primary">
-                                    <LayoutGrid className="w-5 h-5 lg:w-6 lg:h-6" />
+                                    <LayoutGrid className="w-5 h-5 md:w-6 md:h-6 lg:w-6 lg:h-6" />
                                 </span>
                                 {t("admin.pos.title")}
                             </h1>
-                            <p className="text-muted-foreground text-xs lg:text-sm">{t("admin.pos.subtitle")}</p>
+                            <p className="text-muted-foreground text-xs md:text-sm lg:text-sm">{t("admin.pos.subtitle")}</p>
                         </div>
 
                         <div className="flex items-center gap-3 bg-white/5 p-1 rounded-2xl border border-white/10 w-full sm:w-auto">
-                            <div className="relative w-full sm:w-64">
+                            <div className="relative w-full sm:w-64 md:w-80 lg:w-64">
                                 <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                 <Input
                                     placeholder={t("admin.pos.search_placeholder")}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-9 rtl:pr-9 rtl:pl-3 bg-transparent border-0 focus-visible:ring-0 h-10 w-full"
+                                    className="pl-9 rtl:pr-9 rtl:pl-3 bg-transparent border-0 focus-visible:ring-0 h-10 md:h-11 lg:h-10 w-full"
                                 />
                             </div>
                         </div>
@@ -224,9 +224,9 @@ export default function POSPage() {
                             <button
                                 key={category}
                                 onClick={() => setSelectedCategory(category)}
-                                className={`px-3 py-1.5 lg:px-4 lg:py-2 rounded-xl text-xs lg:text-sm font-medium transition-all whitespace-nowrap ${selectedCategory === category
+                                className={`px-4 py-2 md:px-5 md:py-2.5 lg:px-4 lg:py-2 rounded-xl text-xs md:text-sm lg:text-sm font-medium transition-all whitespace-nowrap touch-manipulation ${selectedCategory === category
                                     ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-105"
-                                    : "bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-foreground"
+                                    : "bg-white/5 hover:bg-white/10 active:bg-white/15 text-muted-foreground hover:text-foreground"
                                     }`}
                             >
                                 {category === "All" ? t("admin.pos.category_all") : category}
@@ -235,15 +235,15 @@ export default function POSPage() {
                     </div>
 
                     {/* Products Grid */}
-                    <div className="flex-1 overflow-y-auto min-h-0 pr-1 lg:pr-2 custom-scrollbar pb-24 lg:pb-0">
+                    <div className="flex-1 overflow-y-auto min-h-0 pr-1 lg:pr-2 custom-scrollbar pb-24 md:pb-28 lg:pb-0">
                         {loading ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4 lg:gap-4">
                                 {[...Array(8)].map((_, i) => (
-                                    <div key={i} className="h-48 lg:h-64 rounded-[2rem] lg:rounded-[2.5rem] bg-white/5 animate-pulse" />
+                                    <div key={i} className="h-48 md:h-64 lg:h-64 rounded-[2rem] md:rounded-[2.5rem] lg:rounded-[2.5rem] bg-white/5 animate-pulse" />
                                 ))}
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4 lg:gap-4">
                                 <AnimatePresence mode="popLayout">
                                     {filteredProducts.map((product) => (
                                         <POSCard
@@ -275,8 +275,8 @@ export default function POSPage() {
                     </div>
                 </div>
 
-                {/* Desktop Cart - Hidden on Mobile */}
-                <div className="hidden lg:flex w-[400px] p-6 pl-0 flex-col h-full">
+                {/* Desktop Cart - Hidden on Mobile and iPad */}
+                <div className="hidden xl:flex w-[400px] p-6 pl-0 flex-col h-full">
                     <POSCart
                         items={cart}
                         onUpdateQuantity={updateQuantity}
@@ -285,24 +285,24 @@ export default function POSPage() {
                     />
                 </div>
 
-                {/* Mobile Cart Button & Sheet */}
-                <div className="lg:hidden fixed bottom-4 left-4 right-4 z-50">
+                {/* Mobile & iPad Cart Button & Sheet */}
+                <div className="xl:hidden fixed bottom-4 left-4 right-4 z-50">
                     <Sheet>
                         <SheetTrigger asChild>
-                            <Button className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-lg font-bold shadow-xl shadow-primary/20 flex items-center justify-between px-6">
-                                <div className="flex items-center gap-2">
-                                    <ShoppingBag className="w-5 h-5" />
+                            <Button className="w-full h-14 md:h-16 lg:h-16 rounded-2xl bg-primary hover:bg-primary/90 active:bg-primary/80 text-base md:text-lg lg:text-lg font-bold shadow-xl shadow-primary/20 flex items-center justify-between px-5 md:px-8 lg:px-8 touch-manipulation">
+                                <div className="flex items-center gap-2 md:gap-3 lg:gap-3">
+                                    <ShoppingBag className="w-5 h-5 md:w-6 md:h-6 lg:w-6 lg:h-6" />
                                     <span>{t("admin.pos.view_cart")}</span>
-                                    <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs">
+                                    <span className="bg-white/20 px-2 md:px-3 lg:px-3 py-0.5 md:py-1 lg:py-1 rounded-full text-xs md:text-sm lg:text-sm">
                                         {cart.reduce((sum, item) => sum + item.quantity, 0)} {t("admin.pos.items")}
                                     </span>
                                 </div>
-                                <span>
+                                <span className="text-base md:text-lg lg:text-lg">
                                     {cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)} MAD
                                 </span>
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="bottom" className="h-[85vh] rounded-t-[2rem] p-0 border-0">
+                        <SheetContent side="bottom" className="h-[85vh] md:h-[80vh] lg:h-[80vh] rounded-t-[2rem] md:rounded-t-[2.5rem] lg:rounded-t-[2.5rem] p-0 border-0">
                             <div className="sr-only">
                                 <SheetTitle>{t("admin.pos.cart_title")}</SheetTitle>
                             </div>
