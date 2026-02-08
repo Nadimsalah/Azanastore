@@ -1,133 +1,89 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion"
-import { Package, ShoppingCart, Sparkles } from "lucide-react"
+import { motion } from "framer-motion"
+import { Package, Plus } from "lucide-react"
 import type { Product } from "@/lib/supabase-api"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/components/language-provider"
 
 interface POSCardProps {
     product: Product
-    gravityEnabled: boolean
-    onAddToCart: (product: Product, event: React.MouseEvent) => void
+    gravityEnabled?: boolean
+    onAddToCart: (product: Product) => void
 }
 
-export function POSCard({ product, gravityEnabled, onAddToCart }: POSCardProps) {
+export function POSCard({ product, onAddToCart }: POSCardProps) {
     const { t } = useLanguage()
-    const cardRef = useRef<HTMLDivElement>(null)
-    const [isTouchDevice, setIsTouchDevice] = useState(false)
-
-    // Detect touch device
-    useEffect(() => {
-        setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
-    }, [])
-
-    // Spring physics for smooth movement (disabled on touch devices)
-    const x = useMotionValue(0)
-    const y = useMotionValue(0)
-
-    const springX = useSpring(x, { stiffness: 100, damping: 30 })
-    const springY = useSpring(y, { stiffness: 100, damping: 30 })
-
-    const rotateX = useTransform(springY, [-100, 100], [10, -10])
-    const rotateY = useTransform(springX, [-100, 100], [-10, 10])
-
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        // Disable gravity effect on touch devices
-        if (!gravityEnabled || !cardRef.current || isTouchDevice) return
-
-        const rect = cardRef.current.getBoundingClientRect()
-        const centerX = rect.left + rect.width / 2
-        const centerY = rect.top + rect.height / 2
-
-        x.set(e.clientX - centerX)
-        y.set(e.clientY - centerY)
-    }
-
-    const handleMouseLeave = () => {
-        x.set(0)
-        y.set(0)
-    }
 
     return (
         <motion.div
-            ref={cardRef}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            style={{
-                rotateX: gravityEnabled && !isTouchDevice ? rotateX : 0,
-                rotateY: gravityEnabled && !isTouchDevice ? rotateY : 0,
-                transformStyle: "preserve-3d",
-            }}
-            className="glass-strong rounded-[2.5rem] p-4 md:p-5 lg:p-5 relative overflow-hidden group transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 active:shadow-2xl active:shadow-primary/10 border border-white/10"
+            layout
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            whileTap={{ scale: 0.97 }}
+            className="group relative bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden transition-all hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-primary/5 active:scale-95"
         >
-            {/* Glossy Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity pointer-events-none" />
-
-            {/* Product Image Placeholder/Icon */}
-            <div className="relative h-40 md:h-52 lg:h-48 mb-3 md:mb-4 rounded-3xl overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center">
+            {/* Image Section */}
+            <div className="aspect-[4/5] relative overflow-hidden bg-gradient-to-br from-white/5 to-transparent">
                 {product.images?.[0] ? (
                     <img
                         src={product.images[0]}
                         alt={product.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-active:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                 ) : (
-                    <Package className="w-12 h-12 text-primary/20 group-hover:scale-110 group-active:scale-110 transition-transform duration-500" />
+                    <div className="w-full h-full flex items-center justify-center opacity-20">
+                        <Package className="w-16 h-16" />
+                    </div>
                 )}
 
-                <div className="absolute top-3 right-3 rtl:left-3 rtl:right-auto">
-                    <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold text-white uppercase tracking-wider">
+                {/* Product Info Overlay (Optional, keeping it clean) */}
+                <div className="absolute top-4 right-4">
+                    <div className="px-3 py-1.5 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 text-[10px] font-black text-white uppercase tracking-widest">
                         {product.category}
                     </div>
                 </div>
             </div>
 
-            <div className="space-y-2">
-                <div className="flex justify-between items-start">
-                    <h3 className="font-bold text-base md:text-lg leading-tight group-hover:text-primary transition-colors line-clamp-1">
+            {/* Content Section */}
+            <div className="p-4 md:p-6 space-y-3">
+                <div>
+                    <h3 className="text-lg font-bold text-foreground leading-tight line-clamp-1 group-hover:text-primary transition-colors">
                         {product.title}
                     </h3>
+                    <p className="text-xs text-muted-foreground font-mono mt-1 opacity-60">
+                        {product.sku || "NO SKU"}
+                    </p>
                 </div>
 
-                <p className="text-xs text-muted-foreground line-clamp-2 min-h-[2rem]">
-                    {product.sku}
-                </p>
-
-                <div className="flex items-center justify-between pt-2">
+                <div className="flex items-center justify-between gap-4 pt-1">
                     <div className="flex flex-col">
-                        <span className="text-xs text-muted-foreground">{t("admin.products.pricing")}</span>
-                        <span className="text-lg md:text-xl font-bold text-foreground">
-                            {product.price} <span className="text-xs font-normal opacity-50">MAD</span>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-50">
+                            {t("admin.products.pricing")}
                         </span>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-xl md:text-2xl font-black text-foreground">
+                                {product.price}
+                            </span>
+                            <span className="text-xs font-bold text-primary">MAD</span>
+                        </div>
                     </div>
 
                     <Button
-                        size="icon"
-                        onClick={(e) => onAddToCart(product, e)}
-                        className="rounded-2xl h-12 w-12 md:h-14 md:w-14 lg:h-12 lg:w-12 bg-primary hover:bg-primary/90 active:bg-primary/80 shadow-lg shadow-primary/20 transition-all active:scale-95 group/btn overflow-hidden relative touch-manipulation"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            onAddToCart(product)
+                        }}
+                        className="h-14 w-14 md:h-16 md:w-16 rounded-2xl bg-primary hover:bg-primary/90 active:scale-90 shadow-xl shadow-primary/20 transition-all flex items-center justify-center group/btn"
                     >
-                        <motion.div
-                            whileHover={!isTouchDevice ? { y: "-50%" } : {}}
-                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                            className="flex flex-col h-[200%] w-full absolute top-0 left-0"
-                        >
-                            <div className="h-1/2 w-full flex items-center justify-center">
-                                <ShoppingCart className="w-5 h-5 md:w-6 md:h-6 lg:w-5 lg:h-5 text-primary-foreground" />
-                            </div>
-                            <div className="h-1/2 w-full flex items-center justify-center">
-                                <Sparkles className="w-5 h-5 md:w-6 md:h-6 lg:w-5 lg:h-5 text-primary-foreground" />
-                            </div>
-                        </motion.div>
+                        <Plus className="w-7 h-7 md:w-8 md:h-8 text-primary-foreground group-hover/btn:rotate-90 transition-transform duration-300" />
                     </Button>
                 </div>
             </div>
 
-            {/* Float effect elements if gravity is on and not touch device */}
-            {gravityEnabled && !isTouchDevice && (
-                <div className="absolute -bottom-2 -right-2 rtl:-left-2 rtl:right-auto w-20 h-20 bg-primary/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-            )}
+            {/* Tap Feedback Overlay */}
+            <div className="absolute inset-0 bg-primary/0 active:bg-primary/5 transition-colors pointer-events-none" />
         </motion.div>
     )
 }

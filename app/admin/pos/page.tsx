@@ -5,9 +5,10 @@ import { useState, useEffect, useMemo } from "react"
 import { POSCard } from "@/components/admin/pos/pos-card"
 import { POSCart } from "@/components/admin/pos/pos-cart"
 import { POSReceipt } from "@/components/admin/pos/pos-receipt"
+import { BarcodeScanner } from "@/components/admin/pos/barcode-scanner"
 import { Input } from "@/components/ui/input"
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
-import { Search, ShoppingBag, LayoutGrid, RotateCcw } from "lucide-react"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
+import { Search, ShoppingBag, LayoutGrid, Barcode, X, Package } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
     getProducts,
@@ -27,11 +28,10 @@ export default function POSPage() {
     const [products, setProducts] = useState<Product[]>([])
     const [cart, setCart] = useState<CartItem[]>([])
     const [searchQuery, setSearchQuery] = useState("")
-    const [selectedCategory, setSelectedCategory] = useState<string>("All")
-    const [categories, setCategories] = useState<string[]>(["All"])
     const [loading, setLoading] = useState(true)
     const [lastOrder, setLastOrder] = useState<(Order & { order_items: OrderItem[] }) | null>(null)
-    const [gravityEnabled, setGravityEnabled] = useState(false)
+    const [isScannerOpen, setIsScannerOpen] = useState(false)
+    const [isCartOpen, setIsCartOpen] = useState(false)
     const { t } = useLanguage()
 
     useEffect(() => {
@@ -41,23 +41,8 @@ export default function POSPage() {
     const loadProducts = async () => {
         setLoading(true)
         try {
-            // Fetch all active products
-            const data = await getProducts({ status: 'active', limit: 100 })
+            const data = await getProducts({ status: 'active', limit: 200 })
             setProducts(data || [])
-
-            // Fetch categories from categories table
-            const { data: categoriesData } = await supabase
-                .from('categories')
-                .select('name')
-                .order('name')
-
-            if (categoriesData) {
-                // Exclude specific categories from POS
-                const excludedCategories = ['face_care', 'hair_care', 'body_care', 'gift_sets']
-                const filteredCategories = categoriesData.filter(c => !excludedCategories.includes(c.name))
-                const categoryNames = ["All", ...filteredCategories.map(c => c.name)]
-                setCategories(categoryNames)
-            }
         } catch (error) {
             console.error("Failed to load products:", error)
             toast.error("Failed to load products")
@@ -67,18 +52,17 @@ export default function POSPage() {
     }
 
     const filteredProducts = useMemo(() => {
-        return products.filter(product => {
-            const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                product.sku?.toLowerCase().includes(searchQuery.toLowerCase())
-            const matchesCategory = selectedCategory === "All" || product.category === selectedCategory
-            return matchesSearch && matchesCategory
-        })
-    }, [products, searchQuery, selectedCategory])
+        if (!searchQuery) return products
+        const lowerQuery = searchQuery.toLowerCase()
+        return products.filter(product =>
+            product.title.toLowerCase().includes(lowerQuery) ||
+            product.sku?.toLowerCase().includes(lowerQuery)
+        )
+    }, [products, searchQuery])
 
     const addToCart = (product: Product) => {
         setCart(currentCart => {
             const existingItem = currentCart.find(item => item.product_id === product.id)
-
             if (existingItem) {
                 return currentCart.map(item =>
                     item.product_id === product.id
@@ -86,7 +70,6 @@ export default function POSPage() {
                         : item
                 )
             }
-
             return [...currentCart, {
                 id: Math.random().toString(36).substr(2, 9),
                 product_id: product.id,
@@ -97,7 +80,16 @@ export default function POSPage() {
                 sku: product.sku
             }]
         })
-        // Toast notification removed
+    }
+
+    const onBarcodeScan = (barcode: string) => {
+        const product = products.find(p => p.sku === barcode || p.sku?.includes(barcode))
+        if (product) {
+            addToCart(product)
+            toast.success(`Added ${product.title} to cart`)
+        } else {
+            toast.error(`Product with barcode ${barcode} not found`)
+        }
     }
 
     const updateQuantity = (id: string, delta: number) => {
@@ -118,11 +110,9 @@ export default function POSPage() {
 
     const handleCheckout = async () => {
         if (cart.length === 0) return
-
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
 
         try {
-            // Create order with basic walk-in customer details
             const orderData = {
                 customer: {
                     name: "Walk-in Customer",
@@ -144,19 +134,16 @@ export default function POSPage() {
                 shipping_cost: 0,
                 total: subtotal,
                 source: 'pos' as const,
-                status: 'delivered' // Auto-complete POS orders
+                status: 'delivered'
             }
 
             const { order, error } = await createOrder(orderData)
-
             if (error) throw error
 
             if (order) {
-                // Prepare receipt data
                 const receiptOrder = {
                     ...order,
                     order_items: cart.map(item => ({
-                        // map cart items to match OrderItem structure for receipt
                         id: item.id,
                         order_id: order.id,
                         product_id: item.product_id,
@@ -173,12 +160,9 @@ export default function POSPage() {
 
                 setLastOrder(receiptOrder)
                 setCart([])
+                setIsCartOpen(false)
                 toast.success(t("admin.pos.order_success"))
-
-                // Trigger print after a short delay to allow state update
-                setTimeout(() => {
-                    window.print()
-                }, 500)
+                setTimeout(() => window.print(), 500)
             }
         } catch (error) {
             console.error("Checkout failed:", error)
@@ -186,142 +170,156 @@ export default function POSPage() {
         }
     }
 
+    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
+    const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+
     return (
         <div className="flex bg-background text-foreground h-screen overflow-hidden">
             <AdminSidebar />
 
-            <main className="flex-1 flex flex-col lg:flex-row lg:pl-72 rtl:lg:pl-0 rtl:lg:pr-72 min-w-0 transition-all duration-300 h-full relative">
-                {/* Product Grid Section */}
-                <div className="flex-1 flex flex-col min-w-0 p-3 md:p-4 lg:p-6 gap-3 md:gap-4 lg:gap-6 h-full overflow-hidden">
-                    {/* Header */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
-                        <div>
-                            <h1 className="text-xl md:text-2xl lg:text-2xl font-bold flex items-center gap-2">
-                                <span className="p-2 bg-primary/10 rounded-xl text-primary">
-                                    <LayoutGrid className="w-5 h-5 md:w-6 md:h-6 lg:w-6 lg:h-6" />
-                                </span>
-                                {t("admin.pos.title")}
-                            </h1>
-                            <p className="text-muted-foreground text-xs md:text-sm lg:text-sm">{t("admin.pos.subtitle")}</p>
+            <main className="flex-1 flex flex-col lg:pl-72 rtl:lg:pl-0 rtl:lg:pr-72 min-w-0 transition-all duration-300 h-full relative">
+                {/* Header Section */}
+                <div className="p-4 md:p-6 border-b border-white/10 flex items-center justify-between shrink-0 bg-white/5 backdrop-blur-md">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-xl text-primary">
+                            <LayoutGrid className="w-6 h-6" />
                         </div>
-
-                        <div className="flex items-center gap-3 bg-white/5 p-1 rounded-2xl border border-white/10 w-full sm:w-auto">
-                            <div className="relative w-full sm:w-64 md:w-80 lg:w-64">
-                                <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                <Input
-                                    placeholder={t("admin.pos.search_placeholder")}
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-9 rtl:pr-9 rtl:pl-3 bg-transparent border-0 focus-visible:ring-0 h-10 md:h-11 lg:h-10 w-full"
-                                />
-                            </div>
+                        <div>
+                            <h1 className="text-xl md:text-2xl font-bold tracking-tight">Point of Sale</h1>
+                            <p className="text-muted-foreground text-xs md:text-sm">Quick & Easy Checkout</p>
                         </div>
                     </div>
 
-                    {/* Categories */}
-                    <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar shrink-0">
-                        {categories.map(category => (
-                            <button
-                                key={category}
-                                onClick={() => setSelectedCategory(category)}
-                                className={`px-4 py-2 md:px-5 md:py-2.5 lg:px-4 lg:py-2 rounded-xl text-xs md:text-sm lg:text-sm font-medium transition-all whitespace-nowrap touch-manipulation ${selectedCategory === category
-                                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-105"
-                                    : "bg-white/5 hover:bg-white/10 active:bg-white/15 text-muted-foreground hover:text-foreground"
-                                    }`}
-                            >
-                                {category === "All" ? t("admin.pos.category_all") : category}
-                            </button>
-                        ))}
+                    <div className="flex items-center gap-2">
+                        <Button
+                            onClick={() => setIsScannerOpen(true)}
+                            variant="outline"
+                            className="rounded-2xl h-12 px-4 md:px-6 flex items-center gap-2 border-white/10 hover:bg-white/5 active:scale-95 transition-all text-sm font-bold"
+                        >
+                            <Barcode className="w-5 h-5 text-primary" />
+                            <span className="hidden sm:inline">Scan Barcode</span>
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Main Content Area */}
+                <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+                    {/* Search Section */}
+                    <div className="p-4 md:p-6 pb-2 shrink-0">
+                        <div className="relative group">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                            <Input
+                                placeholder="Search by product name or SKU..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-12 h-14 md:h-16 text-lg rounded-3xl bg-white/5 border-white/10 focus:bg-white/10 focus:ring-primary/20 transition-all w-full shadow-inner"
+                            />
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery("")}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-white/10 rounded-full text-muted-foreground"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     {/* Products Grid */}
-                    <div className="flex-1 overflow-y-auto min-h-0 pr-1 md:pr-2 lg:pr-2 custom-scrollbar pb-20 md:pb-24 xl:pb-0">
+                    <div className="flex-1 overflow-y-auto px-4 md:px-6 pb-24 custom-scrollbar">
                         {loading ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4 lg:gap-4">
-                                {[...Array(8)].map((_, i) => (
-                                    <div key={i} className="h-48 md:h-64 lg:h-64 rounded-[2rem] md:rounded-[2.5rem] lg:rounded-[2.5rem] bg-white/5 animate-pulse" />
+                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
+                                {[...Array(12)].map((_, i) => (
+                                    <div key={i} className="aspect-[4/5] rounded-[2.5rem] bg-white/5 animate-pulse" />
                                 ))}
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4 lg:gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
                                 <AnimatePresence mode="popLayout">
                                     {filteredProducts.map((product) => (
                                         <POSCard
                                             key={product.id}
                                             product={product}
-                                            gravityEnabled={gravityEnabled}
+                                            gravityEnabled={false}
                                             onAddToCart={addToCart}
                                         />
                                     ))}
                                 </AnimatePresence>
 
                                 {filteredProducts.length === 0 && (
-                                    <div className="col-span-full flex flex-col items-center justify-center py-20 text-muted-foreground">
-                                        <ShoppingBag className="w-12 h-12 mb-4 opacity-20" />
-                                        <p>{t("admin.pos.no_products")}</p>
+                                    <div className="col-span-full flex flex-col items-center justify-center py-24 text-muted-foreground bg-white/5 rounded-[3rem] border border-dashed border-white/10">
+                                        <Package className="w-16 h-16 mb-4 opacity-20" />
+                                        <p className="text-lg font-medium">No products found</p>
                                         <Button
                                             variant="link"
-                                            onClick={() => {
-                                                setSearchQuery("")
-                                                setSelectedCategory("All")
-                                            }}
+                                            className="mt-2 text-primary hover:no-underline"
+                                            onClick={() => setSearchQuery("")}
                                         >
-                                            {t("admin.pos.clear_filters")}
+                                            Clear search filters
                                         </Button>
                                     </div>
                                 )}
                             </div>
                         )}
                     </div>
-                </div>
 
-                {/* Desktop Cart - Hidden on Mobile and iPad */}
-                <div className="hidden xl:flex w-[400px] p-6 pl-0 flex-col h-full">
-                    <POSCart
-                        items={cart}
-                        onUpdateQuantity={updateQuantity}
-                        onRemove={removeFromCart}
-                        onCheckout={handleCheckout}
-                    />
-                </div>
-
-                {/* Mobile & iPad Cart Button & Sheet */}
-                <div className="xl:hidden fixed bottom-4 left-4 right-4 z-50">
-                    <Sheet>
-                        <SheetTrigger asChild>
-                            <Button className="w-full h-14 md:h-16 lg:h-16 rounded-2xl bg-primary hover:bg-primary/90 active:bg-primary/80 text-base md:text-lg lg:text-lg font-bold shadow-xl shadow-primary/20 flex items-center justify-between px-5 md:px-8 lg:px-8 touch-manipulation">
-                                <div className="flex items-center gap-2 md:gap-3 lg:gap-3">
-                                    <ShoppingBag className="w-5 h-5 md:w-6 md:h-6 lg:w-6 lg:h-6" />
-                                    <span>{t("admin.pos.view_cart")}</span>
-                                    <span className="bg-white/20 px-2 md:px-3 lg:px-3 py-0.5 md:py-1 lg:py-1 rounded-full text-xs md:text-sm lg:text-sm">
-                                        {cart.reduce((sum, item) => sum + item.quantity, 0)} {t("admin.pos.items")}
-                                    </span>
+                    {/* Floating Cart Button (iPad-friendly) */}
+                    <div className="absolute bottom-6 left-6 right-6 z-40">
+                        <Button
+                            onClick={() => setIsCartOpen(true)}
+                            className="w-full h-16 md:h-20 rounded-[2rem] bg-primary hover:bg-primary/90 active:scale-[0.98] shadow-2xl shadow-primary/30 flex items-center justify-between px-6 md:px-10 transition-all group"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white/20 rounded-2xl group-hover:scale-110 transition-transform">
+                                    <ShoppingBag className="w-6 h-6 md:w-7 md:h-7" />
                                 </div>
-                                <span className="text-base md:text-lg lg:text-lg">
-                                    {cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)} MAD
-                                </span>
-                            </Button>
-                        </SheetTrigger>
-                        <SheetContent side="bottom" className="h-[85vh] md:h-[80vh] lg:h-[80vh] rounded-t-[2rem] md:rounded-t-[2.5rem] lg:rounded-t-[2.5rem] p-0 border-0">
-                            <div className="sr-only">
-                                <SheetTitle>{t("admin.pos.cart_title")}</SheetTitle>
+                                <div className="text-left">
+                                    <span className="block text-sm font-bold opacity-80 uppercase tracking-widest">Cart</span>
+                                    <span className="text-lg md:text-xl font-extrabold">{cartCount} Items</span>
+                                </div>
                             </div>
-                            <div className="h-full pt-4">
-                                <POSCart
-                                    items={cart}
-                                    onUpdateQuantity={updateQuantity}
-                                    onRemove={removeFromCart}
-                                    onCheckout={() => {
-                                        // Close sheet logic would ideally go here, but POSCart handles checkout directly
-                                        // For now, checkout will work and sheet will stay open or we can trigger a close via ref if needed
-                                        handleCheckout()
-                                    }}
-                                />
+                            <div className="h-10 w-[2px] bg-white/20 hidden md:block" />
+                            <div className="text-right">
+                                <span className="block text-xs md:text-sm font-bold opacity-80 uppercase tracking-widest">Total</span>
+                                <span className="text-xl md:text-2xl font-black text-white">{cartTotal} MAD</span>
                             </div>
-                        </SheetContent>
-                    </Sheet>
+                        </Button>
+                    </div>
                 </div>
             </main>
+
+            {/* Full-screen Cart Modal */}
+            <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
+                <DialogContent className="max-w-[100vw] h-[100vh] m-0 rounded-0 p-0 border-0 bg-background overflow-hidden flex flex-col">
+                    <div className="sr-only">
+                        <DialogTitle>Shopping Cart</DialogTitle>
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                        <POSCart
+                            items={cart}
+                            onUpdateQuantity={updateQuantity}
+                            onRemove={removeFromCart}
+                            onCheckout={handleCheckout}
+                        />
+                    </div>
+                    <Button
+                        onClick={() => setIsCartOpen(false)}
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-6 top-6 h-12 w-12 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 z-50 transition-all active:scale-95"
+                    >
+                        <X className="w-6 h-6" />
+                    </Button>
+                </DialogContent>
+            </Dialog>
+
+            {/* Barcode Scanner Modal */}
+            {isScannerOpen && (
+                <BarcodeScanner
+                    onScan={onBarcodeScan}
+                    onClose={() => setIsScannerOpen(false)}
+                />
+            )}
 
             {/* Hidden Receipt for Printing */}
             <div className="hidden print:block fixed inset-0 z-[9999] bg-white">
@@ -332,10 +330,13 @@ export default function POSPage() {
                 @media print {
                     @page { margin: 0; size: 80mm auto; }
                     body { margin: 0; padding: 0; }
-                    /* Hide everything except the receipt container */
                     body > *:not(.print\\:block) { display: none !important; }
                     .print\\:block { display: block !important; position: absolute; top: 0; left: 0; width: 100%; }
                 }
+                .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
             `}</style>
         </div>
     )
