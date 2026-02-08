@@ -19,8 +19,10 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
     const [libLoaded, setLibLoaded] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [lastScanned, setLastScanned] = useState<string>("")
+    const [lastScanTime, setLastScanTime] = useState<number>(0)
+    const [showSuccess, setShowSuccess] = useState(false)
 
-    // Load library from CDN
+    // ... Load library effect (unchanged)
     useEffect(() => {
         if ((window as any).Html5Qrcode) {
             setLibLoaded(true)
@@ -33,10 +35,6 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
         script.onload = () => setLibLoaded(true)
         script.onerror = () => setError("Failed to load scanner library from CDN.")
         document.body.appendChild(script)
-
-        return () => {
-            // We don't remove the script to avoid reloading it if opened again
-        }
     }, [])
 
     useEffect(() => {
@@ -58,7 +56,6 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
             const scanner = new Html5Qrcode("barcode-reader")
             scannerRef.current = scanner
 
-            // Configuration for the scanner
             const config = {
                 fps: 20,
                 qrbox: { width: 300, height: 300 },
@@ -66,32 +63,26 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
             }
 
             const onScanSuccess = (decodedText: string) => {
-                if (decodedText !== lastScanned) {
+                const now = Date.now()
+                // Cooldown: 2 seconds for the SAME barcode to prevent duplicates
+                // Different barcodes can be scanned instantly
+                if (decodedText !== lastScanned || now - lastScanTime > 2000) {
                     setLastScanned(decodedText)
+                    setLastScanTime(now)
                     onScan(decodedText)
-                    setTimeout(() => {
-                        stopScanner()
-                        onClose()
-                    }, 500)
+
+                    // Visual feedback
+                    setShowSuccess(true)
+                    setTimeout(() => setShowSuccess(false), 500)
                 }
             }
 
-            // Try environment (back) camera first
             try {
-                console.log("Attempting to start scanner with back camera...")
                 await scanner.start({ facingMode: "environment" }, config, onScanSuccess, () => { })
             } catch (envError) {
-                console.warn("Environment camera not found or failed:", envError)
-
-                // Fallback to any available camera (usually front on many devices)
-                console.log("Attempting fallback to default camera...")
                 try {
                     await scanner.start({ facingMode: "user" }, config, onScanSuccess, () => { })
                 } catch (userError) {
-                    console.warn("User camera also failed:", userError)
-
-                    // Last resort: just try to start with any camera
-                    console.log("Attempting last resort: any camera...")
                     await scanner.start({}, config, onScanSuccess, () => { })
                 }
             }
@@ -99,8 +90,8 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
             setIsScanning(true)
             setError(null)
         } catch (err: any) {
-            console.error("Scanner failed completely:", err)
-            setError(err.message || "Could not access any camera. Please check permissions and ensure you are on HTTPS.")
+            console.error("Scanner failed:", err)
+            setError(err.message || "Could not access any camera.")
             setIsScanning(false)
         }
     }
@@ -130,6 +121,18 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                     exit={{ scale: 0.9, opacity: 0, y: 20 }}
                     className="w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-[3rem] p-6 md:p-10 shadow-2xl relative overflow-hidden"
                 >
+                    {/* Success Flash Effect */}
+                    <AnimatePresence>
+                        {showSuccess && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="absolute inset-0 bg-primary/20 pointer-events-none z-10"
+                            />
+                        )}
+                    </AnimatePresence>
+
                     {/* Header */}
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-5">
@@ -137,8 +140,8 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                                 <Camera className="w-8 h-8" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-black text-white tracking-tight uppercase">Scanner</h2>
-                                <p className="text-sm text-white/50 font-medium">Place product barcode in frame</p>
+                                <h2 className="text-2xl font-black text-white tracking-tight uppercase">Batch Scan</h2>
+                                <p className="text-sm text-white/50 font-medium whitespace-nowrap">Scan multiple items smoothly</p>
                             </div>
                         </div>
                         <Button
@@ -146,11 +149,10 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                                 stopScanner()
                                 onClose()
                             }}
-                            variant="ghost"
-                            size="icon"
-                            className="h-14 w-14 rounded-2xl text-white hover:bg-white/5 active:scale-90 transition-all"
+                            className="h-14 px-8 rounded-2xl bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest border border-white/10 active:scale-95 transition-all flex items-center gap-2"
                         >
-                            <X className="w-8 h-8" />
+                            <span>Done</span>
+                            <X className="w-6 h-6" />
                         </Button>
                     </div>
 
@@ -159,18 +161,18 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                         {!libLoaded && !error && (
                             <div className="absolute inset-0 flex flex-col items-center justify-center space-y-4">
                                 <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                                <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Initializing Scanner...</p>
+                                <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Initializing...</p>
                             </div>
                         )}
 
                         <div id="barcode-reader" className="w-full h-full" />
 
-                        {/* Custom Overlay for Scanner */}
+                        {/* Custom Overlay */}
                         {isScanning && (
                             <div className="absolute inset-0 pointer-events-none">
                                 <div className="absolute inset-0 border-[4rem] border-black/40" />
-                                <div className="absolute top-1/2 left-0 w-full h-[2px] bg-primary/50 shadow-[0_0_15px_rgba(var(--primary),0.5)] animate-scan" />
-                                <div className="absolute inset-[4rem] border-2 border-primary border-dashed opacity-50 rounded-2xl" />
+                                <div className={`absolute top-1/2 left-0 w-full h-[2px] transition-all duration-300 ${showSuccess ? 'bg-white h-[4px] shadow-[0_0_30px_#fff]' : 'bg-primary/50 shadow-[0_0_15px_rgba(var(--primary),0.5)]'} animate-scan`} />
+                                <div className={`absolute inset-[4rem] border-2 transition-all duration-300 ${showSuccess ? 'border-white scale-105 border-solid opacity-100' : 'border-primary border-dashed opacity-50'} rounded-2xl`} />
                             </div>
                         )}
 
@@ -178,18 +180,14 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                         {isScanning && (
                             <div className="absolute top-6 left-1/2 -translate-x-1/2 px-5 py-2.5 bg-primary rounded-2xl text-white text-xs font-black uppercase tracking-widest shadow-xl flex items-center gap-2">
                                 <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                                Live
+                                Active
                             </div>
                         )}
                     </div>
 
                     {/* Error Message */}
                     {error && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="mt-6 p-6 bg-destructive/10 border border-destructive/20 rounded-[2rem] flex items-start gap-4"
-                        >
+                        <div className="mt-6 p-6 bg-destructive/10 border border-destructive/20 rounded-[2rem] flex items-start gap-4">
                             <AlertCircle className="w-6 h-6 text-destructive shrink-0" />
                             <div>
                                 <p className="text-lg font-bold text-destructive">Camera Error</p>
@@ -202,13 +200,13 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                                     Try Again
                                 </Button>
                             </div>
-                        </motion.div>
+                        </div>
                     )}
 
                     {/* Instructions */}
-                    <div className="mt-8 p-6 bg-white/5 rounded-[2rem] border border-white/5 text-center">
-                        <p className="text-sm text-white/40 font-medium">
-                            The scanner will automatically detect barcodes and add items to your cart.
+                    <div className={`mt-8 p-6 transition-all duration-500 rounded-[2rem] border ${showSuccess ? 'bg-primary/10 border-primary/20 translate-y-[-4px]' : 'bg-white/5 border-white/5'} text-center`}>
+                        <p className={`text-sm font-bold tracking-wide transition-colors duration-500 ${showSuccess ? 'text-primary' : 'text-white/40'}`}>
+                            {showSuccess ? "✓ ITEM ADDED TO CART" : "KEEP SCANNING TO ADD MORE PRODUCTS"}
                         </p>
                     </div>
                 </motion.div>
