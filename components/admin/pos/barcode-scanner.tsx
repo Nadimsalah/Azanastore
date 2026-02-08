@@ -15,6 +15,7 @@ interface BarcodeScannerProps {
 
 export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
     const scannerRef = useRef<any>(null)
+    const isLocked = useRef(false) // Synchronous lock for rapid frames
     const [isScanning, setIsScanning] = useState(false)
     const [libLoaded, setLibLoaded] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -63,8 +64,11 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
             }
 
             const onScanSuccess = (decodedText: string) => {
-                // Ignore if we already have a pending scan confirmation
-                if (hasScanned) return
+                // Synchronous check: React state is too slow for 60fps frames
+                if (isLocked.current) return
+
+                // Slam the gate shut immediately
+                isLocked.current = true
 
                 setLastScanned(decodedText)
                 setHasScanned(true)
@@ -106,6 +110,7 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
     }
 
     const resetForNextScan = () => {
+        isLocked.current = false // Release the gate
         setHasScanned(false)
         setLastScanned("")
     }
