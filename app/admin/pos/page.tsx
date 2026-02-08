@@ -56,37 +56,65 @@ export default function POSPage() {
         const lowerQuery = searchQuery.toLowerCase()
         return products.filter(product =>
             product.title.toLowerCase().includes(lowerQuery) ||
-            product.sku?.toLowerCase().includes(lowerQuery)
+            product.sku?.toLowerCase().includes(lowerQuery) ||
+            product.variants?.some(v => v.sku?.toLowerCase().includes(lowerQuery))
         )
     }, [products, searchQuery])
 
-    const addToCart = (product: Product) => {
+    const addToCart = (product: Product, variantSku?: string) => {
+        const variant = variantSku ? product.variants?.find(v => v.sku === variantSku) : null
+        const itemPrice = variant ? variant.price : product.price
+        const itemSku = variant ? variant.sku : product.sku
+        const variantName = variant ? `${variant.color || ""} ${variant.size || ""}`.trim() : null
+
         setCart(currentCart => {
-            const existingItem = currentCart.find(item => item.product_id === product.id)
+            const existingItem = currentCart.find(item =>
+                item.product_id === product.id &&
+                item.variant_name === variantName
+            )
+
             if (existingItem) {
                 return currentCart.map(item =>
-                    item.product_id === product.id
+                    (item.product_id === product.id && item.variant_name === variantName)
                         ? { ...item, quantity: item.quantity + 1 }
                         : item
                 )
             }
+
             return [...currentCart, {
                 id: Math.random().toString(36).substr(2, 9),
                 product_id: product.id,
                 title: product.title,
-                price: product.price,
+                variant_name: variantName,
+                price: itemPrice,
                 image: product.images?.[0] || null,
                 quantity: 1,
-                sku: product.sku
+                sku: itemSku
             }]
         })
     }
 
     const onBarcodeScan = (barcode: string) => {
-        const product = products.find(p => p.sku === barcode || p.sku?.includes(barcode))
-        if (product) {
-            addToCart(product)
-            toast.success(`Added ${product.title} to cart`)
+        // Find product by SKU or variant SKU
+        let foundProduct: Product | undefined
+        let foundVariantSku: string | undefined
+
+        for (const p of products) {
+            if (p.sku === barcode) {
+                foundProduct = p
+                break
+            }
+            const variant = p.variants?.find(v => v.sku === barcode)
+            if (variant) {
+                foundProduct = p
+                foundVariantSku = variant.sku
+                break
+            }
+        }
+
+        if (foundProduct) {
+            addToCart(foundProduct, foundVariantSku)
+            toast.success(`Added ${foundProduct.title}${foundVariantSku ? ` (${barcode})` : ''} to cart`)
         } else {
             toast.error(`Product with barcode ${barcode} not found`)
         }
@@ -288,12 +316,16 @@ export default function POSPage() {
                 </div>
             </main>
 
-            {/* Full-screen Cart Modal */}
+            {/* Bottom Sheet Cart */}
             <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
-                <DialogContent className="max-w-[100vw] h-[100vh] m-0 rounded-0 p-0 border-0 bg-background overflow-hidden flex flex-col">
+                <DialogContent className="max-w-[100vw] h-[100vh] sm:max-w-[450px] sm:h-[90vh] sm:rounded-t-[3rem] sm:bottom-0 sm:top-auto sm:translate-y-0 m-0 p-0 border-0 bg-background overflow-hidden flex flex-col transition-all duration-500">
                     <div className="sr-only">
                         <DialogTitle>Shopping Cart</DialogTitle>
                     </div>
+
+                    {/* Handle for visual cue */}
+                    <div className="w-12 h-1.5 bg-white/10 rounded-full mx-auto my-4 shrink-0 sm:hidden" />
+
                     <div className="flex-1 overflow-hidden">
                         <POSCart
                             items={cart}
@@ -306,9 +338,9 @@ export default function POSPage() {
                         onClick={() => setIsCartOpen(false)}
                         variant="ghost"
                         size="icon"
-                        className="absolute right-6 top-6 h-12 w-12 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 z-50 transition-all active:scale-95"
+                        className="absolute right-4 top-4 md:right-6 md:top-6 h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 z-50 transition-all active:scale-95"
                     >
-                        <X className="w-6 h-6" />
+                        <X className="w-5 h-5 md:w-6 md:h-6" />
                     </Button>
                 </DialogContent>
             </Dialog>
