@@ -192,7 +192,7 @@ export default function POSPage() {
 
             <main className="flex-1 flex flex-col lg:flex-row lg:pl-72 rtl:lg:pl-0 rtl:lg:pr-72 min-w-0 transition-all duration-300 h-full relative">
                 {/* Product Grid Section */}
-                <div className="flex-1 flex flex-col min-w-0 p-4 lg:p-6 gap-4 lg:gap-6 h-full overflow-hidden">
+                <div className="flex-1 flex flex-col min-w-0 p-3 md:p-4 lg:p-6 gap-3 md:gap-4 lg:gap-6 h-full overflow-hidden">
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
                         <div>
@@ -235,7 +235,7 @@ export default function POSPage() {
                     </div>
 
                     {/* Products Grid */}
-                    <div className="flex-1 overflow-y-auto min-h-0 pr-1 lg:pr-2 custom-scrollbar pb-24 md:pb-28 lg:pb-0">
+                    <div className="flex-1 overflow-y-auto min-h-0 pr-1 md:pr-2 lg:pr-2 custom-scrollbar pb-20 md:pb-24 xl:pb-0">
                         {loading ? (
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4 lg:gap-4">
                                 {[...Array(8)].map((_, i) => (
