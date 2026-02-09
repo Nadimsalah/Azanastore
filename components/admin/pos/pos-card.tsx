@@ -47,26 +47,26 @@ export function POSCard({ product, onAddToCart }: POSCardProps) {
             </div>
 
             {/* Content Section */}
-            <div className="p-5 flex flex-col gap-4">
-                <div className="space-y-1">
-                    <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight line-clamp-1 group-hover:text-primary transition-colors">
+            <div className="p-3 md:p-5 flex flex-col gap-3 md:gap-4">
+                <div className="space-y-0.5 md:space-y-1">
+                    <h3 className="text-sm md:text-lg font-bold text-gray-900 leading-tight line-clamp-1 group-hover:text-primary transition-colors">
                         {product.title}
                     </h3>
-                    <p className="text-[10px] text-gray-400 font-mono tracking-wider">
+                    <p className="text-[8px] md:text-[10px] text-gray-400 font-mono tracking-wider">
                         {product.sku || "NO SKU"}
                     </p>
                 </div>
 
-                <div className="flex items-center justify-between gap-3 pt-1">
+                <div className="flex items-center justify-between gap-2 md:gap-3 pt-0.5">
                     <div className="flex flex-col">
-                        <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em] opacity-80">
+                        <span className="text-[8px] md:text-[9px] font-black text-primary uppercase tracking-[0.2em] opacity-80">
                             {t("admin.products.pricing")}
                         </span>
                         <div className="flex items-baseline gap-1">
-                            <span className="text-xl md:text-2xl font-black text-gray-900 tracking-tighter">
+                            <span className="text-lg md:text-2xl font-black text-gray-900 tracking-tighter">
                                 {product.price}
                             </span>
-                            <span className="text-[10px] font-bold text-primary italic">MAD</span>
+                            <span className="text-[8px] md:text-[10px] font-bold text-primary italic">MAD</span>
                         </div>
                     </div>
 
@@ -75,9 +75,9 @@ export function POSCard({ product, onAddToCart }: POSCardProps) {
                             e.stopPropagation()
                             onAddToCart(product)
                         }}
-                        className="h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-primary hover:bg-primary/90 active:scale-90 shadow-[0_10px_20px_rgba(var(--primary-rgb),0.15)] transition-all flex items-center justify-center group/btn border border-white/20"
+                        className="h-10 w-10 md:h-14 md:w-14 rounded-xl md:rounded-2xl bg-primary hover:bg-primary/90 active:scale-90 shadow-[0_10px_20px_rgba(var(--primary-rgb),0.15)] transition-all flex items-center justify-center group/btn border border-white/20"
                     >
-                        <Plus className="w-6 h-6 md:w-7 md:h-7 text-primary-foreground group-hover/btn:rotate-90 transition-transform duration-500" />
+                        <Plus className="w-5 h-5 md:w-7 md:h-7 text-primary-foreground group-hover/btn:rotate-90 transition-transform duration-500" />
                     </Button>
                 </div>
             </div>

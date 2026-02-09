@@ -25,22 +25,22 @@ export function POSCart({ items, onUpdateQuantity, onRemove, onCheckout }: POSCa
             <div className="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] bg-secondary/10 blur-[100px] rounded-full pointer-events-none" />
 
             {/* Header */}
-            <div className="p-6 md:p-10 border-b border-white/20 shrink-0 glass-strong relative z-10">
-                <div className="flex items-center gap-5 md:gap-7">
+            <div className="p-4 md:p-6 lg:p-5 xl:p-8 border-b border-white/20 shrink-0 glass-strong relative z-10">
+                <div className="flex items-center gap-4 md:gap-6 lg:gap-4 xl:gap-7">
                     <div className="relative group">
                         <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full group-hover:blur-2xl transition-all duration-700" />
-                        <div className="p-4 md:p-5 bg-white shadow-xl rounded-3xl text-primary relative z-10 border border-white">
-                            <ShoppingBag className="w-6 h-6 md:w-9 md:h-9" />
+                        <div className="p-3 md:p-4 bg-white shadow-xl rounded-2xl md:rounded-3xl text-primary relative z-10 border border-white">
+                            <ShoppingBag className="w-5 h-5 md:w-8 md:h-8" />
                         </div>
                     </div>
                     <div>
-                        <h2 className="text-2xl md:text-4xl font-black text-foreground tracking-tight uppercase tracking-widest leading-none mb-2">
+                        <h2 className="text-lg md:text-2xl lg:text-xl xl:text-3xl font-black text-foreground tracking-tight uppercase tracking-widest leading-none mb-1 md:mb-2">
                             {t("admin.pos.current_cart")}
                         </h2>
-                        <div className="flex items-center gap-3">
-                            <span className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 rounded-full">
-                                <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                                <p className="text-primary text-[10px] md:text-xs font-black uppercase tracking-widest">
+                        <div className="flex items-center gap-2">
+                            <span className="flex items-center gap-1 px-2 py-0.5 bg-primary/10 rounded-full">
+                                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+                                <p className="text-primary text-[8px] md:text-[10px] font-black uppercase tracking-widest">
                                     {itemCount} {t("admin.pos.items_selected")}
                                 </p>
                             </span>
@@ -145,27 +145,27 @@ export function POSCart({ items, onUpdateQuantity, onRemove, onCheckout }: POSCa
             </div>
 
             {/* Checkout Footer */}
-            <div className="p-6 md:p-10 lg:p-12 glass-strong border-t border-white/20 shrink-0 space-y-6 md:space-y-8 relative z-10 shadow-[0_-20px_50px_rgba(0,0,0,0.02)]">
+            <div className="p-4 md:p-8 lg:p-6 xl:p-10 border-t border-white/20 shrink-0 space-y-4 md:space-y-6 relative z-10 shadow-[0_-20px_50px_rgba(0,0,0,0.02)]">
                 <div className="flex items-end justify-between px-2 md:px-4">
                     <div>
-                        <div className="flex items-center gap-2 mb-2 md:mb-3">
-                            <div className="h-3 md:h-4 w-1 bg-primary rounded-full" />
-                            <p className="text-primary font-black uppercase tracking-[0.4em] text-[10px] md:text-xs">
+                        <div className="flex items-center gap-2 mb-1 md:mb-2">
+                            <div className="h-3 w-1 bg-primary rounded-full" />
+                            <p className="text-primary font-black uppercase tracking-[0.4em] text-[8px] md:text-[10px]">
                                 Grand Total
                             </p>
                         </div>
-                        <div className="flex items-baseline gap-2 md:gap-3">
-                            <p className="text-4xl md:text-7xl lg:text-8xl font-black tracking-tighter text-foreground leading-none">
+                        <div className="flex items-baseline gap-1.5 md:gap-2">
+                            <p className="text-3xl md:text-5xl lg:text-4xl xl:text-6xl font-black tracking-tighter text-foreground leading-none">
                                 {total}
                             </p>
-                            <span className="text-base md:text-3xl font-bold text-primary italic lowercase tracking-tight leading-none mb-1 md:mb-3">mad</span>
+                            <span className="text-sm md:text-2xl lg:text-xl font-bold text-primary italic lowercase tracking-tight leading-none mb-1">mad</span>
                         </div>
                     </div>
                     <div className="text-right">
-                        <p className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1 opacity-50">
+                        <p className="text-[8px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-0.5 opacity-50">
                             {t("admin.pos.items_selected")}
                         </p>
-                        <p className="text-xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tighter line-clamp-1">
+                        <p className="text-lg md:text-3xl lg:text-2xl xl:text-4xl font-black text-foreground tracking-tighter line-clamp-1">
                             {itemCount}
                         </p>
                     </div>
@@ -174,11 +174,11 @@ export function POSCart({ items, onUpdateQuantity, onRemove, onCheckout }: POSCa
                 <Button
                     disabled={items.length === 0}
                     onClick={onCheckout}
-                    className="w-full h-18 md:h-28 lg:h-32 rounded-[2rem] lg:rounded-[2.5rem] bg-gradient-to-r from-primary to-purple-600 hover:scale-[1.01] active:scale-[0.98] text-lg md:text-3xl lg:text-4xl font-black text-white shadow-[0_30px_60px_rgba(var(--primary-rgb),0.3)] flex items-center justify-center gap-4 md:gap-8 transition-all group relative overflow-hidden border-t border-white/30"
+                    className="w-full h-14 md:h-24 lg:h-20 xl:h-28 rounded-2xl md:rounded-[2.5rem] bg-gradient-to-r from-primary to-purple-600 hover:scale-[1.01] active:scale-[0.98] text-sm md:text-2xl lg:text-xl xl:text-3xl font-black text-white shadow-[0_30px_60px_rgba(var(--primary-rgb),0.3)] flex items-center justify-center gap-3 md:gap-6 transition-all group relative overflow-hidden border-t border-white/30"
                 >
                     <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <Printer className="w-6 h-6 md:w-10 md:h-10 lg:w-12 lg:h-12 group-hover:rotate-12 transition-transform shrink-0" />
-                    <span className="uppercase tracking-[0.05em] truncate px-4">
+                    <Printer className="w-5 h-5 md:w-8 md:h-8 lg:w-7 lg:h-7 xl:w-10 xl:h-10 group-hover:rotate-12 transition-transform shrink-0" />
+                    <span className="uppercase tracking-[0.05em] truncate px-2 md:px-4">
                         {t("admin.pos.checkout") || "Complete Transaction"}
                     </span>
                 </Button>
