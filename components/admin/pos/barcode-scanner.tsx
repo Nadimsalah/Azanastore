@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Html5QrcodeScanner } from "html5-qrcode"
+// We remove the import to bypass npm installation issues and use a global loader instead
+// import { Html5QrcodeScanner } from "html5-qrcode"
 import { X, Sparkles, Barcode, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
@@ -12,44 +13,72 @@ interface BarcodeScannerProps {
     onClose: () => void
 }
 
+declare global {
+    interface Window {
+        Html5QrcodeScanner: any
+    }
+}
+
 export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
     const { t } = useLanguage()
     const [lastScanned, setLastScanned] = useState<string | null>(null)
     const [isPaused, setIsPaused] = useState(false)
-    const scannerRef = useRef<Html5QrcodeScanner | null>(null)
+    const [isLibraryLoaded, setIsLibraryLoaded] = useState(false)
+    const scannerRef = useRef<any>(null)
+
+    // Load scanner library from CDN to bypass local build issues
+    useEffect(() => {
+        if (window.Html5QrcodeScanner) {
+            setIsLibraryLoaded(true);
+            return;
+        }
+
+        const script = document.createElement("script");
+        script.src = "https://unpkg.com/html5-qrcode";
+        script.async = true;
+        script.onload = () => setIsLibraryLoaded(true);
+        document.body.appendChild(script);
+
+        return () => {
+            // We don't remove it to avoid reloading if reopened
+        }
+    }, []);
 
     useEffect(() => {
-        scannerRef.current = new Html5QrcodeScanner(
-            "reader",
-            {
-                fps: 10,
-                qrbox: { width: 250, height: 150 },
-                aspectRatio: 1.0
-            },
-            false
-        )
+        if (!isLibraryLoaded || !window.Html5QrcodeScanner) return;
 
-        scannerRef.current.render(
-            (decodedText) => {
-                if (!isPaused) {
-                    onScan(decodedText)
-                    setLastScanned(decodedText)
-                    setIsPaused(true)
-                    // Vibration feedback if supported
-                    if (navigator.vibrate) navigator.vibrate(200)
-                }
-            },
-            (error) => {
-                // Ignore errors
-            }
-        )
+        try {
+            scannerRef.current = new window.Html5QrcodeScanner(
+                "reader",
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 150 },
+                    aspectRatio: 1.0
+                },
+                /* verbose= */ false
+            )
+
+            scannerRef.current.render(
+                (decodedText: string) => {
+                    if (!isPaused) {
+                        onScan(decodedText)
+                        setLastScanned(decodedText)
+                        setIsPaused(true)
+                        if (navigator.vibrate) navigator.vibrate(200)
+                    }
+                },
+                () => { /* Ignore errors */ }
+            )
+        } catch (err) {
+            console.error("Scanner init error:", err);
+        }
 
         return () => {
             if (scannerRef.current) {
-                scannerRef.current.clear().catch(console.error)
+                scannerRef.current.clear().catch((e: any) => console.error("Scanner clear error:", e))
             }
         }
-    }, [onScan, isPaused])
+    }, [onScan, isPaused, isLibraryLoaded])
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
@@ -76,7 +105,9 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                             <h2 className="text-xl font-black text-gray-900 tracking-tight uppercase tracking-widest leading-none mb-1">
                                 {t("admin.pos.scanner")}
                             </h2>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Continuous Mode Active</p>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                {isLibraryLoaded ? "Continuous Mode Active" : "Initializing Hardware..."}
+                            </p>
                         </div>
                     </div>
                     <Button variant="ghost" size="icon" className="rounded-2xl h-12 w-12" onClick={onClose}>
@@ -87,6 +118,14 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                 <div className="p-8 space-y-8">
                     {/* Scanner Stage */}
                     <div className="relative aspect-square md:aspect-video bg-black rounded-[2rem] overflow-hidden border-4 border-gray-50 shadow-inner group">
+                        {!isLibraryLoaded && (
+                            <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/80 text-white p-6 text-center">
+                                <div className="space-y-4">
+                                    <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+                                    <p className="text-sm font-bold uppercase tracking-widest opacity-50">Loading Scanner Module...</p>
+                                </div>
+                            </div>
+                        )}
                         <div id="reader" className="w-full h-full" />
 
                         {/* Overlay when paused */}
