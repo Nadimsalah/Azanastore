@@ -202,30 +202,30 @@ export default function POSPage() {
     const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
 
     return (
-        <div className="flex bg-[#050505] text-white h-screen overflow-hidden font-sans relative">
-            {/* Background Decorative Blobs */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 blur-[150px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[150px] rounded-full pointer-events-none" />
+        <div className="flex bg-background text-foreground h-screen overflow-hidden font-sans relative">
+            {/* Soft Background Blobs (Light Mode) */}
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[150px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/5 blur-[150px] rounded-full pointer-events-none" />
 
             <AdminSidebar />
 
             <main className="flex-1 flex flex-col lg:pl-72 rtl:lg:pl-0 rtl:lg:pr-72 min-w-0 transition-all duration-300 h-full relative z-10">
                 {/* Header Section */}
-                <div className="p-4 md:p-8 border-b border-white/5 flex items-center justify-between shrink-0 bg-white/[0.02] backdrop-blur-2xl">
+                <div className="p-4 md:p-8 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white/50 backdrop-blur-2xl">
                     <div className="flex items-center gap-4 md:gap-6">
-                        <div className="p-3 bg-primary/20 rounded-2xl text-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.2)]">
+                        <div className="p-3 bg-primary/10 rounded-2xl text-primary">
                             <LayoutGrid className="w-6 h-6 md:w-8 md:h-8" />
                         </div>
                         <div>
-                            <h1 className="text-xl md:text-3xl font-black tracking-tight uppercase tracking-widest leading-none">Azana <span className="text-primary italic">POS</span></h1>
-                            <p className="text-white/30 text-[10px] md:text-xs font-bold uppercase mt-1 tracking-[0.2em]">{t("admin.pos.quick_checkout") || "Precision Retail"}</p>
+                            <h1 className="text-xl md:text-3xl font-black tracking-tight uppercase tracking-widest leading-none text-gray-900">Azana <span className="text-primary italic">POS</span></h1>
+                            <p className="text-gray-400 text-[10px] md:text-xs font-bold uppercase mt-1 tracking-[0.2em]">{t("admin.pos.quick_checkout") || "Precision Retail"}</p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-3">
                         <Button
                             onClick={() => setIsScannerOpen(true)}
-                            className="rounded-2xl h-14 px-6 md:px-8 flex items-center gap-3 bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 active:scale-95 transition-all text-sm font-black uppercase tracking-widest shadow-xl"
+                            className="rounded-2xl h-14 px-6 md:px-8 flex items-center gap-3 bg-white border border-gray-100 hover:bg-gray-50 active:scale-95 transition-all text-sm font-black uppercase tracking-widest shadow-sm text-gray-900"
                         >
                             <Barcode className="w-6 h-6 text-primary" />
                             <span className="hidden sm:inline">Scanner</span>
@@ -238,18 +238,18 @@ export default function POSPage() {
                     {/* Search Section */}
                     <div className="p-6 md:p-10 pb-4 shrink-0">
                         <div className="relative group max-w-4xl mx-auto">
-                            <div className="absolute inset-0 bg-primary/10 blur-2xl rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity duration-700" />
-                            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-white/20 group-focus-within:text-primary transition-all duration-500" />
+                            <div className="absolute inset-0 bg-primary/5 blur-2xl rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity duration-700" />
+                            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-300 group-focus-within:text-primary transition-all duration-500" />
                             <Input
                                 placeholder="Find Products, Variants or SKUs..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-16 h-18 md:h-22 text-xl rounded-full bg-white/[0.03] border-white/5 focus:bg-white/[0.08] focus:border-white/20 focus:ring-0 transition-all w-full shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] placeholder:text-white/10 font-medium"
+                                className="pl-16 h-18 md:h-22 text-xl rounded-full bg-white border-gray-100 focus:border-primary/20 focus:ring-0 transition-all w-full shadow-sm placeholder:text-gray-300 font-medium text-gray-900"
                             />
                             {searchQuery && (
                                 <button
                                     onClick={() => setSearchQuery("")}
-                                    className="absolute right-6 top-1/2 -translate-y-1/2 p-2 hover:bg-white/10 rounded-full text-white/40 transition-colors"
+                                    className="absolute right-6 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-50 rounded-full text-gray-400 transition-colors"
                                 >
                                     <X className="w-6 h-6" />
                                 </button>
@@ -262,7 +262,7 @@ export default function POSPage() {
                         {loading ? (
                             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 md:gap-8">
                                 {[...Array(15)].map((_, i) => (
-                                    <div key={i} className="aspect-[4/5] rounded-[2.5rem] bg-white/[0.03] animate-pulse border border-white/5" />
+                                    <div key={i} className="aspect-[4/5] rounded-[2.5rem] bg-gray-100/50 animate-pulse border border-gray-100" />
                                 ))}
                             </div>
                         ) : (
@@ -278,8 +278,8 @@ export default function POSPage() {
                                 </AnimatePresence>
 
                                 {filteredProducts.length === 0 && (
-                                    <div className="col-span-full flex flex-col items-center justify-center py-32 text-white/20 bg-white/[0.02] rounded-[3rem] border border-dashed border-white/5">
-                                        <Package className="w-24 h-24 mb-6 opacity-10" />
+                                    <div className="col-span-full flex flex-col items-center justify-center py-32 text-gray-300 bg-gray-50/50 rounded-[3rem] border border-dashed border-gray-100">
+                                        <Package className="w-24 h-24 mb-6 opacity-20" />
                                         <p className="text-2xl font-black uppercase tracking-[0.2em]">No Matches</p>
                                         <Button
                                             variant="link"
@@ -298,13 +298,11 @@ export default function POSPage() {
                     <div className="absolute bottom-8 left-8 right-8 z-40 max-w-5xl mx-auto">
                         <Button
                             onClick={() => setIsCartOpen(true)}
-                            className="w-full h-20 md:h-24 rounded-[2.5rem] bg-primary hover:bg-primary/90 active:scale-[0.98] shadow-[0_30px_60px_rgba(var(--primary-rgb),0.4)] flex items-center justify-between px-8 md:px-14 transition-all group border border-white/20 relative overflow-hidden"
+                            className="w-full h-20 md:h-24 rounded-[2.5rem] bg-primary hover:bg-primary/90 active:scale-[0.98] shadow-[0_30px_60px_rgba(var(--primary-rgb),0.2)] flex items-center justify-between px-8 md:px-14 transition-all group border border-white/20 relative overflow-hidden"
                         >
-                            {/* Shimmer anim */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
 
                             <div className="flex items-center gap-6 relative z-10">
-                                <div className="p-4 bg-white/20 rounded-[1.5rem] group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 shadow-xl">
+                                <div className="p-4 bg-white/20 rounded-[1.5rem] group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 shadow-lg">
                                     <ShoppingBag className="w-8 h-8 md:w-10 md:h-10 text-white" />
                                 </div>
                                 <div className="text-left">
@@ -313,10 +311,10 @@ export default function POSPage() {
                                 </div>
                             </div>
 
-                            <div className="h-12 w-[2px] bg-white/10 hidden md:block mx-10" />
+                            <div className="h-12 w-[1px] bg-white/20 hidden md:block mx-10" />
 
                             <div className="text-right relative z-10">
-                                <span className="block text-[10px] md:text-xs font-black opacity-60 uppercase tracking-[0.3em] mb-1 text-primary-foreground/60 leading-none">Payable Amount</span>
+                                <span className="block text-[10px] md:text-xs font-black opacity-60 uppercase tracking-[0.3em] mb-1 text-white leading-none">Payable Amount</span>
                                 <div className="flex items-baseline justify-end gap-1">
                                     <span className="text-3xl md:text-5xl font-black text-white tracking-tighter">{cartTotal}</span>
                                     <span className="text-sm md:text-lg font-bold text-white/50 italic font-mono lowercase tracking-tighter">mad</span>
@@ -329,13 +327,13 @@ export default function POSPage() {
 
             {/* Bottom Sheet Cart */}
             <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
-                <DialogContent className="max-w-[100vw] h-[100vh] sm:max-w-[450px] sm:h-[90vh] sm:rounded-t-[3rem] sm:bottom-0 sm:top-auto sm:translate-y-0 m-0 p-0 border-0 bg-background overflow-hidden flex flex-col transition-all duration-500">
+                <DialogContent className="max-w-[100vw] h-[100vh] sm:max-w-[450px] sm:h-[90vh] sm:rounded-t-[3rem] sm:bottom-0 sm:top-auto sm:translate-y-0 m-0 p-0 border-0 bg-white overflow-hidden flex flex-col transition-all duration-500 shadow-2xl">
                     <div className="sr-only">
                         <DialogTitle>Shopping Cart</DialogTitle>
                     </div>
 
                     {/* Handle for visual cue */}
-                    <div className="w-12 h-1.5 bg-white/10 rounded-full mx-auto my-4 shrink-0 sm:hidden" />
+                    <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto my-4 shrink-0 sm:hidden" />
 
                     <div className="flex-1 overflow-hidden">
                         <POSCart
@@ -349,7 +347,7 @@ export default function POSPage() {
                         onClick={() => setIsCartOpen(false)}
                         variant="ghost"
                         size="icon"
-                        className="absolute right-4 top-4 md:right-6 md:top-6 h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 z-50 transition-all active:scale-95"
+                        className="absolute right-4 top-4 md:right-6 md:top-6 h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-gray-100/50 hover:bg-gray-100 border border-gray-100 z-50 transition-all active:scale-95 text-gray-500"
                     >
                         <X className="w-5 h-5 md:w-6 md:h-6" />
                     </Button>
@@ -378,8 +376,8 @@ export default function POSPage() {
                 }
                 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.05); border-radius: 10px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.1); }
             `}</style>
         </div>
     )
