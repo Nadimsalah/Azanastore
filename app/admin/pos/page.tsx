@@ -325,15 +325,15 @@ export default function POSPage() {
                 </div>
             </main>
 
-            {/* Bottom Sheet Cart */}
+            {/* Responsive Cart Drawer / Bottom Sheet */}
             <AnimatePresence>
                 <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
-                    <DialogContent className="max-w-[100vw] h-[100vh] sm:max-w-[550px] sm:h-[95vh] sm:rounded-t-[4rem] sm:bottom-0 sm:top-auto sm:translate-y-0 m-0 p-0 border-0 glass-strong overflow-hidden flex flex-col transition-all duration-700 shadow-[0_-50px_100px_rgba(0,0,0,0.1)] backdrop-blur-3xl border-t border-white/40">
+                    <DialogContent className="max-w-[100vw] h-[100vh] sm:max-w-[550px] sm:h-[95vh] sm:rounded-t-[4rem] sm:bottom-0 sm:top-auto sm:translate-y-0 lg:left-auto lg:right-0 lg:top-0 lg:h-screen lg:max-w-[600px] lg:rounded-none lg:rounded-l-[4rem] m-0 p-0 border-0 glass-strong overflow-hidden flex flex-col transition-all duration-700 shadow-[-50px_0_100px_rgba(0,0,0,0.1)] backdrop-blur-3xl border-l border-white/40">
                         <div className="sr-only">
                             <DialogTitle>Shopping Cart</DialogTitle>
                         </div>
 
-                        {/* Dash Handle - Visual cue for gestural interaction */}
+                        {/* Dash Handle - Visual cue for mobile gestural interaction */}
                         <div className="relative h-12 shrink-0 flex items-center justify-center sm:hidden">
                             <div className="w-16 h-1.5 bg-foreground/10 rounded-full group-hover:bg-primary/40 transition-colors" />
                         </div>
