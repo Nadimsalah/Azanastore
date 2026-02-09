@@ -1,15 +1,21 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { POSCard } from "@/components/admin/pos/pos-card"
-import { POSCart } from "@/components/admin/pos/pos-cart"
-import { POSReceipt } from "@/components/admin/pos/pos-receipt"
-import { BarcodeScanner } from "@/components/admin/pos/barcode-scanner"
-import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { Search, ShoppingBag, LayoutGrid, Barcode, X, Package } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import {
+    Search,
+    ShoppingBag,
+    LayoutGrid,
+    Barcode,
+    Settings,
+    X,
+    Sparkles,
+    Calendar,
+    Package,
+    ShoppingCart,
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
     getProducts,
     createOrder,
@@ -18,28 +24,37 @@ import {
     type Order,
     type OrderItem
 } from "@/lib/supabase-api"
-import { supabase } from "@/lib/supabase"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { AdminSidebar } from "@/components/admin/admin-sidebar"
+import { POSCard } from "@/components/admin/pos/pos-card"
+import { POSCart } from "@/components/admin/pos/pos-cart"
+import { POSReceipt } from "@/components/admin/pos/pos-receipt"
+import { BarcodeScanner } from "@/components/admin/pos/barcode-scanner"
 import { useLanguage } from "@/components/language-provider"
+import { toast } from "sonner"
 
 export default function POSPage() {
+    const { t } = useLanguage()
     const [products, setProducts] = useState<Product[]>([])
     const [cart, setCart] = useState<CartItem[]>([])
     const [searchQuery, setSearchQuery] = useState("")
-    const [loading, setLoading] = useState(true)
+    const [category, setCategory] = useState("all")
+    const [isLoading, setIsLoading] = useState(true)
     const [lastOrder, setLastOrder] = useState<(Order & { order_items: OrderItem[] }) | null>(null)
     const [isScannerOpen, setIsScannerOpen] = useState(false)
-    const [isCartOpen, setIsCartOpen] = useState(false)
-    const { t } = useLanguage()
+    const [isCartOpenMobile, setIsCartOpenMobile] = useState(false)
+    const [currentTime, setCurrentTime] = useState(new Date())
+
+    // Clock update
+    useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000)
+        return () => clearInterval(timer)
+    }, [])
 
     useEffect(() => {
         loadProducts()
     }, [])
 
     const loadProducts = async () => {
-        setLoading(true)
+        setIsLoading(true)
         try {
             const data = await getProducts({ status: 'active', limit: 200 })
             setProducts(data || [])
@@ -47,19 +62,25 @@ export default function POSPage() {
             console.error("Failed to load products:", error)
             toast.error("Failed to load products")
         } finally {
-            setLoading(false)
+            setIsLoading(false)
         }
     }
 
+    const categories = useMemo(() => {
+        const cats = new Set(products.map(p => p.category).filter(Boolean))
+        return ["all", ...Array.from(cats)]
+    }, [products])
+
     const filteredProducts = useMemo(() => {
-        if (!searchQuery) return products
         const lowerQuery = searchQuery.toLowerCase()
-        return products.filter(product =>
-            product.title.toLowerCase().includes(lowerQuery) ||
-            product.sku?.toLowerCase().includes(lowerQuery) ||
-            product.variants?.some(v => v.sku?.toLowerCase().includes(lowerQuery))
-        )
-    }, [products, searchQuery])
+        return products.filter(product => {
+            const matchesSearch = product.title.toLowerCase().includes(lowerQuery) ||
+                product.sku?.toLowerCase().includes(lowerQuery) ||
+                product.variants?.some(v => v.sku?.toLowerCase().includes(lowerQuery))
+            const matchesCategory = category === "all" || product.category === category
+            return matchesSearch && matchesCategory
+        })
+    }, [products, searchQuery, category])
 
     const addToCart = (product: Product, variantSku?: string) => {
         const variant = variantSku ? product.variants?.find(v => v.sku === variantSku) : null
@@ -92,48 +113,21 @@ export default function POSPage() {
                 sku: itemSku
             }]
         })
-    }
-
-    const onBarcodeScan = (barcode: string) => {
-        // Find product by SKU or variant SKU
-        let foundProduct: Product | undefined
-        let foundVariantSku: string | undefined
-
-        for (const p of products) {
-            if (p.sku === barcode) {
-                foundProduct = p
-                break
-            }
-            const variant = p.variants?.find(v => v.sku === barcode)
-            if (variant) {
-                foundProduct = p
-                foundVariantSku = variant.sku
-                break
-            }
-        }
-
-        if (foundProduct) {
-            addToCart(foundProduct, foundVariantSku)
-            toast.success(`Added ${foundProduct.title}${foundVariantSku ? ` (${barcode})` : ''} to cart`)
-        } else {
-            toast.error(`Product with barcode ${barcode} not found`)
-        }
+        toast.success(`${product.title}${variantName ? ` (${variantName})` : ''} ${t("admin.pos.added_to_cart")}`)
     }
 
     const updateQuantity = (id: string, delta: number) => {
-        setCart(currentCart => {
-            return currentCart.map(item => {
-                if (item.id === id) {
-                    const newQuantity = Math.max(0, item.quantity + delta)
-                    return { ...item, quantity: newQuantity }
-                }
-                return item
-            }).filter(item => item.quantity > 0)
-        })
+        setCart(prev => prev.map(item => {
+            if (item.id === id) {
+                const newQty = Math.max(0, item.quantity + delta)
+                return { ...item, quantity: newQty }
+            }
+            return item
+        }).filter(item => item.quantity > 0))
     }
 
     const removeFromCart = (id: string) => {
-        setCart(currentCart => currentCart.filter(item => item.id !== id))
+        setCart(prev => prev.filter(item => item.id !== id))
     }
 
     const handleCheckout = async () => {
@@ -188,7 +182,7 @@ export default function POSPage() {
 
                 setLastOrder(receiptOrder)
                 setCart([])
-                setIsCartOpen(false)
+                setIsCartOpenMobile(false)
                 toast.success(t("admin.pos.order_success"))
                 setTimeout(() => window.print(), 500)
             }
@@ -198,147 +192,190 @@ export default function POSPage() {
         }
     }
 
-    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
-    const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+    const onBarcodeScan = (barcode: string) => {
+        let foundProduct: Product | undefined
+        let foundVariantSku: string | undefined
+
+        for (const p of products) {
+            if (p.sku === barcode) {
+                foundProduct = p
+                break
+            }
+            const variant = p.variants?.find(v => v.sku === barcode)
+            if (variant) {
+                foundProduct = p
+                foundVariantSku = variant.sku
+                break
+            }
+        }
+
+        if (foundProduct) {
+            addToCart(foundProduct, foundVariantSku)
+        } else {
+            toast.error(`Product with barcode ${barcode} not found`)
+        }
+    }
 
     return (
-        <div className="flex bg-background text-foreground h-screen overflow-hidden font-sans relative">
-            {/* Soft Background Blobs (Light Mode) */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[150px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/5 blur-[150px] rounded-full pointer-events-none" />
+        <div className="flex h-screen bg-background overflow-hidden font-sans relative">
+            {/* Background Aesthetic Blobs */}
+            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-secondary/5 blur-[150px] rounded-full pointer-events-none" />
 
-            <AdminSidebar />
-
-            <main className="flex-1 flex flex-col lg:pl-72 rtl:lg:pl-0 rtl:lg:pr-72 min-w-0 transition-all duration-300 h-full relative z-10">
-                {/* Header Section */}
-                <div className="p-4 md:p-8 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white/50 backdrop-blur-2xl">
-                    <div className="flex items-center gap-4 md:gap-6">
-                        <div className="p-3 bg-primary/10 rounded-2xl text-primary">
-                            <LayoutGrid className="w-6 h-6 md:w-8 md:h-8" />
+            {/* Left: Application Shell & Product Browser */}
+            <main className="flex-1 flex flex-col min-w-0 relative z-10 border-r border-white/20">
+                <header className="px-8 py-6 border-b border-white/20 glass-strong flex items-center justify-between shrink-0">
+                    <div className="flex items-center gap-6">
+                        <div className="p-3 bg-primary/10 rounded-2xl">
+                            <Sparkles className="w-6 h-6 text-primary" />
                         </div>
                         <div>
-                            <h1 className="text-xl md:text-3xl font-black tracking-tight uppercase tracking-widest leading-none text-gray-900">Azana <span className="text-primary italic">POS</span></h1>
-                            <p className="text-gray-400 text-[10px] md:text-xs font-bold uppercase mt-1 tracking-[0.2em]">{t("admin.pos.quick_checkout") || "Precision Retail"}</p>
+                            <h1 className="text-2xl font-black text-foreground tracking-tight uppercase tracking-[0.2em] mb-1">
+                                Azana POS
+                            </h1>
+                            <div className="flex items-center gap-3 opacity-40">
+                                <p className="text-[10px] font-bold uppercase tracking-widest">{t("admin.pos.quick_checkout")}</p>
+                                <span className="w-1 h-1 bg-foreground rounded-full" />
+                                <p className="text-[10px] font-mono font-bold">终端 #01</p>
+                            </div>
                         </div>
+                    </div>
+
+                    <div className="hidden md:flex items-center gap-8 bg-white/50 px-6 py-2.5 rounded-full border border-white/60 shadow-sm backdrop-blur-xl">
+                        <div className="flex items-center gap-3">
+                            <Calendar className="w-4 h-4 text-primary" />
+                            <span className="text-xs font-black uppercase tracking-widest text-foreground/60">
+                                {currentTime.toLocaleDateString()}
+                            </span>
+                        </div>
+                        <div className="w-px h-4 bg-gray-200" />
+                        <span className="text-sm font-mono font-bold text-primary tabular-nums">
+                            {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                        </span>
                     </div>
 
                     <div className="flex items-center gap-3">
                         <Button
+                            variant="outline"
+                            className="rounded-2xl h-12 gap-2 border-white/60 bg-white/50 shadow-sm"
                             onClick={() => setIsScannerOpen(true)}
-                            className="rounded-2xl h-14 px-6 md:px-8 flex items-center gap-3 bg-white border border-gray-100 hover:bg-gray-50 active:scale-95 transition-all text-sm font-black uppercase tracking-widest shadow-sm text-gray-900"
                         >
-                            <Barcode className="w-6 h-6 text-primary" />
-                            <span className="hidden sm:inline">Scanner</span>
+                            <Barcode className="w-5 h-5 text-primary" />
+                            <span className="hidden sm:inline text-xs font-black uppercase tracking-widest">{t("admin.pos.scanner")}</span>
                         </Button>
+                        <Button variant="ghost" size="icon" className="rounded-2xl h-12 w-12 hover:bg-white/80">
+                            <Settings className="w-6 h-6 text-muted-foreground" />
+                        </Button>
+                    </div>
+                </header>
+
+                <div className="p-6 md:p-8 space-y-6">
+                    <div className="flex flex-col lg:flex-row gap-6">
+                        <div className="relative flex-1 group">
+                            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-muted-foreground" />
+                            <Input
+                                type="text"
+                                placeholder={t("admin.pos.search_products")}
+                                className="pl-16 h-16 rounded-[2rem] bg-white border-white/60 shadow-lg shadow-black/5"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="flex items-center gap-3 overflow-x-auto pb-2 no-scrollbar px-1">
+                            {categories.map((cat) => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setCategory(cat)}
+                                    className={`px-8 h-16 rounded-[2rem] border transition-all whitespace-nowrap text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 ${category === cat
+                                            ? "bg-primary text-primary-foreground border-primary shadow-xl scale-105"
+                                            : "glass border-white/60 text-muted-foreground hover:bg-white"
+                                        }`}
+                                >
+                                    {cat === "all" ? <LayoutGrid className="w-5 h-5" /> : <Package className="w-5 h-5" />}
+                                    {cat === "all" ? t("admin.pos.all_categories") : cat}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* Main Content Area */}
-                <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-                    {/* Search Section */}
-                    <div className="p-6 md:p-10 pb-4 shrink-0">
-                        <div className="relative group max-w-4xl mx-auto">
-                            <div className="absolute inset-0 bg-primary/5 blur-2xl rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity duration-700" />
-                            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-300 group-focus-within:text-primary transition-all duration-500" />
-                            <Input
-                                placeholder="Find Products, Variants or SKUs..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-16 h-18 md:h-22 text-xl rounded-full bg-white border-gray-100 focus:border-primary/20 focus:ring-0 transition-all w-full shadow-sm placeholder:text-gray-300 font-medium text-gray-900"
-                            />
-                            {searchQuery && (
-                                <button
-                                    onClick={() => setSearchQuery("")}
-                                    className="absolute right-6 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-50 rounded-full text-gray-400 transition-colors"
-                                >
-                                    <X className="w-6 h-6" />
-                                </button>
-                            )}
+                <div className="flex-1 overflow-y-auto px-6 md:px-8 pb-10 custom-scrollbar">
+                    {isLoading ? (
+                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+                            {[...Array(10)].map((_, i) => (
+                                <div key={i} className="aspect-[4/5] rounded-[2.5rem] shimmer bg-muted/20" />
+                            ))}
                         </div>
-                    </div>
-
-                    {/* Products Grid */}
-                    <div className="flex-1 overflow-y-auto px-6 md:px-10 pb-32 custom-scrollbar">
-                        {loading ? (
-                            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 md:gap-8">
-                                {[...Array(15)].map((_, i) => (
-                                    <div key={i} className="aspect-[4/5] rounded-[2.5rem] bg-gray-100/50 animate-pulse border border-gray-100" />
+                    ) : filteredProducts.length > 0 ? (
+                        <motion.div layout className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+                            <AnimatePresence>
+                                {filteredProducts.map((product) => (
+                                    <POSCard
+                                        key={product.id}
+                                        product={product}
+                                        onAddToCart={addToCart}
+                                    />
                                 ))}
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 md:gap-8">
-                                <AnimatePresence mode="popLayout">
-                                    {filteredProducts.map((product) => (
-                                        <POSCard
-                                            key={product.id}
-                                            product={product}
-                                            onAddToCart={addToCart}
-                                        />
-                                    ))}
-                                </AnimatePresence>
-
-                                {filteredProducts.length === 0 && (
-                                    <div className="col-span-full flex flex-col items-center justify-center py-32 text-gray-300 bg-gray-50/50 rounded-[3rem] border border-dashed border-gray-100">
-                                        <Package className="w-24 h-24 mb-6 opacity-20" />
-                                        <p className="text-2xl font-black uppercase tracking-[0.2em]">No Matches</p>
-                                        <Button
-                                            variant="link"
-                                            className="mt-4 text-primary hover:no-underline font-bold uppercase tracking-widest text-sm"
-                                            onClick={() => setSearchQuery("")}
-                                        >
-                                            Reset Filters
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Floating Cart Button (Liquid Aesthetic) */}
-                    <div className="absolute bottom-8 left-8 right-8 z-40 max-w-5xl mx-auto">
-                        <Button
-                            onClick={() => setIsCartOpen(true)}
-                            className="w-full h-20 md:h-24 rounded-[2.5rem] bg-primary hover:bg-primary/90 active:scale-[0.98] shadow-[0_30px_60px_rgba(var(--primary-rgb),0.2)] flex items-center justify-between px-8 md:px-14 transition-all group border border-white/20 relative overflow-hidden"
-                        >
-
-                            <div className="flex items-center gap-6 relative z-10">
-                                <div className="p-4 bg-white/20 rounded-[1.5rem] group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 shadow-lg">
-                                    <ShoppingBag className="w-8 h-8 md:w-10 md:h-10 text-white" />
-                                </div>
-                                <div className="text-left">
-                                    <span className="block text-[10px] md:text-xs font-black opacity-60 uppercase tracking-[0.3em] mb-1">Basket Status</span>
-                                    <span className="text-2xl md:text-3xl font-black text-white leading-none whitespace-nowrap">{cartCount} {cartCount === 1 ? 'Product' : 'Products'}</span>
-                                </div>
-                            </div>
-
-                            <div className="h-12 w-[1px] bg-white/20 hidden md:block mx-10" />
-
-                            <div className="text-right relative z-10">
-                                <span className="block text-[10px] md:text-xs font-black opacity-60 uppercase tracking-[0.3em] mb-1 text-white leading-none">Payable Amount</span>
-                                <div className="flex items-baseline justify-end gap-1">
-                                    <span className="text-3xl md:text-5xl font-black text-white tracking-tighter">{cartTotal}</span>
-                                    <span className="text-sm md:text-lg font-bold text-white/50 italic font-mono lowercase tracking-tighter">mad</span>
-                                </div>
-                            </div>
-                        </Button>
-                    </div>
+                            </AnimatePresence>
+                        </motion.div>
+                    ) : (
+                        <div className="h-full flex flex-col items-center justify-center py-20 opacity-20">
+                            <ShoppingCart className="w-24 h-24 mb-6" />
+                            <p className="text-2xl font-black uppercase tracking-widest">{t("admin.pos.no_products_found")}</p>
+                        </div>
+                    )}
                 </div>
             </main>
 
-            {/* Responsive Cart Drawer / Bottom Sheet */}
+            {/* Right: Persistent Cart Sidebar */}
+            <aside className="hidden xl:flex w-[450px] 2xl:w-[550px] flex-col shrink-0 bg-white/5 backdrop-blur-3xl border-l border-white/20 relative z-20">
+                <POSCart
+                    items={cart}
+                    onUpdateQuantity={updateQuantity}
+                    onRemove={removeFromCart}
+                    onCheckout={handleCheckout}
+                />
+            </aside>
+
+            {/* Mobile Cart Trigger */}
+            <div className="xl:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-3rem)] max-w-lg">
+                <Button
+                    onClick={() => setIsCartOpenMobile(true)}
+                    className="w-full h-18 rounded-[2.5rem] bg-primary shadow-2xl flex items-center justify-between px-8"
+                >
+                    <div className="flex items-center gap-4">
+                        <ShoppingBag className="w-7 h-7 text-white" />
+                        <span className="text-lg font-black uppercase tracking-widest text-white">Cart</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <span className="text-2xl font-black text-white">
+                            {cart.reduce((a, b) => a + b.price * b.quantity, 0)}
+                        </span>
+                        <span className="text-xs font-bold text-white/50 italic font-mono uppercase">mad</span>
+                    </div>
+                </Button>
+            </div>
+
+            {/* Mobile Cart Drawer */}
             <AnimatePresence>
-                <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
-                    <DialogContent className="max-w-[100vw] h-[100vh] sm:max-w-[550px] sm:h-[95vh] sm:rounded-t-[4rem] sm:bottom-0 sm:top-auto sm:translate-y-0 lg:left-auto lg:right-0 lg:top-0 lg:h-screen lg:max-w-[600px] lg:rounded-none lg:rounded-l-[4rem] m-0 p-0 border-0 glass-strong overflow-hidden flex flex-col transition-all duration-700 shadow-[-50px_0_100px_rgba(0,0,0,0.1)] backdrop-blur-3xl border-l border-white/40">
-                        <div className="sr-only">
-                            <DialogTitle>Shopping Cart</DialogTitle>
-                        </div>
-
-                        {/* Dash Handle - Visual cue for mobile gestural interaction */}
-                        <div className="relative h-12 shrink-0 flex items-center justify-center sm:hidden">
-                            <div className="w-16 h-1.5 bg-foreground/10 rounded-full group-hover:bg-primary/40 transition-colors" />
-                        </div>
-
-                        <div className="flex-1 overflow-hidden relative">
+                {isCartOpenMobile && (
+                    <motion.div
+                        initial={{ y: "100%" }}
+                        animate={{ y: 0 }}
+                        exit={{ y: "100%" }}
+                        className="fixed inset-0 z-50 xl:hidden overflow-hidden flex flex-col pt-[10vh]"
+                    >
+                        <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setIsCartOpenMobile(false)} />
+                        <div className="flex-1 bg-background rounded-t-[4rem] relative z-10 overflow-hidden shadow-2xl flex flex-col border-t border-white/40">
+                            <Button
+                                onClick={() => setIsCartOpenMobile(false)}
+                                className="absolute right-8 top-8 z-50 w-12 h-12 rounded-2xl bg-white border border-gray-100 shadow-xl text-gray-400"
+                                variant="ghost"
+                                size="icon"
+                            >
+                                <X className="w-6 h-6" />
+                            </Button>
                             <POSCart
                                 items={cart}
                                 onUpdateQuantity={updateQuantity}
@@ -346,29 +383,16 @@ export default function POSPage() {
                                 onCheckout={handleCheckout}
                             />
                         </div>
-
-                        {/* High-End Close Button */}
-                        <Button
-                            onClick={() => setIsCartOpen(false)}
-                            variant="ghost"
-                            size="icon"
-                            className="absolute right-6 top-6 h-12 w-12 md:h-16 md:w-16 rounded-[1.5rem] bg-white border border-gray-100 shadow-xl z-50 transition-all hover:scale-110 active:scale-95 text-gray-400 hover:text-primary group"
-                        >
-                            <X className="w-6 h-6 md:w-8 md:h-8 group-hover:rotate-90 transition-transform duration-500" />
-                        </Button>
-                    </DialogContent>
-                </Dialog>
+                    </motion.div>
+                )}
             </AnimatePresence>
 
-            {/* Barcode Scanner Modal */}
+            {/* Barcode Scanner */}
             {isScannerOpen && (
-                <BarcodeScanner
-                    onScan={onBarcodeScan}
-                    onClose={() => setIsScannerOpen(false)}
-                />
+                <BarcodeScanner onScan={onBarcodeScan} onClose={() => setIsScannerOpen(false)} />
             )}
 
-            {/* Hidden Receipt for Printing */}
+            {/* Hidden Receipt */}
             <div className="hidden print:block fixed inset-0 z-[9999] bg-white">
                 {lastOrder && <POSReceipt order={lastOrder} />}
             </div>
@@ -383,7 +407,6 @@ export default function POSPage() {
                 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.05); border-radius: 10px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.1); }
             `}</style>
         </div>
     )
