@@ -88,6 +88,32 @@ export const generatePOSTicketPDF = (items: CartItem[], total: number) => {
     doc.text("azana.com", pageWidth / 2, y, { align: "center" })
 
     // Output
+    const blob = doc.output("blob")
+    const blobURL = URL.createObjectURL(blob)
+
+    // For mobile/desktop "appear in print request"
+    // We recreate a temporary iframe to trigger print specifically for the PDF
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+    iframe.src = blobURL;
+    document.body.appendChild(iframe);
+
+    iframe.onload = () => {
+        try {
+            iframe.contentWindow?.focus();
+            iframe.contentWindow?.print();
+        } catch (e) {
+            // Fallback for some browsers: open in new tab
+            window.open(blobURL, '_blank');
+        }
+    };
+
+    // Also save it for convenience
     const fileName = `azana-ticket-${Date.now()}.pdf`
     doc.save(fileName)
 }

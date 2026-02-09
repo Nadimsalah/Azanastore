@@ -30,9 +30,10 @@ import { toast } from "sonner"
 
 // Re-implemented components
 import { BarcodeScanner } from "@/components/admin/pos/barcode-scanner"
-import { POSReceipt } from "@/components/admin/pos/pos-receipt"
 import { ZenCart } from "@/components/admin/pos/zen-cart"
 import { AdminSidebar } from "@/components/admin/admin-sidebar"
+
+import { generatePOSTicketPDF } from "@/lib/pos-ticket-generator"
 
 export default function POSPage() {
     const { t } = useLanguage()
@@ -186,10 +187,13 @@ export default function POSPage() {
                 }
 
                 setLastOrder(receiptOrder)
+
+                // Generate and trigger PDF print directly
+                generatePOSTicketPDF(cart, subtotal)
+
                 setCart([])
                 setIsCartOpen(false)
                 toast.success(t("admin.pos.order_success"))
-                setTimeout(() => window.print(), 500)
             }
         } catch (error) {
             console.error("Checkout failed:", error)
@@ -401,11 +405,6 @@ export default function POSPage() {
                         onClose={() => setIsScannerOpen(false)}
                     />
                 )}
-
-                {/* Hidden Receipt for Printing */}
-                <div className="hidden print:block fixed inset-0 z-[9999] bg-white">
-                    {lastOrder && <POSReceipt order={lastOrder} />}
-                </div>
             </div>
 
             <style jsx global>{`
