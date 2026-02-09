@@ -326,33 +326,39 @@ export default function POSPage() {
             </main>
 
             {/* Bottom Sheet Cart */}
-            <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
-                <DialogContent className="max-w-[100vw] h-[100vh] sm:max-w-[450px] sm:h-[90vh] sm:rounded-t-[3rem] sm:bottom-0 sm:top-auto sm:translate-y-0 m-0 p-0 border-0 bg-white overflow-hidden flex flex-col transition-all duration-500 shadow-2xl">
-                    <div className="sr-only">
-                        <DialogTitle>Shopping Cart</DialogTitle>
-                    </div>
+            <AnimatePresence>
+                <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
+                    <DialogContent className="max-w-[100vw] h-[100vh] sm:max-w-[550px] sm:h-[95vh] sm:rounded-t-[4rem] sm:bottom-0 sm:top-auto sm:translate-y-0 m-0 p-0 border-0 glass-strong overflow-hidden flex flex-col transition-all duration-700 shadow-[0_-50px_100px_rgba(0,0,0,0.1)] backdrop-blur-3xl border-t border-white/40">
+                        <div className="sr-only">
+                            <DialogTitle>Shopping Cart</DialogTitle>
+                        </div>
 
-                    {/* Handle for visual cue */}
-                    <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto my-4 shrink-0 sm:hidden" />
+                        {/* Dash Handle - Visual cue for gestural interaction */}
+                        <div className="relative h-12 shrink-0 flex items-center justify-center sm:hidden">
+                            <div className="w-16 h-1.5 bg-foreground/10 rounded-full group-hover:bg-primary/40 transition-colors" />
+                        </div>
 
-                    <div className="flex-1 overflow-hidden">
-                        <POSCart
-                            items={cart}
-                            onUpdateQuantity={updateQuantity}
-                            onRemove={removeFromCart}
-                            onCheckout={handleCheckout}
-                        />
-                    </div>
-                    <Button
-                        onClick={() => setIsCartOpen(false)}
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-4 top-4 md:right-6 md:top-6 h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-gray-100/50 hover:bg-gray-100 border border-gray-100 z-50 transition-all active:scale-95 text-gray-500"
-                    >
-                        <X className="w-5 h-5 md:w-6 md:h-6" />
-                    </Button>
-                </DialogContent>
-            </Dialog>
+                        <div className="flex-1 overflow-hidden relative">
+                            <POSCart
+                                items={cart}
+                                onUpdateQuantity={updateQuantity}
+                                onRemove={removeFromCart}
+                                onCheckout={handleCheckout}
+                            />
+                        </div>
+
+                        {/* High-End Close Button */}
+                        <Button
+                            onClick={() => setIsCartOpen(false)}
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-6 top-6 h-12 w-12 md:h-16 md:w-16 rounded-[1.5rem] bg-white border border-gray-100 shadow-xl z-50 transition-all hover:scale-110 active:scale-95 text-gray-400 hover:text-primary group"
+                        >
+                            <X className="w-6 h-6 md:w-8 md:h-8 group-hover:rotate-90 transition-transform duration-500" />
+                        </Button>
+                    </DialogContent>
+                </Dialog>
+            </AnimatePresence>
 
             {/* Barcode Scanner Modal */}
             {isScannerOpen && (
