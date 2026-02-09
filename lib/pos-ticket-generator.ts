@@ -87,7 +87,7 @@ export const generatePOSTicketPDF = (items: CartItem[], total: number) => {
     y += 5
     doc.text("azana.com", pageWidth / 2, y, { align: "center" })
 
-    // Output
+    // Generate Blob
     const blob = doc.output("blob")
     const blobURL = URL.createObjectURL(blob)
 
@@ -97,23 +97,38 @@ export const generatePOSTicketPDF = (items: CartItem[], total: number) => {
     iframe.style.position = 'fixed';
     iframe.style.right = '0';
     iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
+    iframe.style.width = '1px';
+    iframe.style.height = '1px';
+    iframe.style.opacity = '0.01';
+    iframe.style.pointerEvents = 'none';
     iframe.style.border = 'none';
+
+    // Crucial: Use the load event to trigger print after a small delay
+    iframe.onload = () => {
+        setTimeout(() => {
+            try {
+                if (iframe.contentWindow) {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+
+                    // Cleanup after print dialog is closed or dismissed
+                    // Note: We don't remove immediately to avoid cutting off the print
+                    setTimeout(() => {
+                        document.body.removeChild(iframe);
+                        URL.revokeObjectURL(blobURL);
+                    }, 1000);
+                }
+            } catch (e) {
+                console.error("Print failed, falling back to new window", e);
+                window.open(blobURL, '_blank');
+            }
+        }, 300); // Small delay to ensure render
+    };
+
     iframe.src = blobURL;
     document.body.appendChild(iframe);
 
-    iframe.onload = () => {
-        try {
-            iframe.contentWindow?.focus();
-            iframe.contentWindow?.print();
-        } catch (e) {
-            // Fallback for some browsers: open in new tab
-            window.open(blobURL, '_blank');
-        }
-    };
-
-    // Also save it for convenience
+    // Also download as fallback for devices that block iframes
     const fileName = `azana-ticket-${Date.now()}.pdf`
     doc.save(fileName)
 }
