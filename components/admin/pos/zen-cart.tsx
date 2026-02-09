@@ -1,7 +1,8 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { ShoppingCart, Trash2, Plus, Minus, X, ShoppingBag, Printer, Package } from "lucide-react"
+import { ShoppingCart, Trash2, Plus, Minus, X, ShoppingBag, Printer, Package, FileText } from "lucide-react"
+import { generatePOSTicketPDF } from "@/lib/pos-ticket-generator"
 import { type CartItem } from "@/lib/supabase-api"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/components/language-provider"
@@ -142,6 +143,15 @@ export function ZenCart({ isOpen, onClose, items, onUpdateQuantity, onRemove, on
                                     className="h-16 w-16 rounded-2xl border-gray-200 hover:bg-white hover:border-gray-900 transition-all flex items-center justify-center shrink-0"
                                 >
                                     <Printer className="w-6 h-6 text-gray-900" />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => generatePOSTicketPDF(items, total)}
+                                    disabled={items.length === 0}
+                                    className="h-16 px-4 rounded-2xl border-gray-200 hover:bg-white hover:border-gray-900 transition-all flex items-center justify-center gap-2"
+                                >
+                                    <FileText className="w-5 h-5 text-gray-900" />
+                                    <span className="text-[10px] font-bold uppercase text-gray-900">PDF</span>
                                 </Button>
                                 <Button
                                     disabled={items.length === 0}
