@@ -32,6 +32,7 @@ import { toast } from "sonner"
 import { BarcodeScanner } from "@/components/admin/pos/barcode-scanner"
 import { POSReceipt } from "@/components/admin/pos/pos-receipt"
 import { ZenCart } from "@/components/admin/pos/zen-cart"
+import { AdminSidebar } from "@/components/admin/admin-sidebar"
 
 export default function POSPage() {
     const { t } = useLanguage()
@@ -224,183 +225,187 @@ export default function POSPage() {
     const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0)
 
     return (
-        <div className="flex flex-col h-screen bg-[#FDFDFF] overflow-hidden font-sans selection:bg-primary/10">
-            {/* Zen Background Blobs */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-secondary/5 blur-[150px] rounded-full pointer-events-none" />
+        <div className="flex min-h-screen bg-[#FDFDFF] font-sans selection:bg-primary/10 overflow-hidden">
+            <AdminSidebar />
 
-            {/* Compact Adaptive Header */}
-            <header className="px-6 py-4 flex items-center justify-between shrink-0 relative z-20">
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl flex items-center justify-center">
-                        <Sparkles className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-bold text-gray-900 tracking-tight leading-none mb-1">Azana Zen</h1>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                    </div>
-                </div>
+            <div className="flex-1 flex flex-col h-screen overflow-hidden relative lg:pl-72 lg:rtl:pl-0 lg:rtl:pr-72 transition-all duration-300">
+                {/* Zen Background Blobs */}
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-secondary/5 blur-[150px] rounded-full pointer-events-none" />
 
-                <div className="flex-1 max-w-xl mx-8 hidden md:block group">
-                    <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary transition-colors" />
-                        <Input
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder={t("admin.pos.search_products") + "..."}
-                            className="w-full bg-white/50 border-gray-100 focus:bg-white focus:border-primary/20 rounded-2xl pl-11 h-11 text-sm transition-all"
-                        />
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" className="rounded-xl h-10 w-10 text-gray-400 hover:text-primary hover:bg-primary/5" onClick={() => setIsScannerOpen(true)}>
-                        <Barcode className="w-5 h-5" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="rounded-xl h-10 w-10 text-gray-400">
-                        <Settings className="w-5 h-5" />
-                    </Button>
-                </div>
-            </header>
-
-            {/* Sub-Header: Search for Mobile & Categories */}
-            <div className="px-6 pb-4 space-y-4 relative z-20">
-                <div className="md:hidden">
-                    <Input
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder={t("admin.pos.search_products")}
-                        className="bg-white/50 border-gray-100 rounded-2xl h-12"
-                    />
-                </div>
-                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">
-                    {categories.map((cat) => (
-                        <button
-                            key={cat}
-                            onClick={() => setCategory(cat)}
-                            className={`px-5 py-2.5 rounded-xl border whitespace-nowrap text-[11px] font-bold uppercase tracking-wider transition-all ${category === cat
-                                    ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
-                                    : "bg-white/50 border-gray-100 text-gray-500 hover:border-primary/20"
-                                }`}
-                        >
-                            {cat === "all" ? t("admin.pos.all_categories") : cat}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Main Edge-to-Edge Grid */}
-            <main className="flex-1 overflow-y-auto px-6 pb-32 custom-scrollbar relative z-10">
-                {isLoading ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
-                        {[...Array(12)].map((_, i) => (
-                            <div key={i} className="aspect-[4/5] rounded-3xl shimmer bg-gray-100" />
-                        ))}
-                    </div>
-                ) : filteredProducts.length > 0 ? (
-                    <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
-                        <AnimatePresence>
-                            {filteredProducts.map((product) => (
-                                <motion.div
-                                    key={product.id}
-                                    layout
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    className="group bg-white border border-gray-100 rounded-3xl overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all cursor-pointer select-none"
-                                    onClick={() => addToCart(product)}
-                                >
-                                    <div className="aspect-[4/5] bg-gray-50/50 relative overflow-hidden">
-                                        {product.images?.[0] ? (
-                                            <img src={product.images[0]} alt={product.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center opacity-10"><Package className="w-12 h-12" /></div>
-                                        )}
-                                        <div className="absolute top-3 left-3">
-                                            <div className="px-2 py-1 rounded-lg bg-white/80 backdrop-blur-sm border border-gray-100 text-[8px] font-bold text-gray-400 uppercase tracking-tighter">
-                                                {product.category}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="p-4 space-y-3">
-                                        <h3 className="text-sm font-bold text-gray-900 truncate leading-none">{product.title}</h3>
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-baseline gap-1">
-                                                <span className="text-lg font-black text-gray-900 tabular-nums">{product.price}</span>
-                                                <span className="text-[10px] font-bold text-primary">MAD</span>
-                                            </div>
-                                            <div className="w-8 h-8 rounded-lg bg-primary/5 text-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
-                                                <Plus className="w-4 h-4" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </AnimatePresence>
-                    </motion.div>
-                ) : (
-                    <div className="h-full flex flex-col items-center justify-center opacity-20">
-                        <ShoppingCart className="w-16 h-16 mb-4" />
-                        <p className="text-sm font-bold uppercase tracking-widest">{t("admin.pos.no_products_found")}</p>
-                    </div>
-                )}
-            </main>
-
-            {/* Zen Floating Action Bar */}
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-3rem)] max-w-4xl">
-                <motion.div
-                    initial={{ y: 100 }}
-                    animate={{ y: 0 }}
-                    className="bg-white/70 backdrop-blur-2xl border border-white shadow-[0_20px_40px_rgba(0,0,0,0.08)] rounded-[2rem] p-3 flex items-center justify-between gap-4"
-                >
-                    <div className="flex items-center gap-4 pl-4 cursor-pointer group" onClick={() => setIsCartOpen(true)}>
-                        <div className="relative">
-                            <ShoppingBag className="w-6 h-6 text-primary" />
-                            {itemCount > 0 && (
-                                <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
-                                    {itemCount}
-                                </span>
-                            )}
+                {/* Compact Adaptive Header */}
+                <header className="px-6 py-4 flex items-center justify-between shrink-0 relative z-20">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl flex items-center justify-center">
+                            <Sparkles className="w-5 h-5 text-primary" />
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-xl font-black text-gray-900 tracking-tighter leading-none">{total} <span className="text-xs font-bold text-primary italic">mad</span></span>
-                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-primary transition-colors">View Cart details</span>
+                        <div>
+                            <h1 className="text-xl font-bold text-gray-900 tracking-tight leading-none mb-1">Azana Zen</h1>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 max-w-xl mx-8 hidden md:block group">
+                        <div className="relative">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary transition-colors" />
+                            <Input
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder={t("admin.pos.search_products") + "..."}
+                                className="w-full bg-white/50 border-gray-100 focus:bg-white focus:border-primary/20 rounded-2xl pl-11 h-11 text-sm transition-all"
+                            />
                         </div>
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Button
-                            onClick={handleCheckout}
-                            className="bg-gray-900 hover:bg-black text-white px-8 h-14 rounded-2xl flex items-center gap-3 active:scale-95 transition-all"
-                        >
-                            <span className="text-sm font-bold uppercase tracking-widest">Complete Order</span>
-                            <div className="w-px h-4 bg-white/20" />
-                            <Plus className="w-5 h-5" />
+                        <Button variant="ghost" size="icon" className="rounded-xl h-10 w-10 text-gray-400 hover:text-primary hover:bg-primary/5" onClick={() => setIsScannerOpen(true)}>
+                            <Barcode className="w-5 h-5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="rounded-xl h-10 w-10 text-gray-400">
+                            <Settings className="w-5 h-5" />
                         </Button>
                     </div>
-                </motion.div>
-            </div>
+                </header>
 
-            {/* Zen Cart Slide-over Drawer */}
-            <ZenCart
-                isOpen={isCartOpen}
-                onClose={() => setIsCartOpen(false)}
-                items={cart}
-                onUpdateQuantity={updateQuantity}
-                onRemove={removeFromCart}
-                onCheckout={handleCheckout}
-            />
+                {/* Sub-Header: Search for Mobile & Categories */}
+                <div className="px-6 pb-4 space-y-4 relative z-20">
+                    <div className="md:hidden">
+                        <Input
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder={t("admin.pos.search_products")}
+                            className="bg-white/50 border-gray-100 rounded-2xl h-12"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">
+                        {categories.map((cat) => (
+                            <button
+                                key={cat}
+                                onClick={() => setCategory(cat)}
+                                className={`px-5 py-2.5 rounded-xl border whitespace-nowrap text-[11px] font-bold uppercase tracking-wider transition-all ${category === cat
+                                    ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                                    : "bg-white/50 border-gray-100 text-gray-500 hover:border-primary/20"
+                                    }`}
+                            >
+                                {cat === "all" ? t("admin.pos.all_categories") : cat}
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
-            {/* Barcode Scanner Modal */}
-            {isScannerOpen && (
-                <BarcodeScanner
-                    onScan={onBarcodeScan}
-                    onClose={() => setIsScannerOpen(false)}
+                {/* Main Edge-to-Edge Grid */}
+                <main className="flex-1 overflow-y-auto px-6 pb-32 custom-scrollbar relative z-10">
+                    {isLoading ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+                            {[...Array(12)].map((_, i) => (
+                                <div key={i} className="aspect-[4/5] rounded-3xl shimmer bg-gray-100" />
+                            ))}
+                        </div>
+                    ) : filteredProducts.length > 0 ? (
+                        <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+                            <AnimatePresence>
+                                {filteredProducts.map((product) => (
+                                    <motion.div
+                                        key={product.id}
+                                        layout
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="group bg-white border border-gray-100 rounded-3xl overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all cursor-pointer select-none"
+                                        onClick={() => addToCart(product)}
+                                    >
+                                        <div className="aspect-[4/5] bg-gray-50/50 relative overflow-hidden">
+                                            {product.images?.[0] ? (
+                                                <img src={product.images[0]} alt={product.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center opacity-10"><Package className="w-12 h-12" /></div>
+                                            )}
+                                            <div className="absolute top-3 left-3">
+                                                <div className="px-2 py-1 rounded-lg bg-white/80 backdrop-blur-sm border border-gray-100 text-[8px] font-bold text-gray-400 uppercase tracking-tighter">
+                                                    {product.category}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="p-4 space-y-3">
+                                            <h3 className="text-sm font-bold text-gray-900 truncate leading-none">{product.title}</h3>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="text-lg font-black text-gray-900 tabular-nums">{product.price}</span>
+                                                    <span className="text-[10px] font-bold text-primary">MAD</span>
+                                                </div>
+                                                <div className="w-8 h-8 rounded-lg bg-primary/5 text-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
+                                                    <Plus className="w-4 h-4" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
+                        </motion.div>
+                    ) : (
+                        <div className="h-full flex flex-col items-center justify-center opacity-20">
+                            <ShoppingCart className="w-16 h-16 mb-4" />
+                            <p className="text-sm font-bold uppercase tracking-widest">{t("admin.pos.no_products_found")}</p>
+                        </div>
+                    )}
+                </main>
+
+                {/* Zen Floating Action Bar */}
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 lg:left-[calc(50%+144px)] -translate-x-1/2 z-40 w-[calc(100%-3rem)] max-w-4xl lg:w-[calc(100%-36rem)]">
+                    <motion.div
+                        initial={{ y: 100 }}
+                        animate={{ y: 0 }}
+                        className="bg-white/70 backdrop-blur-2xl border border-white shadow-[0_20px_40px_rgba(0,0,0,0.08)] rounded-[2rem] p-3 flex items-center justify-between gap-4"
+                    >
+                        <div className="flex items-center gap-4 pl-4 cursor-pointer group" onClick={() => setIsCartOpen(true)}>
+                            <div className="relative">
+                                <ShoppingBag className="w-6 h-6 text-primary" />
+                                {itemCount > 0 && (
+                                    <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
+                                        {itemCount}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-xl font-black text-gray-900 tracking-tighter leading-none">{total} <span className="text-xs font-bold text-primary italic">mad</span></span>
+                                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-primary transition-colors">View Cart details</span>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <Button
+                                onClick={() => setIsCartOpen(true)}
+                                className="bg-gray-900 hover:bg-black text-white px-8 h-14 rounded-2xl flex items-center gap-3 active:scale-95 transition-all"
+                            >
+                                <span className="text-sm font-bold uppercase tracking-widest">View Cart & Complete</span>
+                                <div className="w-px h-4 bg-white/20" />
+                                <Plus className="w-5 h-5" />
+                            </Button>
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Zen Cart Slide-over Drawer */}
+                <ZenCart
+                    isOpen={isCartOpen}
+                    onClose={() => setIsCartOpen(false)}
+                    items={cart}
+                    onUpdateQuantity={updateQuantity}
+                    onRemove={removeFromCart}
+                    onCheckout={handleCheckout}
                 />
-            )}
 
-            {/* Hidden Receipt for Printing */}
-            <div className="hidden print:block fixed inset-0 z-[9999] bg-white">
-                {lastOrder && <POSReceipt order={lastOrder} />}
+                {/* Barcode Scanner Modal */}
+                {isScannerOpen && (
+                    <BarcodeScanner
+                        onScan={onBarcodeScan}
+                        onClose={() => setIsScannerOpen(false)}
+                    />
+                )}
+
+                {/* Hidden Receipt for Printing */}
+                <div className="hidden print:block fixed inset-0 z-[9999] bg-white">
+                    {lastOrder && <POSReceipt order={lastOrder} />}
+                </div>
             </div>
 
             <style jsx global>{`

@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { ShoppingCart, Trash2, Plus, Minus, X, ShoppingBag } from "lucide-react"
+import { ShoppingCart, Trash2, Plus, Minus, X, ShoppingBag, Printer, Package } from "lucide-react"
 import { type CartItem } from "@/lib/supabase-api"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/components/language-provider"
@@ -134,13 +134,24 @@ export function ZenCart({ isOpen, onClose, items, onUpdateQuantity, onRemove, on
                                 </div>
                             </div>
 
-                            <Button
-                                disabled={items.length === 0}
-                                onClick={onCheckout}
-                                className="w-full h-18 rounded-2xl bg-gray-900 hover:bg-black text-white text-lg font-black uppercase tracking-widest shadow-2xl shadow-gray-200 flex items-center justify-center gap-4 transition-all active:scale-95"
-                            >
-                                <span className="truncate">Checkout Order</span>
-                            </Button>
+                            <div className="flex gap-3">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => window.print()}
+                                    disabled={items.length === 0}
+                                    className="h-16 w-16 rounded-2xl border-gray-200 hover:bg-white hover:border-gray-900 transition-all flex items-center justify-center shrink-0"
+                                >
+                                    <Printer className="w-6 h-6 text-gray-900" />
+                                </Button>
+                                <Button
+                                    disabled={items.length === 0}
+                                    onClick={onCheckout}
+                                    className="flex-1 h-16 rounded-2xl bg-gray-900 hover:bg-black text-white text-md font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95"
+                                >
+                                    <span>Complete & Print </span>
+                                    <Plus className="w-5 h-5" />
+                                </Button>
+                            </div>
                         </div>
                     </motion.div>
                 </>
@@ -149,21 +160,5 @@ export function ZenCart({ isOpen, onClose, items, onUpdateQuantity, onRemove, on
     )
 }
 
-function Package(props: any) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M7.5 4.27 19.7 11.5c.38.22.38.78 0 1L7.5 19.73c-.38.22-.88-.06-.88-.5V4.77c0-.44.5-.72.88-.5Z" />
-        </svg>
-    )
-}
+
+
