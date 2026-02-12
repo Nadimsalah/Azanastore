@@ -143,7 +143,7 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                                 // Stop specifically this control instance
                                 controls.stop();
                                 controlsRef.current = null;
-                                handleScanSuccess(text);
+                                handleScan(text);
                             }
                         }
                     }
@@ -168,16 +168,28 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
 
     }, [activeCameraId, isScanning]);
 
-    const handleScanSuccess = (text: string) => {
+    const handleScan = (text: string) => {
         if (navigator.vibrate) navigator.vibrate(200);
         setLastScanned(text);
-        setIsScanning(false); // Switch UI to "Success" mode
-        onScan(text);
+        setIsScanning(false); // Pause scanning, show confirmation UI
     };
 
-    const handleScanNext = () => {
+    const confirmAddToCart = () => {
+        if (lastScanned) {
+            onScan(lastScanned);
+            // Instant resume for "fast scanning"
+            setLastScanned(null);
+            setIsScanning(true);
+        }
+    };
+
+    const handleDone = () => {
+        onClose();
+    };
+
+    const handleRescan = () => {
         setLastScanned(null);
-        setIsScanning(true); // Re-enables the scanning effect
+        setIsScanning(true);
     };
 
     const switchCamera = () => {
@@ -218,18 +230,35 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                     muted
                 />
 
-                {/* Focus Guide Overlay */}
+                {/* Focus Guide Overlay & Re-scan Icon */}
                 {isScanning && !lastScanned && (
-                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                        <div className="w-64 h-64 border-2 border-white/50 rounded-lg relative">
-                            <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-primary -mt-1 -ml-1" />
-                            <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-primary -mt-1 -mr-1" />
-                            <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-primary -mb-1 -ml-1" />
-                            <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-primary -mb-1 -mr-1" />
+                    <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center">
+                        <div className="w-72 h-48 border-2 border-white/50 rounded-xl relative mb-8">
+                            <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-primary -mt-1 -ml-1" />
+                            <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-primary -mt-1 -mr-1" />
+                            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-primary -mb-1 -ml-1" />
+                            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-primary -mb-1 -mr-1" />
+
+                            {/* Scanning Line Animation */}
+                            <motion.div
+                                animate={{ top: ["0%", "100%", "0%"] }}
+                                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                className="absolute left-2 right-2 h-0.5 bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"
+                            />
                         </div>
-                        <p className="absolute mt-80 text-sm font-medium bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm">
-                            Point at barcode
-                        </p>
+
+                        {/* Re-scan Icon (Under Frame as requested) */}
+                        <div className="pointer-events-auto mt-4">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={handleRescan}
+                                className="w-12 h-12 rounded-full bg-white/10 backdrop-blur border-white/20 hover:bg-white/20 active:scale-95 transition-all"
+                            >
+                                <RefreshCw className="w-6 h-6 text-white" />
+                            </Button>
+                            <p className="text-[10px] text-white/60 mt-2 text-center uppercase tracking-widest font-bold">Reset</p>
+                        </div>
                     </div>
                 )}
 
@@ -263,20 +292,29 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                         className="absolute bottom-0 left-0 right-0 z-30 bg-white text-black p-6 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]"
                     >
                         <div className="flex flex-col items-center">
-                            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                                <CheckCircle2 className="w-8 h-8 text-green-600" />
+                            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                                <CheckCircle2 className="w-6 h-6 text-green-600" />
                             </div>
-                            <h3 className="text-2xl font-black uppercase tracking-wide mb-1">Scanned!</h3>
-                            <p className="text-lg font-mono text-gray-600 mb-8 bg-gray-100 px-4 py-1 rounded">
+                            <h3 className="text-xl font-black uppercase tracking-wide mb-1">Code Detected</h3>
+                            <p className="text-2xl font-mono font-bold text-gray-900 mb-6 bg-gray-50 px-6 py-2 rounded-xl border border-gray-100">
                                 {lastScanned}
                             </p>
 
-                            <Button
-                                onClick={handleScanNext}
-                                className="w-full h-14 text-lg font-bold rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-transform"
-                            >
-                                Scan Next Item
-                            </Button>
+                            <div className="flex w-full gap-3">
+                                <Button
+                                    onClick={handleDone}
+                                    variant="outline"
+                                    className="flex-1 h-14 text-base font-bold rounded-xl border-gray-200"
+                                >
+                                    Done
+                                </Button>
+                                <Button
+                                    onClick={confirmAddToCart}
+                                    className="flex-[2] h-14 text-lg font-bold rounded-xl shadow-lg shadow-primary/20 bg-primary text-white hover:scale-[1.02] active:scale-[0.98] transition-transform"
+                                >
+                                    Add to Cart
+                                </Button>
+                            </div>
                         </div>
                     </motion.div>
                 )}
