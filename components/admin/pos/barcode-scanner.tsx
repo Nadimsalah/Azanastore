@@ -81,6 +81,7 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
             // Check permissions first
             addLog("Requesting camera permissions...");
             try {
+                // We request it to trigger the prompt
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 stream.getTracks().forEach(track => track.stop());
                 setHasCameraPermission(true);
@@ -99,17 +100,39 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                 addLog("Scanner instance created.");
             }
 
+            // Enumerate Cameras
+            addLog("Enumerating cameras...");
+            let cameraDevices = [];
+            try {
+                cameraDevices = await window.Html5Qrcode.getCameras();
+                addLog(`Found ${cameraDevices.length} cameras.`);
+            } catch (enumErr: any) {
+                addLog(`Enumeration failed: ${enumErr}`);
+                throw enumErr;
+            }
+
+            if (cameraDevices.length === 0) {
+                throw new Error("No cameras found.");
+            }
+
+            // intelligent selection: prefer back camera
+            let selectedCameraId = cameraDevices[0].id; // Default to first
+            const backCamera = cameraDevices.find((device: any) =>
+                device.label.toLowerCase().includes('back') ||
+                device.label.toLowerCase().includes('environment') ||
+                device.label.toLowerCase().includes('rear')
+            );
+
+            if (backCamera) {
+                selectedCameraId = backCamera.id;
+                addLog(`Selected Back Camera: ${backCamera.label}`);
+            } else {
+                addLog(`Using Default Camera: ${cameraDevices[0].label}`);
+            }
+
             const config = {
                 fps: 10,
-                qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
-                    const minEdgePercentage = 0.70;
-                    const minSize = Math.min(viewfinderWidth, viewfinderHeight);
-                    const boxSize = Math.floor(minSize * minEdgePercentage);
-                    return {
-                        width: boxSize,
-                        height: Math.floor(boxSize * 0.6)
-                    };
-                },
+                qrbox: { width: 250, height: 250 }, // Simplified for debugging
                 aspectRatio: 1.0
             };
 
@@ -124,40 +147,44 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                 }
             };
 
-            addLog("Starting camera stream (Environment)...");
-            try {
-                await scannerRef.current.start(
-                    { facingMode: "environment" },
-                    config,
-                    onScanSuccess,
-                    () => { /* Ignore frame failures */ }
-                );
-                addLog("Camera started via Environment Mode.");
-            } catch (envErr: any) {
-                addLog(`Env camera failed: ${envErr.name}. Trying fallback...`);
-                // Fallback
-                await scannerRef.current.start(
-                    true, // Default camera
-                    config,
-                    onScanSuccess,
-                    () => { }
-                );
-                addLog("Camera started via Fallback Mode.");
-            }
+            addLog(`Starting camera ID: ${selectedCameraId.substring(0, 10)}...`);
+            await scannerRef.current.start(
+                selectedCameraId,
+                config,
+                onScanSuccess,
+                (errorMessage: string) => {
+                    // verbose logging of frame errors can be noisy
+                }
+            );
+            addLog("Camera started successfully.");
 
         } catch (err: any) {
             console.error("Scanner fatal error:", err);
-            let errorMessage = "Failed to start camera.";
-            addLog(`Fatal Error: ${err.message || err.name}`);
 
-            if (err?.name === "NotAllowedError" || err?.name === "PermissionDeniedError") {
-                errorMessage = "Camera permission denied.";
-            } else if (err?.name === "NotFoundError") {
-                errorMessage = "No camera found on this device.";
-            } else if (err?.name === "NotReadableError") {
-                errorMessage = "Camera is already in use.";
+            // formatting the error message to be visible
+            let errorMsg = "Unknown Error";
+            if (typeof err === "string") {
+                errorMsg = err;
+            } else if (err instanceof Error) {
+                errorMsg = err.message;
+            } else {
+                try {
+                    errorMsg = JSON.stringify(err);
+                } catch (e) {
+                    errorMsg = "Critical Unknown Error";
+                }
             }
-            setError(errorMessage);
+
+            addLog(`Fatal Error: ${errorMsg}`);
+
+            let userMessage = "Failed to start camera.";
+            if (errorMsg.includes("Permission")) {
+                userMessage = "Camera permission denied.";
+            } else if (errorMsg.includes("No camera")) {
+                userMessage = "No camera found on this device.";
+            }
+
+            setError(`${userMessage} (${errorMsg.substring(0, 30)}...)`);
         }
     };
 
