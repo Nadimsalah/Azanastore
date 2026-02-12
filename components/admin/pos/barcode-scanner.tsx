@@ -1,12 +1,11 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-// We remove the import to bypass npm installation issues and use a global loader instead
-// import { Html5QrcodeScanner } from "html5-qrcode"
-import { X, Sparkles, Barcode, CheckCircle2 } from "lucide-react"
+import { X, Sparkles, Barcode, CheckCircle2, Camera, AlertCircle, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
 import { useLanguage } from "@/components/language-provider"
+import { toast } from "sonner"
 
 interface BarcodeScannerProps {
     onScan: (barcode: string) => void
@@ -15,7 +14,7 @@ interface BarcodeScannerProps {
 
 declare global {
     interface Window {
-        Html5QrcodeScanner: any
+        Html5Qrcode: any
     }
 }
 
@@ -24,11 +23,14 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
     const [lastScanned, setLastScanned] = useState<string | null>(null)
     const [isPaused, setIsPaused] = useState(false)
     const [isLibraryLoaded, setIsLibraryLoaded] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+    const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null)
     const scannerRef = useRef<any>(null)
+    const scannerRegionId = "html5qr-code-full-region"
 
-    // Load scanner library from CDN to bypass local build issues
+    // Load scanner library
     useEffect(() => {
-        if (window.Html5QrcodeScanner) {
+        if (window.Html5Qrcode) {
             setIsLibraryLoaded(true);
             return;
         }
@@ -37,148 +39,199 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
         script.src = "https://unpkg.com/html5-qrcode";
         script.async = true;
         script.onload = () => setIsLibraryLoaded(true);
+        script.onerror = () => setError("Failed to load scanner library. Please check internet connection.");
         document.body.appendChild(script);
 
         return () => {
-            // We don't remove it to avoid reloading if reopened
+            // Cleanup
         }
     }, []);
 
+    // Initialize Scanner
     useEffect(() => {
-        if (!isLibraryLoaded || !window.Html5QrcodeScanner) return;
+        if (!isLibraryLoaded || !window.Html5Qrcode) return;
 
-        try {
-            scannerRef.current = new window.Html5QrcodeScanner(
-                "reader",
-                {
+        const startScanner = async () => {
+            try {
+                // Check permissions first
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    stream.getTracks().forEach(track => track.stop()); // Stop immediately, just checking
+                    setHasCameraPermission(true);
+                } catch (err) {
+                    console.error("Permission check failed:", err);
+                    setHasCameraPermission(false);
+                    setError("Camera permission denied. Please allow camera access in your browser settings.");
+                    return;
+                }
+
+                if (!scannerRef.current) {
+                    scannerRef.current = new window.Html5Qrcode(scannerRegionId);
+                }
+
+                const config = {
                     fps: 10,
-                    qrbox: { width: 250, height: 150 },
+                    qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
+                        // Responsive box size
+                        const minEdgePercentage = 0.70; // 70%
+                        const minSize = Math.min(viewfinderWidth, viewfinderHeight);
+                        const boxSize = Math.floor(minSize * minEdgePercentage);
+                        return {
+                            width: boxSize,
+                            height: Math.floor(boxSize * 0.6) // Rectangular for barcodes
+                        };
+                    },
                     aspectRatio: 1.0
-                },
-                /* verbose= */ false
-            )
+                };
 
-            scannerRef.current.render(
-                (decodedText: string) => {
-                    if (!isPaused) {
-                        onScan(decodedText)
-                        setLastScanned(decodedText)
-                        setIsPaused(true)
-                        if (navigator.vibrate) navigator.vibrate(200)
-                    }
-                },
-                () => { /* Ignore errors */ }
-            )
-        } catch (err) {
-            console.error("Scanner init error:", err);
-        }
+                await scannerRef.current.start(
+                    { facingMode: "environment" }, // Prefer back camera
+                    config,
+                    (decodedText: string) => {
+                        if (!isPaused) {
+                            onScan(decodedText)
+                            setLastScanned(decodedText)
+                            setIsPaused(true)
+                            if (navigator.vibrate) navigator.vibrate(200)
+                        }
+                    },
+                    () => { /* Ignore frame failures */ }
+                );
+
+            } catch (err: any) {
+                console.error("Scanner start error:", err);
+                let errorMessage = "Failed to start camera.";
+                if (err?.name === "NotAllowedError" || err?.name === "PermissionDeniedError") {
+                    errorMessage = "Camera permission denied.";
+                } else if (err?.name === "NotFoundError") {
+                    errorMessage = "No camera found on this device.";
+                } else if (err?.name === "NotReadableError") {
+                    errorMessage = "Camera is already in use by another app.";
+                }
+                setError(errorMessage);
+            }
+        };
+
+        // Small delay to ensure DOM is ready
+        const timer = setTimeout(startScanner, 100);
 
         return () => {
-            if (scannerRef.current) {
-                scannerRef.current.clear().catch((e: any) => console.error("Scanner clear error:", e))
+            clearTimeout(timer);
+            if (scannerRef.current && scannerRef.current.isScanning) {
+                scannerRef.current.stop().catch((e: any) => console.error("Create stop error:", e));
             }
+        };
+    }, [isLibraryLoaded, onScan]);
+
+    const handleResume = () => {
+        setIsPaused(false);
+        setLastScanned(null);
+        if (scannerRef.current) {
+            scannerRef.current.resume();
         }
-    }, [onScan, isPaused, isLibraryLoaded])
+    };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-black/60 backdrop-blur-xl"
-                onClick={onClose}
-            />
-
-            <motion.div
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                className="relative w-full max-w-2xl bg-white rounded-[3rem] overflow-hidden shadow-2xl border border-white/20"
-            >
-                {/* Scanner Header */}
-                <div className="p-8 border-b border-gray-50 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-primary/10 rounded-2xl">
-                            <Barcode className="w-6 h-6 text-primary" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-black text-gray-900 tracking-tight uppercase tracking-widest leading-none mb-1">
-                                {t("admin.pos.scanner")}
-                            </h2>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                {isLibraryLoaded ? "Continuous Mode Active" : "Initializing Hardware..."}
-                            </p>
-                        </div>
+        <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex flex-col md:justify-center">
+            {/* Mobile Header */}
+            <div className="flex items-center justify-between p-4 text-white md:absolute md:top-0 md:left-0 md:right-0 md:z-50">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white/10 rounded-xl backdrop-blur-md">
+                        <Barcode className="w-5 h-5" />
                     </div>
-                    <Button variant="ghost" size="icon" className="rounded-2xl h-12 w-12" onClick={onClose}>
-                        <X className="w-6 h-6" />
-                    </Button>
+                    <div>
+                        <h2 className="font-bold text-lg leading-tight">{t("admin.pos.scanner")}</h2>
+                        <p className="text-[10px] text-white/60 uppercase tracking-wider">
+                            {isLibraryLoaded ? "Ready" : "Loading..."}
+                        </p>
+                    </div>
                 </div>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onClose}
+                    className="rounded-full bg-white/10 hover:bg-white/20 text-white"
+                >
+                    <X className="w-6 h-6" />
+                </Button>
+            </div>
 
-                <div className="p-8 space-y-8">
-                    {/* Scanner Stage */}
-                    <div className="relative aspect-square md:aspect-video bg-black rounded-[2rem] overflow-hidden border-4 border-gray-50 shadow-inner group">
-                        {!isLibraryLoaded && (
-                            <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/80 text-white p-6 text-center">
-                                <div className="space-y-4">
-                                    <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-                                    <p className="text-sm font-bold uppercase tracking-widest opacity-50">Loading Scanner Module...</p>
-                                </div>
+            {/* Main Stage */}
+            <div className="flex-1 flex flex-col items-center justify-center relative w-full max-w-2xl mx-auto p-4 md:h-[600px]">
+
+                {/* Camera Container */}
+                <div className="relative w-full h-full bg-black rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10">
+                    <div id={scannerRegionId} className="w-full h-full object-cover" />
+
+                    {/* Loading State */}
+                    {!isLibraryLoaded && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-black z-20">
+                            <RefreshCw className="w-10 h-10 animate-spin mb-4 text-primary" />
+                            <p className="text-sm font-medium opacity-70">Starting Camera...</p>
+                        </div>
+                    )}
+
+                    {/* Error State */}
+                    {error && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-black/90 z-30 p-8 text-center">
+                            <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mb-6">
+                                <AlertCircle className="w-8 h-8 text-red-500" />
                             </div>
-                        )}
-                        <div id="reader" className="w-full h-full" />
+                            <h3 className="text-xl font-bold mb-2">Camera Error</h3>
+                            <p className="text-white/60 mb-8">{error}</p>
+                            <Button onClick={onClose} variant="secondary" className="rounded-full px-8">
+                                Close Scanner
+                            </Button>
+                        </div>
+                    )}
 
-                        {/* Overlay when paused */}
-                        <AnimatePresence>
-                            {isPaused && (
+                    {/* Success Overlay */}
+                    <AnimatePresence>
+                        {isPaused && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="absolute inset-0 bg-primary/95 flex flex-col items-center justify-center text-white z-40 p-6 text-center backdrop-blur-md"
+                            >
                                 <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="absolute inset-0 bg-primary/90 flex flex-col items-center justify-center text-white z-20 p-6 text-center"
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 text-primary"
                                 >
-                                    <CheckCircle2 className="w-20 h-20 mb-6 animate-bounce" />
-                                    <h3 className="text-2xl font-black uppercase tracking-widest mb-2">Item Added!</h3>
-                                    <p className="font-mono text-white/60 mb-8 px-4 opacity-80 break-all">{lastScanned}</p>
-
-                                    <Button
-                                        onClick={() => setIsPaused(false)}
-                                        className="bg-white text-primary hover:bg-white/90 h-16 px-10 rounded-2xl text-lg font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all"
-                                    >
-                                        Scan Next Product
-                                    </Button>
+                                    <CheckCircle2 className="w-12 h-12" strokeWidth={3} />
                                 </motion.div>
-                            )}
-                        </AnimatePresence>
+                                <h3 className="text-3xl font-black uppercase tracking-widest mb-2">Scanned!</h3>
+                                <p className="font-mono text-xl text-white/90 mb-12 bg-black/20 px-6 py-2 rounded-lg">
+                                    {lastScanned}
+                                </p>
 
-                        {/* Scanner Decoration */}
-                        <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-primary/40 rounded-tl-[2rem] m-6 pointer-events-none" />
-                        <div className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-primary/40 rounded-tr-[2rem] m-6 pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-primary/40 rounded-bl-[2rem] m-6 pointer-events-none" />
-                        <div className="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-primary/40 rounded-br-[2rem] m-6 pointer-events-none" />
-                    </div>
-
-                    {/* Quick Tips */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="p-5 bg-gray-50 rounded-3xl border border-gray-100 flex items-start gap-4">
-                            <Sparkles className="w-5 h-5 text-yellow-500 shrink-0 mt-1" />
-                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
-                                Ensure the barcode is within the <span className="text-gray-900">center box</span> for faster detection.
-                            </p>
-                        </div>
-                        <div className="p-5 bg-gray-50 rounded-3xl border border-gray-100 flex items-start gap-4">
-                            <Barcode className="w-5 h-5 text-primary shrink-0 mt-1" />
-                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
-                                Scanning automatically pauses to <span className="text-gray-900">prevent duplicates</span>.
-                            </p>
-                        </div>
-                    </div>
-
-                    <Button variant="outline" className="w-full h-16 rounded-[1.5rem] border-gray-100 font-bold uppercase tracking-widest text-gray-400 hover:text-gray-900" onClick={onClose}>
-                        Finish Scanning
-                    </Button>
+                                <Button
+                                    onClick={handleResume}
+                                    className="bg-white text-primary hover:bg-white/90 h-16 px-12 rounded-2xl text-lg font-bold uppercase tracking-widest shadow-xl active:scale-95 transition-all w-full max-w-xs"
+                                >
+                                    Scan Next
+                                </Button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
-            </motion.div>
+
+                {/* Helper Text */}
+                {!error && !isPaused && (
+                    <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none px-4">
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 1 }}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-black/60 backdrop-blur-md rounded-full text-xs font-medium text-white/80"
+                        >
+                            <Sparkles className="w-3 h-3 text-yellow-400" />
+                            Point camera at a barcode
+                        </motion.div>
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

@@ -36,17 +36,67 @@ import { useLanguage } from "@/components/language-provider"
 // Predefined Options
 const COMMON_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "36", "38", "40", "42", "44"]
 const COMMON_COLORS = [
+    // Basics
     { name: "Black", hex: "#000000" },
     { name: "White", hex: "#FFFFFF" },
-    { name: "Navy", hex: "#000080" },
-    { name: "Beige", hex: "#F5F5DC" },
-    { name: "Pink", hex: "#FFC0CB" },
-    { name: "Red", hex: "#FF0000" },
-    { name: "Green", hex: "#008000" },
-    { name: "Blue", hex: "#0000FF" },
     { name: "Grey", hex: "#808080" },
+    { name: "Silver", hex: "#C0C0C0" },
     { name: "Gold", hex: "#FFD700" },
-    { name: "Silver", hex: "#C0C0C0" }
+    { name: "Beige", hex: "#F5F5DC" },
+    { name: "Brown", hex: "#A52A2A" },
+    { name: "Tan", hex: "#D2B48C" },
+    { name: "Cream", hex: "#FFFDD0" },
+    { name: "Ivory", hex: "#FFFFF0" },
+    { name: "Taupe", hex: "#483C32" },
+    { name: "Khaki", hex: "#F0E68C" },
+
+    // Blues
+    { name: "Navy", hex: "#000080" },
+    { name: "Blue", hex: "#0000FF" },
+    { name: "Royal Blue", hex: "#4169E1" },
+    { name: "Sky Blue", hex: "#87CEEB" },
+    { name: "Teal", hex: "#008080" },
+    { name: "Turquoise", hex: "#40E0D0" },
+    { name: "Cyan", hex: "#00FFFF" },
+    { name: "Midnight", hex: "#191970" },
+    { name: "Indigo", hex: "#4B0082" },
+
+    // Reds / Pinks
+    { name: "Red", hex: "#FF0000" },
+    { name: "Burgundy", hex: "#800020" },
+    { name: "Maroon", hex: "#800000" },
+    { name: "Crimson", hex: "#DC143C" },
+    { name: "Pink", hex: "#FFC0CB" },
+    { name: "Hot Pink", hex: "#FF69B4" },
+    { name: "Rose", hex: "#FF007F" },
+    { name: "Magenta", hex: "#FF00FF" },
+    { name: "Coral", hex: "#FF7F50" },
+    { name: "Salmon", hex: "#FA8072" },
+    { name: "Peach", hex: "#FFDAB9" },
+
+    // Greens
+    { name: "Green", hex: "#008000" },
+    { name: "Forest", hex: "#228B22" },
+    { name: "Olive", hex: "#808000" },
+    { name: "Lime", hex: "#00FF00" },
+    { name: "Mint", hex: "#98FF98" },
+    { name: "Sage", hex: "#BCB88A" },
+    { name: "Emerald", hex: "#50C878" },
+
+    // Yellows / Oranges
+    { name: "Yellow", hex: "#FFFF00" },
+    { name: "Mustard", hex: "#FFDB58" },
+    { name: "Amber", hex: "#FFBF00" },
+    { name: "Orange", hex: "#FFA500" },
+    { name: "Rust", hex: "#B7410E" },
+    { name: "Apricot", hex: "#FBCEB1" },
+
+    // Purples
+    { name: "Purple", hex: "#800080" },
+    { name: "Violet", hex: "#EE82EE" },
+    { name: "Lavender", hex: "#E6E6FA" },
+    { name: "Lilac", hex: "#C8A2C8" },
+    { name: "Plum", hex: "#DDA0DD" }
 ]
 
 export default function EditProductPage() {

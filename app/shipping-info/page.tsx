@@ -42,8 +42,8 @@ export default function ShippingInfoPage() {
           </h2>
           <p>
             {isArabic
-              ? "عادةً ما يتم توصيل الطلبات داخل القاهرة والجيزة خلال 1–3 أيام عمل، وداخل باقي المحافظات خلال 2–5 أيام عمل، حسب شركة الشحن والمنطقة."
-              : "Les commandes à Casablanca et Rabat sont généralement livrées sous 1 à 3 jours ouvrables, et sous 2 à 5 jours ouvrables pour les autres villes, selon le transporteur et la localisation."}
+              ? "عادةً ما يتم توصيل الطلبات داخل الرباط والدار البيضاء خلال 1–3 أيام عمل، وداخل باقي المدن خلال 2–5 أيام عمل، حسب شركة الشحن والمنطقة."
+              : "Les commandes à Rabat et Casablanca sont généralement livrées sous 1 à 3 jours ouvrables, et sous 2 à 5 jours ouvrables pour les autres villes, selon le transporteur et la localisation."}
           </p>
 
           <h2 className="font-semibold text-foreground">

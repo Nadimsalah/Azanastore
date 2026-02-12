@@ -1,7 +1,8 @@
 import { jsPDF } from "jspdf"
 import { type CartItem } from "./supabase-api"
 
-export const generatePOSTicketPDF = (items: CartItem[], total: number) => {
+export const generatePOSTicketPDF = (items: CartItem[], total: number, options: { skipDownload?: boolean, language?: string } = {}) => {
+    const isArabic = options.language === 'ar'
     // Estimate height: Header (25) + Items (8 per item) + Total (15) + Footer (15)
     const estimatedHeight = 60 + (items.length * 10)
 
@@ -22,7 +23,7 @@ export const generatePOSTicketPDF = (items: CartItem[], total: number) => {
 
     doc.setFontSize(8)
     doc.setFont("helvetica", "normal")
-    doc.text("CASABLANCA, MOROCCO", pageWidth / 2, y, { align: "center" })
+    doc.text(isArabic ? "الرباط، المغرب" : "RABAT, MOROCCO", pageWidth / 2, y, { align: "center" })
     y += 4
     doc.text(new Date().toLocaleString(), pageWidth / 2, y, { align: "center" })
     y += 8
@@ -35,9 +36,9 @@ export const generatePOSTicketPDF = (items: CartItem[], total: number) => {
     // Items Header
     doc.setFontSize(9)
     doc.setFont("helvetica", "bold")
-    doc.text("DESCRIPTION", 5, y)
-    doc.text("QTY", 45, y, { align: "center" })
-    doc.text("TOTAL", 75, y, { align: "right" })
+    doc.text(isArabic ? "الوصف" : "DESCRIPTION", 5, y)
+    doc.text(isArabic ? "الكمية" : "QTY", 45, y, { align: "center" })
+    doc.text(isArabic ? "المجموع" : "TOTAL", 75, y, { align: "right" })
     y += 6
 
     doc.setFont("helvetica", "normal")
@@ -61,7 +62,7 @@ export const generatePOSTicketPDF = (items: CartItem[], total: number) => {
 
         if (item.variant_name) {
             doc.setFontSize(7)
-            doc.text(`VARIANT: ${item.variant_name.toUpperCase()}`, 5, y - 1)
+            doc.text(`${isArabic ? "الخيار" : "VARIANT"}: ${item.variant_name.toUpperCase()}`, 5, y - 1)
             y += 4
             doc.setFontSize(8)
         }
@@ -76,14 +77,14 @@ export const generatePOSTicketPDF = (items: CartItem[], total: number) => {
     // Total
     doc.setFontSize(14)
     doc.setFont("helvetica", "bold")
-    doc.text("TOTAL:", 5, y)
+    doc.text(isArabic ? "المجموع الإجمالي:" : "TOTAL:", 5, y)
     doc.text(`${total.toFixed(2)} MAD`, 75, y, { align: "right" })
     y += 15
 
     // Footer
     doc.setFontSize(8)
     doc.setFont("helvetica", "normal")
-    doc.text("THANK YOU FOR YOUR VISIT", pageWidth / 2, y, { align: "center" })
+    doc.text(isArabic ? "شكراً لزيارتكم" : "THANK YOU FOR YOUR VISIT", pageWidth / 2, y, { align: "center" })
     y += 5
     doc.text("azana.com", pageWidth / 2, y, { align: "center" })
 
@@ -102,6 +103,13 @@ export const generatePOSTicketPDF = (items: CartItem[], total: number) => {
     iframe.style.opacity = '0.01';
     iframe.style.pointerEvents = 'none';
     iframe.style.border = 'none';
+    iframe.id = 'print-iframe';
+
+    // Remove existing iframe if any
+    const existingIframe = document.getElementById('print-iframe');
+    if (existingIframe) {
+        document.body.removeChild(existingIframe);
+    }
 
     // Crucial: Use the load event to trigger print after a small delay
     iframe.onload = () => {
@@ -114,21 +122,25 @@ export const generatePOSTicketPDF = (items: CartItem[], total: number) => {
                     // Cleanup after print dialog is closed or dismissed
                     // Note: We don't remove immediately to avoid cutting off the print
                     setTimeout(() => {
-                        document.body.removeChild(iframe);
+                        if (document.body.contains(iframe)) {
+                            document.body.removeChild(iframe);
+                        }
                         URL.revokeObjectURL(blobURL);
-                    }, 1000);
+                    }, 5000); // 5 seconds is safer for high latency systems
                 }
             } catch (e) {
                 console.error("Print failed, falling back to new window", e);
                 window.open(blobURL, '_blank');
             }
-        }, 300); // Small delay to ensure render
+        }, 500); // Increased delay slightly
     };
 
     iframe.src = blobURL;
     document.body.appendChild(iframe);
 
-    // Also download as fallback for devices that block iframes
-    const fileName = `azana-ticket-${Date.now()}.pdf`
-    doc.save(fileName)
+    // Also download as fallback unless skipped
+    if (!options.skipDownload) {
+        const fileName = `azana-ticket-${Date.now()}.pdf`
+        doc.save(fileName)
+    }
 }

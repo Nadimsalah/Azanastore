@@ -50,9 +50,9 @@ export function ZenCart({ isOpen, onClose, items, onUpdateQuantity, onRemove, on
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-black text-gray-900 tracking-tight uppercase tracking-widest leading-none mb-1">
-                                        Your Cart
+                                        {t('admin.pos.cart_title')}
                                     </h2>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{itemCount} Items Selected</p>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{itemCount} {t('admin.pos.items_selected')}</p>
                                 </div>
                             </div>
                             <Button variant="ghost" size="icon" className="rounded-2xl h-12 w-12" onClick={onClose}>
@@ -65,7 +65,7 @@ export function ZenCart({ isOpen, onClose, items, onUpdateQuantity, onRemove, on
                             {items.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center opacity-20">
                                     <ShoppingCart className="w-16 h-16 mb-4" />
-                                    <p className="text-sm font-bold uppercase tracking-widest">Cart is empty</p>
+                                    <p className="text-sm font-bold uppercase tracking-widest">{t('admin.pos.empty_cart')}</p>
                                 </div>
                             ) : (
                                 items.map((item) => (
@@ -89,7 +89,7 @@ export function ZenCart({ isOpen, onClose, items, onUpdateQuantity, onRemove, on
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-baseline gap-1">
                                                     <span className="text-lg font-black text-gray-900 tabular-nums">{item.price}</span>
-                                                    <span className="text-[9px] font-bold text-primary italic uppercase leading-none">mad</span>
+                                                    <span className="text-[9px] font-bold text-primary italic uppercase leading-none">{t('common.currency')}</span>
                                                 </div>
                                                 <div className="flex items-center gap-3 bg-white border border-gray-100 rounded-xl p-1">
                                                     <button
@@ -123,42 +123,25 @@ export function ZenCart({ isOpen, onClose, items, onUpdateQuantity, onRemove, on
                         <div className="p-8 border-t border-gray-50 bg-gray-50/30 space-y-6">
                             <div className="flex items-end justify-between">
                                 <div>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Grand Total</p>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{t('admin.pos.grand_total')}</p>
                                     <div className="flex items-baseline gap-2">
                                         <span className="text-4xl font-black text-gray-900 tracking-tighter">{total}</span>
-                                        <span className="text-sm font-bold text-primary italic uppercase leading-none mb-1">mad</span>
+                                        <span className="text-sm font-bold text-primary italic uppercase leading-none mb-1">{t('common.currency')}</span>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Items</p>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{t('admin.pos.items')}</p>
                                     <p className="text-2xl font-black text-gray-900 leading-none">{itemCount}</p>
                                 </div>
                             </div>
 
                             <div className="flex gap-3">
                                 <Button
-                                    variant="outline"
-                                    onClick={() => window.print()}
-                                    disabled={items.length === 0}
-                                    className="h-16 w-16 rounded-2xl border-gray-200 hover:bg-white hover:border-gray-900 transition-all flex items-center justify-center shrink-0"
-                                >
-                                    <Printer className="w-6 h-6 text-gray-900" />
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    onClick={() => generatePOSTicketPDF(items, total)}
-                                    disabled={items.length === 0}
-                                    className="h-16 px-4 rounded-2xl border-gray-200 hover:bg-white hover:border-gray-900 transition-all flex items-center justify-center gap-2"
-                                >
-                                    <FileText className="w-5 h-5 text-gray-900" />
-                                    <span className="text-[10px] font-bold uppercase text-gray-900">PDF</span>
-                                </Button>
-                                <Button
                                     disabled={items.length === 0}
                                     onClick={onCheckout}
                                     className="flex-1 h-16 rounded-2xl bg-gray-900 hover:bg-black text-white text-md font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95"
                                 >
-                                    <span>Complete & Print </span>
+                                    <span>{t('admin.pos.print_complete')}</span>
                                     <Plus className="w-5 h-5" />
                                 </Button>
                             </div>

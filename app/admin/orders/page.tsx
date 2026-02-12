@@ -28,19 +28,27 @@ export default function AdminOrdersPage() {
     const [orders, setOrders] = useState<Order[]>([])
     const [totalOrders, setTotalOrders] = useState(0)
     const [loading, setLoading] = useState(true)
+    const [page, setPage] = useState(1)
+    const limit = 10
+
+    useEffect(() => {
+        setPage(1)
+    }, [activeTab])
 
     useEffect(() => {
         async function loadOrders() {
             setLoading(true)
             const { data, count } = await getOrders({
-                status: activeTab === "all" ? undefined : activeTab
+                status: activeTab === "all" ? undefined : activeTab,
+                limit,
+                offset: (page - 1) * limit
             })
             setOrders(data)
             setTotalOrders(count)
             setLoading(false)
         }
         loadOrders()
-    }, [activeTab])
+    }, [activeTab, page])
 
     const tabs = ["all", "processing", "delivered", "pending", "cancelled"]
 
@@ -58,6 +66,7 @@ export default function AdminOrdersPage() {
             case "delivered": return "bg-green-500/10 text-green-500 border-green-500/20"
             case "pending": return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
             case "cancelled": return "bg-red-500/10 text-red-500 border-red-500/20"
+            case "sale": return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
             default: return "bg-secondary text-secondary-foreground"
         }
     }
@@ -137,7 +146,7 @@ export default function AdminOrdersPage() {
                                         <th className="py-4 pl-4 rtl:pl-0 rtl:pr-4 sm:pl-6 sm:rtl:pr-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('admin.orders.table.order')}</th>
                                         <th className="py-4 px-2 sm:px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">{t('admin.orders.table.date')}</th>
                                         <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden sm:table-cell">{t('admin.orders.table.customer')}</th>
-                                        <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">{t('admin.orders.table.items')}</th>
+                                        <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell text-center">{t('admin.orders.table.items')}</th>
                                         <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('admin.orders.table.total')}</th>
                                         <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('admin.orders.table.source')}</th>
                                         <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('admin.orders.table.status')}</th>
@@ -158,12 +167,17 @@ export default function AdminOrdersPage() {
                                                     {new Date(order.created_at).toLocaleDateString('en-US')}
                                                 </td>
                                                 <td className="py-4 px-4 text-sm font-medium text-foreground hidden sm:table-cell">
-                                                    {order.customer_name}
+                                                    {order.source === 'pos' || order.customer_email === 'walkin@pos.local' ? t('admin.pos.walkin_customer') : order.customer_name}
                                                 </td>
-                                                <td className="py-4 px-4 text-sm text-muted-foreground hidden lg:table-cell">
-                                                    {order.customer_email}
+                                                <td className="py-4 px-4 text-sm text-muted-foreground hidden lg:table-cell text-center">
+                                                    {order.order_items?.length || 0}
                                                 </td>
-                                                <td className="py-4 px-4 text-sm font-bold text-foreground">MAD {order.total.toLocaleString('en-US')}</td>
+                                                <td className="py-4 px-4 text-sm font-bold text-foreground">{t('common.currency')} {order.total.toLocaleString('en-US')}</td>
+                                                <td className="py-4 px-4">
+                                                    <Badge variant="outline" className={`border ${order.source === 'pos' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' : 'bg-purple-500/10 text-purple-500 border-purple-500/20'} text-[10px] sm:text-xs py-0.5 px-2`}>
+                                                        {t(`source.${order.source || 'online'}`)}
+                                                    </Badge>
+                                                </td>
                                                 <td className="py-4 px-4">
                                                     <Badge variant="outline" className={`border ${getStatusColor(order.status)} text-[10px] sm:text-xs py-0.5 px-2`}>
                                                         {t(`status.${order.status.toLowerCase()}`) || order.status}
@@ -176,9 +190,6 @@ export default function AdminOrdersPage() {
                                                                 <Eye className="w-4 h-4" />
                                                             </Button>
                                                         </Link>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary lg:hidden">
-                                                            <MoreHorizontal className="w-4 h-4" />
-                                                        </Button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -194,14 +205,30 @@ export default function AdminOrdersPage() {
                             </table>
                         </div>
 
-                        {/* Pagination */}
                         <div className="p-4 border-t border-white/10 flex items-center justify-between">
-                            <p className="text-sm text-muted-foreground">{t('admin.orders.pagination').replace('{count}', orders.length.toString()).replace('{total}', totalOrders.toString())}</p>
+                            <p className="text-sm text-muted-foreground">
+                                {t('admin.orders.pagination')
+                                    .replace('{start}', ((page - 1) * limit + 1).toString())
+                                    .replace('{end}', Math.min(page * limit, totalOrders).toString())
+                                    .replace('{total}', totalOrders.toString())}
+                            </p>
                             <div className="flex gap-2">
-                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg bg-transparent border-white/10" disabled>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8 rounded-lg bg-transparent border-white/10"
+                                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                                    disabled={page === 1 || loading}
+                                >
                                     <ChevronLeft className="w-4 h-4" />
                                 </Button>
-                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg bg-transparent border-white/10">
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8 rounded-lg bg-transparent border-white/10"
+                                    onClick={() => setPage(p => p + 1)}
+                                    disabled={page * limit >= totalOrders || loading}
+                                >
                                     <ChevronRight className="w-4 h-4" />
                                 </Button>
                             </div>

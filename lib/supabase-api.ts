@@ -1,5 +1,12 @@
 import { supabase } from './supabase'
 
+export interface Category {
+    id: string
+    name: string
+    slug: string
+    created_at?: string
+}
+
 export interface Product {
     id: string
     title: string
@@ -7,11 +14,11 @@ export interface Product {
     description: string | null
     description_ar: string | null
     sku: string
-    category: string
+    category: string | null // Changed from 'string' to 'string | null'
     price: number
     compare_at_price: number | null
     stock: number
-    status: string
+    status: 'active' | 'draft' | 'archived' // Changed from 'string' to specific literal types
     images: string[]
     benefits: string[] | null
     benefits_ar: string[] | null
@@ -79,6 +86,7 @@ export interface Order {
     notes: string | null
     created_at: string
     updated_at: string
+    order_items?: OrderItem[]
 }
 
 export interface OrderItem {
@@ -93,6 +101,9 @@ export interface OrderItem {
     price: number
     subtotal: number
     created_at: string
+    product?: {
+        images: string[]
+    }
 }
 
 // WhatsApp subscriptions
@@ -283,8 +294,8 @@ export async function getProducts(filters?: {
     }
 
     if (filters?.search) {
-        const searchTerm = `%${filters.search}%`
-        const mainOrQuery = `title.ilike."${searchTerm}",title_ar.ilike."${searchTerm}",description.ilike."${searchTerm}",description_ar.ilike."${searchTerm}"`
+        const searchTerm = `% ${filters.search}% `
+        const mainOrQuery = `title.ilike."${searchTerm}", title_ar.ilike."${searchTerm}", description.ilike."${searchTerm}", description_ar.ilike."${searchTerm}"`
 
         const { data, error: searchError } = await query.or(mainOrQuery)
 
@@ -307,7 +318,7 @@ export async function getProducts(filters?: {
                 if (filters?.limit) fallbackQueryBuilder = fallbackQueryBuilder.limit(filters.limit)
                 if (filters?.offset) fallbackQueryBuilder = fallbackQueryBuilder.range(filters.offset, filters.offset + (filters.limit || 10) - 1)
 
-                const { data: fbData, error: fbError } = await fallbackQueryBuilder.or(`title.ilike."${searchTerm}",description.ilike."${searchTerm}"`)
+                const { data: fbData, error: fbError } = await fallbackQueryBuilder.or(`title.ilike."${searchTerm}", description.ilike."${searchTerm}"`)
 
                 if (fbError) {
                     console.error('Search failed even with fallback:', fbError.message)
@@ -353,8 +364,8 @@ export async function getProductById(id: string) {
     const { data, error } = await supabase
         .from('products')
         .select(`
-            *,
-            variants:product_variants(*)
+    *,
+    variants: product_variants(*)
         `)
         .eq('id', id)
         .single()
@@ -364,7 +375,7 @@ export async function getProductById(id: string) {
             console.warn(`Product with ID ${id} not found`)
             return null
         }
-        console.error(`Error fetching product ${id}:`, error)
+        console.error(`Error fetching product ${id}: `, error)
         return null
     }
 
@@ -390,9 +401,9 @@ export async function getRelatedProducts(productId: string, limit = 4) {
     const { data, error } = await supabase
         .from('product_cross_sells')
         .select(`
-      related_product_id,
-      products!product_cross_sells_related_product_id_fkey (*)
-    `)
+related_product_id,
+    products!product_cross_sells_related_product_id_fkey(*)
+        `)
         .eq('product_id', productId)
         .limit(limit)
 
@@ -405,26 +416,29 @@ export async function getRelatedProducts(productId: string, limit = 4) {
 }
 
 // Orders API
-export async function getOrders(filters?: {
+export async function getOrders(options: {
     status?: string
     limit?: number
     offset?: number
-}) {
+} = {}) {
     let query = supabase
         .from('orders')
-        .select('*', { count: 'exact' })
+        .select(`
+        *,
+        order_items(id)
+            `, { count: 'exact' })
         .order('created_at', { ascending: false })
 
-    if (filters?.status) {
-        query = query.eq('status', filters.status)
+    if (options?.status) {
+        query = query.eq('status', options.status)
     }
 
-    if (filters?.limit) {
-        query = query.limit(filters.limit)
+    if (options?.limit) {
+        query = query.limit(options.limit)
     }
 
-    if (filters?.offset) {
-        query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1)
+    if (options?.offset) {
+        query = query.range(options.offset, options.offset + (options.limit || 10) - 1)
     }
 
     const { data, error, count } = await query
@@ -449,9 +463,12 @@ export async function getOrderById(id: string) {
     const { data, error } = await supabase
         .from('orders')
         .select(`
-      *,
-      order_items (*)
-    `)
+        *,
+        order_items(
+        *,
+            product: products(images)
+        )
+            `)
         .eq('id', id)
         .single()
 
@@ -479,6 +496,7 @@ export async function createOrder(data: {
         price: number
         subtotal: number
         variant_name?: string | null
+        product_image?: string | null
     }[]
     subtotal: number
     shipping_cost: number
@@ -502,7 +520,7 @@ export async function createOrder(data: {
     }
 
     // 2. Insert order
-    const orderNumber = `ORD-${Math.floor(1000 + Math.random() * 9000).toString().padStart(4, '0')}`
+    const orderNumber = `ORD - ${Math.floor(1000 + Math.random() * 9000).toString().padStart(4, '0')} `
     const orderPayload: any = {
         order_number: orderNumber,
         customer_id: customer?.id || null,
@@ -557,6 +575,7 @@ export async function createOrder(data: {
         product_title: item.product_title,
         product_sku: item.product_sku,
         variant_name: item.variant_name || null,
+        product_image: item.product_image || null,
         quantity: item.quantity,
         price: item.price,
         subtotal: item.subtotal
@@ -908,8 +927,8 @@ export async function uploadHeroCarouselImage(
 ): Promise<{ success: boolean; url?: string; error?: string }> {
     try {
         const fileExt = file.name.split('.').pop()
-        const fileName = `hero-carousel-${position}-${Date.now()}.${fileExt}`
-        const filePath = `hero-carousel/${fileName}`
+        const fileName = `hero - carousel - ${position} -${Date.now()}.${fileExt} `
+        const filePath = `hero - carousel / ${fileName} `
 
         const { error: uploadError } = await supabase.storage
             .from('product-images')
@@ -976,7 +995,7 @@ export async function getCategories() {
         return []
     }
 
-    return data as { id: string, name: string, slug: string, name_ar?: string }[]
+    return data as Category[]
 }
 
 /**

@@ -32,6 +32,11 @@ export default function OrderDetailsPage() {
     const [updating, setUpdating] = useState(false)
     const { t, language } = useLanguage()
     const isArabic = language === "ar"
+    const isPOSOrder = order?.source === 'pos' ||
+        order?.customer_email === 'walkin@pos.local' ||
+        order?.address_line1 === "عملية نقطة بيع" ||
+        order?.address_line1 === "POS Transaction" ||
+        order?.address_line1 === t('admin.pos.pos_transaction')
 
     useEffect(() => {
         async function loadOrder() {
@@ -92,6 +97,7 @@ export default function OrderDetailsPage() {
             case "delivered": return "bg-green-500/10 text-green-500 border-green-500/20"
             case "pending": return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
             case "cancelled": return "bg-red-500/10 text-red-500 border-red-500/20"
+            case "sale": return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
             default: return "bg-secondary text-secondary-foreground"
         }
     }
@@ -153,9 +159,9 @@ export default function OrderDetailsPage() {
                                 {order.order_items.map((item, i) => (
                                     <div key={i} className="flex items-center gap-4 p-3 rounded-2xl bg-white/5 border border-white/5">
                                         <div className="h-16 w-16 bg-muted rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center relative">
-                                            {item.product_image ? (
+                                            {(item.product_image || item.product?.images?.[0]) ? (
                                                 <Image
-                                                    src={item.product_image}
+                                                    src={item.product_image || item.product?.images?.[0] || ""}
                                                     alt={item.product_title}
                                                     fill
                                                     className="object-cover"
@@ -167,10 +173,10 @@ export default function OrderDetailsPage() {
                                         <div className="flex-1">
                                             <h4 className="font-semibold text-foreground">{item.product_title}</h4>
                                             {item.variant_name && <p className="text-xs text-primary font-medium">{item.variant_name}</p>}
-                                            <p className="text-sm text-muted-foreground">{t('admin.order.qty')}: {item.quantity} × MAD {item.price.toLocaleString('en-US')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('admin.order.qty')}: {item.quantity} × {t('common.currency')} {item.price.toLocaleString('en-US')}</p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="font-bold text-foreground">MAD {item.subtotal.toLocaleString('en-US')}</p>
+                                            <p className="font-bold text-foreground">{t('common.currency')} {item.subtotal.toLocaleString('en-US')}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -179,15 +185,15 @@ export default function OrderDetailsPage() {
                             <div className="mt-6 pt-6 border-t border-white/10 space-y-2">
                                 <div className="flex justify-between text-sm text-muted-foreground">
                                     <span>{t('admin.order.subtotal')}</span>
-                                    <span>MAD {order.subtotal.toLocaleString('en-US')}</span>
+                                    <span>{t('common.currency')} {order.subtotal.toLocaleString('en-US')}</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-muted-foreground">
                                     <span>{t('admin.order.shipping')}</span>
-                                    <span>MAD {order.shipping_cost.toLocaleString('en-US')}</span>
+                                    <span>{t('common.currency')} {order.shipping_cost.toLocaleString('en-US')}</span>
                                 </div>
                                 <div className="flex justify-between text-lg font-bold text-foreground pt-4 border-t border-white/5">
                                     <span>{t('admin.order.total')}</span>
-                                    <span className="text-primary">MAD {order.total.toLocaleString('en-US')}</span>
+                                    <span className="text-primary">{t('common.currency')} {order.total.toLocaleString('en-US')}</span>
                                 </div>
                             </div>
                         </div>
@@ -215,9 +221,9 @@ export default function OrderDetailsPage() {
                                             priority
                                         />
                                     </div>
-                                    <h1 className="text-xl font-black uppercase mb-1">AZANA BOUTIQUE</h1>
-                                    <p className="text-[9px] uppercase">Boutique & Luxury Clothing</p>
-                                    <p className="text-[9px]">Casablanca, Morocco</p>
+                                    <h1 className="text-xl font-black uppercase mb-1">{t('admin.order.store_name')}</h1>
+                                    <p className="text-[9px] uppercase">{t('admin.order.store_tagline')}</p>
+                                    <p className="text-[9px]">{t('admin.pos.store_city')}, {t('common.morocco')}</p>
                                     <p className="text-[9px]">contact@azana.com</p>
                                 </div>
 
@@ -234,7 +240,7 @@ export default function OrderDetailsPage() {
                                     <p className="font-bold">{order.customer_name}</p>
                                     <p>{order.customer_phone}</p>
                                     <p>{order.address_line1}</p>
-                                    <p>{order.city} - {order.governorate}</p>
+                                    <p>{isPOSOrder ? t('admin.pos.store_city') : order.city}{order.governorate && order.governorate !== 'Morocco' && order.governorate !== 'Casablanca' && order.governorate !== 'الدار البيضاء' && !isPOSOrder && ` - ${order.governorate}`}</p>
                                 </div>
 
                                 {/* Items */}
@@ -255,7 +261,7 @@ export default function OrderDetailsPage() {
                                                         {item.variant_name && <span className="text-[9px] italic">{item.variant_name}</span>}
                                                     </td>
                                                     <td className="py-2 text-center align-top">{item.quantity}</td>
-                                                    <td className="py-2 text-right font-bold align-top">{(item.subtotal || 0).toLocaleString('fr-FR')} MAD</td>
+                                                    <td className="py-2 text-right font-bold align-top">{(item.subtotal || 0).toLocaleString('fr-FR')} {t('common.currency')}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -266,15 +272,15 @@ export default function OrderDetailsPage() {
                                 <div className="mb-6 space-y-1 text-right">
                                     <div className="flex justify-between">
                                         <span>{t('admin.order.subtotal')}:</span>
-                                        <span>{(order.subtotal || 0).toLocaleString(isArabic ? 'ar-MA' : 'fr-FR')} MAD</span>
+                                        <span>{(order.subtotal || 0).toLocaleString(isArabic ? 'ar-MA' : 'fr-FR')} {t('common.currency')}</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span>{t('admin.order.shipping')}:</span>
-                                        <span>{(order.shipping_cost || 0).toLocaleString(isArabic ? 'ar-MA' : 'fr-FR')} MAD</span>
+                                        <span>{(order.shipping_cost || 0).toLocaleString(isArabic ? 'ar-MA' : 'fr-FR')} {t('common.currency')}</span>
                                     </div>
                                     <div className="flex justify-between text-sm font-black border-t-2 border-black pt-1 mt-1">
                                         <span>{t('admin.order.total')}:</span>
-                                        <span>{(order.total || 0).toLocaleString(isArabic ? 'ar-MA' : 'fr-FR')} MAD</span>
+                                        <span>{(order.total || 0).toLocaleString(isArabic ? 'ar-MA' : 'fr-FR')} {t('common.currency')}</span>
                                     </div>
                                 </div>
 
@@ -283,7 +289,7 @@ export default function OrderDetailsPage() {
                                     <p className="font-bold uppercase">{t('admin.order.thanks')}</p>
                                     <p>{t('admin.order.returns_policy')}</p>
                                     <div className="pt-2">
-                                        <p>AZANA BOUTIQUE</p>
+                                        <p>{t('admin.order.store_name')}</p>
                                         <p>RC: 123456 | ICE: 000000000000</p>
                                     </div>
                                 </div>
@@ -300,7 +306,7 @@ export default function OrderDetailsPage() {
                             <div className="glass-strong rounded-3xl p-6 border-l-4 border-primary">
                                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">{t('admin.order.update_status')}</h3>
                                 <div className="space-y-3">
-                                    {["Pending", "Processing", "Shipped", "Delivered", "Cancelled"].map((s) => (
+                                    {["Pending", "Processing", "Shipped", "Delivered", "Sale", "Cancelled"].map((s) => (
                                         <button
                                             key={s}
                                             disabled={updating}
@@ -379,7 +385,7 @@ export default function OrderDetailsPage() {
                                         <MapPin className="w-4 h-4 text-primary" />
                                         <div>
                                             <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">{t('admin.order.destination')}</p>
-                                            <p className="text-foreground font-medium">{order.city}, Morocco</p>
+                                            <p className="text-foreground font-medium">{isPOSOrder ? t('admin.pos.store_city') : order.city}, {t('common.morocco')}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -394,12 +400,12 @@ export default function OrderDetailsPage() {
                                     <CreditCard className="w-4 h-4 text-primary" />
                                     <div>
                                         <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">{t('admin.order.method')}</p>
-                                        <p className="text-foreground font-medium">{t('admin.order.cod')}</p>
+                                        <p className="text-foreground font-medium">{order.source === 'pos' ? t('admin.nav.pos') : t('admin.order.cod')}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 text-sm">
-                                    <Badge variant="outline" className={`border-primary/20 ${order.status === "delivered" ? "text-primary bg-primary/5" : "text-yellow-500 bg-yellow-500/10"}`}>
-                                        {order.status === "delivered" ? t('admin.order.payment_collected') : t('admin.order.payment_pending')}
+                                    <Badge variant="outline" className={`border-primary/20 ${isPOSOrder || order.status === "delivered" ? "text-primary bg-primary/5" : "text-yellow-500 bg-yellow-500/10"}`}>
+                                        {isPOSOrder ? t('admin.order.paid') : order.status === "delivered" ? t('admin.order.payment_collected') : t('admin.order.payment_pending')}
                                     </Badge>
                                 </div>
                             </div>

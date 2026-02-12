@@ -128,7 +128,7 @@ export default function SettingsPage() {
                                         value={settings.store_name || ""}
                                         onChange={(e) => handleChange("store_name", e.target.value)}
                                         className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30"
-                                        placeholder="Enter store name"
+                                        placeholder={t('admin.settings.store_name_placeholder')}
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -138,7 +138,7 @@ export default function SettingsPage() {
                                         value={settings.support_email || ""}
                                         onChange={(e) => handleChange("support_email", e.target.value)}
                                         className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30"
-                                        placeholder="support@example.com"
+                                        placeholder={t('admin.settings.support_email_placeholder')}
                                     />
                                 </div>
                                 <div className="space-y-1.5">

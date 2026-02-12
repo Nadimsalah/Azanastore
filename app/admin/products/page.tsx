@@ -89,7 +89,7 @@ export default function AdminProductsPage() {
             })
 
         if (error) {
-            alert('Error adding category: ' + error.message)
+            alert(t('admin.products.error_adding_category') + ': ' + error.message)
         } else {
             setNewCategoryName("")
             loadCategories()
@@ -97,7 +97,7 @@ export default function AdminProductsPage() {
     }
 
     async function handleDeleteCategory(id: string) {
-        if (!confirm('Delete this category? Products using it will need to be recategorized.')) return
+        if (!confirm(t('admin.products.confirm_delete_category'))) return
 
         const { error } = await supabase
             .from('categories')
@@ -105,7 +105,7 @@ export default function AdminProductsPage() {
             .eq('id', id)
 
         if (error) {
-            alert('Error deleting category: ' + error.message)
+            alert(t('admin.products.error_deleting_category') + ': ' + error.message)
         } else {
             loadCategories()
         }
@@ -119,7 +119,7 @@ export default function AdminProductsPage() {
     }
 
     async function handleDelete(id: string) {
-        if (!confirm('Are you sure you want to delete this product?')) return
+        if (!confirm(t('admin.products.confirm_delete_product'))) return
 
         const { error } = await supabase
             .from('products')
@@ -127,7 +127,7 @@ export default function AdminProductsPage() {
             .eq('id', id)
 
         if (error) {
-            alert('Error deleting product: ' + error.message)
+            alert(t('admin.products.error_deleting_product') + ': ' + error.message)
         } else {
             // Reload products
             loadProducts()
@@ -208,7 +208,7 @@ export default function AdminProductsPage() {
                                     {/* Add Category */}
                                     <div className="flex gap-2">
                                         <Input
-                                            placeholder="Category Name"
+                                            placeholder={t('admin.products.category_name_placeholder')}
                                             value={newCategoryName}
                                             onChange={(e) => setNewCategoryName(e.target.value)}
                                             className="flex-1"
@@ -322,7 +322,7 @@ export default function AdminProductsPage() {
                                         <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('admin.products.pricing')}</th>
                                         <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">{t('admin.products.stock')}</th>
                                         <th className="py-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('admin.products.status')}</th>
-                                        <th className="py-4 pr-6 rtl:pr-0 rtl:pl-6 text-right rtl:text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
+                                        <th className="py-4 pr-6 rtl:pr-0 rtl:pl-6 text-right rtl:text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('admin.products.table_actions')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
@@ -348,15 +348,15 @@ export default function AdminProductsPage() {
                                                         <div>
                                                             <p className="font-semibold text-foreground text-sm">{product.title}</p>
                                                             <p className="text-xs text-muted-foreground md:hidden">
-                                                                Qty: {product.stock}
+                                                                {t('admin.order.qty')}: {product.stock}
                                                             </p>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td className="py-4 px-4 text-sm text-foreground/80 hidden sm:table-cell">{product.category}</td>
-                                                <td className="py-4 px-4 text-sm font-bold text-foreground">MAD {product.price?.toLocaleString('en-US')}</td>
+                                                <td className="py-4 px-4 text-sm font-bold text-foreground">{t('common.currency')} {product.price?.toLocaleString('en-US')}</td>
                                                 <td className="py-4 px-4 text-sm text-muted-foreground hidden md:table-cell font-medium">
-                                                    {getProductStock(product).toLocaleString('en-US')} units
+                                                    {getProductStock(product).toLocaleString('en-US')} {t('admin.products.units')}
                                                 </td>
                                                 <td className="py-4 px-4">
                                                     <Badge className={getStatusColor(getStockStatus(getProductStock(product)))}>
@@ -385,7 +385,7 @@ export default function AdminProductsPage() {
                                     ) : (
                                         <tr>
                                             <td colSpan={6} className="py-12 text-center text-muted-foreground">
-                                                No products found matching your criteria.
+                                                {t('admin.products.not_found')}
                                             </td>
                                         </tr>
                                     )}

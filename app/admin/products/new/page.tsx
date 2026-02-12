@@ -34,17 +34,67 @@ import { toast } from "sonner"
 // Predefined Options
 const COMMON_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "36", "38", "40", "42", "44"]
 const COMMON_COLORS = [
+    // Basics
     { name: "Black", hex: "#000000" },
     { name: "White", hex: "#FFFFFF" },
-    { name: "Navy", hex: "#000080" },
-    { name: "Beige", hex: "#F5F5DC" },
-    { name: "Pink", hex: "#FFC0CB" },
-    { name: "Red", hex: "#FF0000" },
-    { name: "Green", hex: "#008000" },
-    { name: "Blue", hex: "#0000FF" },
     { name: "Grey", hex: "#808080" },
+    { name: "Silver", hex: "#C0C0C0" },
     { name: "Gold", hex: "#FFD700" },
-    { name: "Silver", hex: "#C0C0C0" }
+    { name: "Beige", hex: "#F5F5DC" },
+    { name: "Brown", hex: "#A52A2A" },
+    { name: "Tan", hex: "#D2B48C" },
+    { name: "Cream", hex: "#FFFDD0" },
+    { name: "Ivory", hex: "#FFFFF0" },
+    { name: "Taupe", hex: "#483C32" },
+    { name: "Khaki", hex: "#F0E68C" },
+
+    // Blues
+    { name: "Navy", hex: "#000080" },
+    { name: "Blue", hex: "#0000FF" },
+    { name: "Royal Blue", hex: "#4169E1" },
+    { name: "Sky Blue", hex: "#87CEEB" },
+    { name: "Teal", hex: "#008080" },
+    { name: "Turquoise", hex: "#40E0D0" },
+    { name: "Cyan", hex: "#00FFFF" },
+    { name: "Midnight", hex: "#191970" },
+    { name: "Indigo", hex: "#4B0082" },
+
+    // Reds / Pinks
+    { name: "Red", hex: "#FF0000" },
+    { name: "Burgundy", hex: "#800020" },
+    { name: "Maroon", hex: "#800000" },
+    { name: "Crimson", hex: "#DC143C" },
+    { name: "Pink", hex: "#FFC0CB" },
+    { name: "Hot Pink", hex: "#FF69B4" },
+    { name: "Rose", hex: "#FF007F" },
+    { name: "Magenta", hex: "#FF00FF" },
+    { name: "Coral", hex: "#FF7F50" },
+    { name: "Salmon", hex: "#FA8072" },
+    { name: "Peach", hex: "#FFDAB9" },
+
+    // Greens
+    { name: "Green", hex: "#008000" },
+    { name: "Forest", hex: "#228B22" },
+    { name: "Olive", hex: "#808000" },
+    { name: "Lime", hex: "#00FF00" },
+    { name: "Mint", hex: "#98FF98" },
+    { name: "Sage", hex: "#BCB88A" },
+    { name: "Emerald", hex: "#50C878" },
+
+    // Yellows / Oranges
+    { name: "Yellow", hex: "#FFFF00" },
+    { name: "Mustard", hex: "#FFDB58" },
+    { name: "Amber", hex: "#FFBF00" },
+    { name: "Orange", hex: "#FFA500" },
+    { name: "Rust", hex: "#B7410E" },
+    { name: "Apricot", hex: "#FBCEB1" },
+
+    // Purples
+    { name: "Purple", hex: "#800080" },
+    { name: "Violet", hex: "#EE82EE" },
+    { name: "Lavender", hex: "#E6E6FA" },
+    { name: "Lilac", hex: "#C8A2C8" },
+    { name: "Plum", hex: "#DDA0DD" }
 ]
 
 export default function NewProductPage() {
@@ -97,7 +147,7 @@ export default function NewProductPage() {
             if (catData) setCategories(catData)
         }
         fetchData()
-    })
+    }, [])
 
     const handlePublish = async () => {
         // Validation
@@ -311,7 +361,7 @@ export default function NewProductPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50/50 relative overflow-hidden text-gray-900">
+        <div className="min-h-screen bg-gray-50/50 text-gray-900">
             {/* Subtle Background Gradients - Light Mode */}
             <div className="fixed inset-0 pointer-events-none">
                 <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-blue-100/40 rounded-full blur-[120px]" />
@@ -330,8 +380,8 @@ export default function NewProductPage() {
                             </Button>
                         </Link>
                         <div>
-                            <h1 className="text-xl font-bold text-gray-900">Add Product</h1>
-                            <p className="text-xs text-gray-500 font-medium">New Arrival</p>
+                            <h1 className="text-xl font-bold text-gray-900">{t('admin.products.add_product')}</h1>
+                            <p className="text-xs text-gray-500 font-medium">{t('admin.products.new_arrival')}</p>
                         </div>
                     </div>
 
@@ -370,8 +420,8 @@ export default function NewProductPage() {
                                     <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-600">
                                         <Check className="w-10 h-10" strokeWidth={3} />
                                     </div>
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-2">Published!</h3>
-                                    <p className="text-gray-500">Redirecting to products...</p>
+                                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.products.published_title')}</h3>
+                                    <p className="text-gray-500">{t('admin.products.published_redirect')}</p>
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center">
@@ -380,8 +430,8 @@ export default function NewProductPage() {
                                         <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
                                         <Package className="absolute inset-0 m-auto w-8 h-8 text-blue-600 animate-pulse" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-2">Publishing Product</h3>
-                                    <p className="text-gray-500">Optimizing images & syncing...</p>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2">{t('admin.products.publishing_title')}</h3>
+                                    <p className="text-gray-500">{t('admin.products.publishing_desc')}</p>
                                 </div>
                             )}
                         </div>
@@ -432,9 +482,9 @@ export default function NewProductPage() {
                             <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
                                 <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
                                     <ImageIcon className="w-4 h-4 text-blue-500" />
-                                    Product Media
+                                    {t('admin.products.product_media')}
                                 </h3>
-                                <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">{images.length} Images</Badge>
+                                <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">{images.length} {t('admin.products.images_count')}</Badge>
                             </div>
                             <div className="p-6 space-y-6">
                                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -454,7 +504,7 @@ export default function NewProductPage() {
                                             </div>
                                             {index === 0 && (
                                                 <div className="absolute top-2 left-2 px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded-full shadow-sm">
-                                                    Primary
+                                                    {t('admin.products.primary')}
                                                 </div>
                                             )}
                                         </div>
@@ -463,7 +513,7 @@ export default function NewProductPage() {
                                         <div className="w-10 h-10 rounded-full bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors mb-2">
                                             {uploading ? <Loader2 className="w-5 h-5 text-blue-600 animate-spin" /> : <Upload className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />}
                                         </div>
-                                        <span className="text-xs font-bold text-gray-400 group-hover:text-blue-600 uppercase tracking-wider">Upload</span>
+                                        <span className="text-xs font-bold text-gray-400 group-hover:text-blue-600 uppercase tracking-wider">{t('admin.products.upload')}</span>
                                         <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
                                     </label>
                                 </div>
@@ -475,7 +525,7 @@ export default function NewProductPage() {
                             <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
                                 <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
                                     <Layers className="w-4 h-4 text-indigo-500" />
-                                    Product Variants (Sizes & Colors)
+                                    {t('admin.products.variants_section')}
                                 </h3>
                                 <Button
                                     type="button"
@@ -485,15 +535,15 @@ export default function NewProductPage() {
                                     className="rounded-full border-indigo-200 text-indigo-600 hover:bg-indigo-50"
                                 >
                                     <Plus className="w-4 h-4 mr-2" />
-                                    Add Variant
+                                    {t('admin.products.add_variant')}
                                 </Button>
                             </div>
                             <div className="p-6">
                                 <div className="mb-8 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 space-y-6">
                                     <div className="space-y-3">
                                         <label className="text-sm font-bold text-indigo-900 flex items-center gap-2">
-                                            1. Select Sizes
-                                            <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">Multiple</span>
+                                            {t('admin.products.select_sizes')}
+                                            <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">{t('admin.products.multiple')}</span>
                                         </label>
                                         <div className="flex flex-wrap gap-2">
                                             {COMMON_SIZES.map(s => {
@@ -514,8 +564,8 @@ export default function NewProductPage() {
 
                                     <div className="space-y-3">
                                         <label className="text-sm font-bold text-indigo-900 flex items-center gap-2">
-                                            2. Select Colors
-                                            <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">Visual Selection</span>
+                                            {t('admin.products.select_colors')}
+                                            <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">{t('admin.products.visual_selection')}</span>
                                         </label>
                                         <div className="flex flex-wrap gap-3">
                                             {COMMON_COLORS.map(c => {
@@ -547,13 +597,13 @@ export default function NewProductPage() {
                                         className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-100 disabled:bg-gray-200"
                                     >
                                         <RefreshCw className="w-4 h-4 mr-2" />
-                                        Generate {selectedSizes.length > 0 && selectedColors.length > 0 ? selectedSizes.length * selectedColors.length : Math.max(selectedSizes.length, selectedColors.length)} Combinations
+                                        {t('admin.products.generate_combinations').replace('{count}', (selectedSizes.length > 0 && selectedColors.length > 0 ? selectedSizes.length * selectedColors.length : Math.max(selectedSizes.length, selectedColors.length)).toString())}
                                     </Button>
                                 </div>
 
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between px-1">
-                                        <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Active Variants ({variants.length})</h4>
+                                        <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">{t('admin.products.active_variants').replace('{count}', variants.length.toString())}</h4>
                                     </div>
                                     {variants.map((v, i) => (
                                         <div key={i} className="p-4 rounded-2xl border border-gray-100 bg-gray-50/50 space-y-4 relative group hover:bg-white hover:shadow-xl hover:shadow-gray-100 transition-all">
@@ -565,7 +615,7 @@ export default function NewProductPage() {
                                             </button>
                                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                                 <div className="space-y-1.5">
-                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Size</label>
+                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t('admin.products.variant_size')}</label>
                                                     <Input
                                                         placeholder="e.g. XL"
                                                         value={v.size || ""}
@@ -574,7 +624,7 @@ export default function NewProductPage() {
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Color</label>
+                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t('admin.products.variant_color')}</label>
                                                     <Input
                                                         placeholder="e.g. Navy"
                                                         value={v.color || ""}
@@ -583,7 +633,7 @@ export default function NewProductPage() {
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Price (MAD)</label>
+                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t('admin.products.variant_price')}</label>
                                                     <Input
                                                         type="number"
                                                         placeholder={price || "0.00"}
@@ -593,7 +643,7 @@ export default function NewProductPage() {
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Stock</label>
+                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t('admin.products.variant_stock')}</label>
                                                     <Input
                                                         type="number"
                                                         placeholder="0"
@@ -608,7 +658,7 @@ export default function NewProductPage() {
                                     {variants.length === 0 && (
                                         <div className="text-center py-12 border-2 border-dashed border-gray-100 rounded-2xl text-gray-400">
                                             <Layers className="w-8 h-8 mx-auto mb-3 opacity-20" />
-                                            <p className="text-sm">No variants added yet. Add variants if this product has different sizes or colors.</p>
+                                            <p className="text-sm">{t('admin.products.no_variants')}</p>
                                         </div>
                                     )}
                                 </div>

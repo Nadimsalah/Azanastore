@@ -30,7 +30,7 @@ export function AdminSidebar() {
 
     const menuItems = [
         { icon: LayoutDashboard, label: t('admin.nav.dashboard'), href: "/admin/dashboard" },
-        { icon: Zap, label: "POS", href: "/admin/pos" },
+        { icon: Zap, label: t('admin.nav.pos'), href: "/admin/pos" },
         { icon: ShoppingBag, label: t('admin.nav.orders'), href: "/admin/orders" },
         { icon: Package, label: t('admin.nav.products'), href: "/admin/products" },
         { icon: Layers, label: t('admin.nav.inventory'), href: "/admin/inventory" },
@@ -99,14 +99,14 @@ export function AdminSidebar() {
     return (
         <>
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:block w-72 fixed inset-y-0 left-0 rtl:left-auto rtl:right-0 z-50">
+            <aside className="hidden lg:block w-72 fixed inset-y-0 left-0 rtl:left-auto rtl:right-0 z-[999]">
                 <SidebarContent />
             </aside>
 
             {/* Mobile Sidebar */}
             <Sheet>
                 <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="lg:hidden fixed top-4 left-4 rtl:left-auto rtl:right-4 z-50 rounded-full glass-strong">
+                    <Button variant="ghost" size="icon" className="lg:hidden fixed top-4 left-4 rtl:left-auto rtl:right-4 z-[999] rounded-full glass-strong">
                         <Menu className="w-6 h-6" />
                     </Button>
                 </SheetTrigger>
