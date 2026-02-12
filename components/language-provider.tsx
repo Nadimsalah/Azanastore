@@ -194,6 +194,34 @@ const translations = {
         "admin.nav.settings": "Paramètres",
         "admin.nav.logout": "Déconnexion",
 
+        // Admin Analytics
+        "admin.analytics.title": "Analyses",
+        "admin.analytics.subtitle": "Statistiques de ventes et performances",
+        "admin.analytics.total_revenue": "Revenu Total",
+        "admin.analytics.pos_revenue": "Revenu POS",
+        "admin.analytics.ecommerce_revenue": "Revenu E-Commerce",
+        "admin.analytics.pos_orders": "Commandes POS",
+        "admin.analytics.ecommerce_orders": "Commandes E-Commerce",
+        "admin.analytics.top_products": "Produits les plus vendus",
+        "admin.analytics.product_name": "Produit",
+        "admin.analytics.total_sold": "Total Vendu",
+        "admin.analytics.revenue": "Revenu",
+        "admin.analytics.orders": "Commandes",
+        "admin.analytics.date_range": "Période",
+        "admin.analytics.apply_filter": "Appliquer",
+        "admin.analytics.reset_filter": "Réinitialiser",
+        "admin.analytics.all_time": "Tout le temps",
+        "admin.analytics.today": "Aujourd'hui",
+        "admin.analytics.yesterday": "Hier",
+        "admin.analytics.this_week": "Cette semaine",
+        "admin.analytics.this_month": "Ce mois",
+        "admin.analytics.custom": "Personnalisé",
+        "admin.analytics.from": "Du",
+        "admin.analytics.to": "Au",
+        "admin.analytics.search_products": "Rechercher des produits...",
+        "admin.analytics.no_data": "Aucune donnée disponible",
+        "admin.analytics.loading": "Chargement des données...",
+
         // Admin Dashboard
         "admin.dashboard.title": "Tableau de bord",
         "admin.dashboard.subtitle": "Vue d'ensemble détaillée",
@@ -410,46 +438,66 @@ const translations = {
         "admin.order.payment_label": "PAIEMENT",
 
         // Admin Settings
-        "admin.settings.title": "Paramètres du magasin",
-        "admin.settings.subtitle": "Gérez les informations de votre magasin, les textes promotionnels et les configurations système.",
-        "admin.settings.reset": "Réinitialiser",
+        "admin.settings.title": "Paramètres",
+        "admin.settings.subtitle": "Gérez tous les aspects de votre boutique",
+
+        // Tabs
+        "admin.settings.tab_store": "Boutique",
+        "admin.settings.tab_shipping": "Livraison",
+        "admin.settings.tab_payment": "Paiement",
+        "admin.settings.tab_notifications": "Notifications",
+        "admin.settings.tab_product": "Produits",
+        "admin.settings.tab_marketing": "Marketing",
+        "admin.settings.tab_system": "Système",
+
+        // Actions
         "admin.settings.save": "Enregistrer",
-        "admin.settings.saved": "Paramètres enregistrés avec succès",
-        "admin.settings.save_failed": "Échec de l'enregistrement des paramètres",
-        "admin.settings.store_info": "Informations du magasin",
+        "admin.settings.saving": "Enregistrement...",
+        "admin.settings.saved": "Paramètres enregistrés",
+        "admin.settings.save_failed": "Échec de l'enregistrement",
+        "admin.settings.reset": "Réinitialiser",
+
+        // Store Info
         "admin.settings.store_name": "Nom du magasin",
-        "admin.settings.support_email": "Email de support",
-        "admin.settings.store_name_placeholder": "Entrez le nom de la boutique",
-        "admin.settings.support_email_placeholder": "support@exemple.com",
+        "admin.settings.store_name_ar": "Nom du magasin (AR)",
+        "admin.settings.store_description": "Description",
+        "admin.settings.store_description_ar": "Description (AR)",
+        "admin.settings.contact_email": "Email de contact",
+        "admin.settings.contact_phone": "Téléphone",
+        "admin.settings.store_address": "Adresse",
+
+        // Shipping
+        "admin.settings.default_shipping": "Frais de livraison",
+        "admin.settings.free_shipping_threshold": "Seuil livraison gratuite",
+        "admin.settings.delivery_time": "Délai de livraison",
+        "admin.settings.shipping_zones": "Zones de livraison",
+
+        // Payment
+        "admin.settings.cod_enabled": "Paiement à la livraison",
+        "admin.settings.payment_instructions": "Instructions de paiement",
+        "admin.settings.payment_instructions_ar": "Instructions (AR)",
+
+        // Notifications
+        "admin.settings.admin_email": "Email admin",
+        "admin.settings.order_notifications": "Notifications de commande",
+        "admin.settings.push_enabled": "Notifications push",
+        "admin.settings.test_notification": "Tester",
+
+        // Product
         "admin.settings.currency": "Devise",
-        "admin.settings.promotions": "Promotions et textes",
+        "admin.settings.tax_rate": "Taux de taxe (%)",
+        "admin.settings.low_stock_threshold": "Seuil stock bas",
+
+        // Marketing
         "admin.settings.announcement_bar": "Barre d'annonce",
-        "admin.settings.announcement_bar_ar": "Barre d'annonce (Arabe)",
-        "admin.settings.promo_code": "Code promo",
-        "admin.settings.hero_title": "Titre principal",
-        "admin.settings.hero_subtitle": "Sous-titre principal",
-        "admin.settings.hero_title_ar": "Titre principal (Arabe)",
-        "admin.settings.hero_subtitle_ar": "Sous-titre principal (Arabe)",
-        "admin.settings.whatsapp_contact": "WhatsApp et contact",
+        "admin.settings.announcement_bar_ar": "Barre d'annonce (AR)",
         "admin.settings.whatsapp_number": "Numéro WhatsApp",
-        "admin.settings.contact_phone": "Téléphone de contact",
-        "admin.settings.admin_security": "Sécurité admin",
+        "admin.settings.promo_code": "Code promo",
+
+        // System
         "admin.settings.admin_pin": "Code PIN admin",
-        "admin.settings.admin_pin_desc": "utilisé pour la vérification d'accès au tableau de bord",
-        "admin.settings.system_notifications": "Notifications système",
-        "admin.settings.push_notifications": "Notifications push mobile",
-        "admin.settings.push_notifications_desc": "Recevez des alertes en temps réel pour les nouvelles commandes sur votre appareil mobile.",
-        "admin.settings.device_status": "État de l'appareil",
-        "admin.settings.device_status_desc": "Abonnez votre téléphone/PC actuel pour recevoir des alertes.",
-        "admin.settings.subscribe_device": "Abonner l'appareil",
-        "admin.settings.test_notification": "Envoyer une notification test",
-        "admin.settings.mobile_requirements": "Exigences mobiles",
-        "admin.settings.android_info": "Android: Fonctionne dans Chrome moderne.",
-        "admin.settings.ios_info": "iOS (iPhone): Vous DEVEZ d'abord \"Ajouter à l'écran d'accueil\".",
-        "admin.settings.device_specific": "Les abonnements sont spécifiques à l'appareil; vous devez les activer sur chaque téléphone.",
-        "admin.settings.test_sent": "Envoyé à {count} appareil(s)",
-        "admin.settings.no_subscriptions": "Aucun abonnement actif trouvé pour ce magasin.",
-        "admin.settings.test_failed": "Échec de l'envoi de la notification test",
+        "admin.settings.maintenance_mode": "Mode maintenance",
+        "admin.settings.session_timeout": "Délai de session (min)",
 
 
         // Checkout
@@ -770,6 +818,34 @@ const translations = {
         "admin.nav.settings": "الإعدادات",
         "admin.nav.logout": "تسجيل الخروج",
 
+        // Admin Analytics
+        "admin.analytics.title": "التحليلات",
+        "admin.analytics.subtitle": "إحصائيات المبيعات والأداء",
+        "admin.analytics.total_revenue": "إجمالي الإيرادات",
+        "admin.analytics.pos_revenue": "إيرادات نقاط البيع",
+        "admin.analytics.ecommerce_revenue": "إيرادات التجارة الإلكترونية",
+        "admin.analytics.pos_orders": "طلبات نقاط البيع",
+        "admin.analytics.ecommerce_orders": "طلبات التجارة الإلكترونية",
+        "admin.analytics.top_products": "المنتجات الأكثر مبيعاً",
+        "admin.analytics.product_name": "المنتج",
+        "admin.analytics.total_sold": "إجمالي المبيعات",
+        "admin.analytics.revenue": "الإيرادات",
+        "admin.analytics.orders": "الطلبات",
+        "admin.analytics.date_range": "الفترة",
+        "admin.analytics.apply_filter": "تطبيق",
+        "admin.analytics.reset_filter": "إعادة تعيين",
+        "admin.analytics.all_time": "كل الوقت",
+        "admin.analytics.today": "اليوم",
+        "admin.analytics.yesterday": "أمس",
+        "admin.analytics.this_week": "هذا الأسبوع",
+        "admin.analytics.this_month": "هذا الشهر",
+        "admin.analytics.custom": "مخصص",
+        "admin.analytics.from": "من",
+        "admin.analytics.to": "إلى",
+        "admin.analytics.search_products": "البحث عن المنتجات...",
+        "admin.analytics.no_data": "لا توجد بيانات متاحة",
+        "admin.analytics.loading": "جاري تحميل البيانات...",
+
         // Admin Dashboard
         "admin.dashboard.title": "لوحة القيادة",
         "admin.dashboard.subtitle": "نظرة عامة مفصلة",
@@ -986,46 +1062,66 @@ const translations = {
         "admin.order.payment_label": "الدفع",
 
         // Admin Settings
-        "admin.settings.title": "إعدادات المتجر",
-        "admin.settings.subtitle": "إدارة معلومات المتجر والنصوص الترويجية وإعدادات النظام.",
+        "admin.settings.title": "الإعدادات",
+        "admin.settings.subtitle": "إدارة جميع جوانب متجرك",
+
+        // Tabs
+        "admin.settings.tab_store": "المتجر",
+        "admin.settings.tab_shipping": "الشحن",
+        "admin.settings.tab_payment": "الدفع",
+        "admin.settings.tab_notifications": "الإشعارات",
+        "admin.settings.tab_product": "المنتجات",
+        "admin.settings.tab_marketing": "التسويق",
+        "admin.settings.tab_system": "النظام",
+
+        // Actions
+        "admin.settings.save": "حفظ",
+        "admin.settings.saving": "جاري الحفظ...",
+        "admin.settings.saved": "تم حفظ الإعدادات",
+        "admin.settings.save_failed": "فشل الحفظ",
         "admin.settings.reset": "إعادة تعيين",
-        "admin.settings.save": "حفظ التغييرات",
-        "admin.settings.saved": "تم حفظ الإعدادات بنجاح",
-        "admin.settings.save_failed": "فشل حفظ الإعدادات",
-        "admin.settings.store_info": "معلومات المتجر",
+
+        // Store Info
         "admin.settings.store_name": "اسم المتجر",
-        "admin.settings.store_name_placeholder": "أدخل اسم المتجر",
-        "admin.settings.support_email": "بريد الدعم",
-        "admin.settings.support_email_placeholder": "support@example.com",
+        "admin.settings.store_name_ar": "اسم المتجر (AR)",
+        "admin.settings.store_description": "الوصف",
+        "admin.settings.store_description_ar": "الوصف (AR)",
+        "admin.settings.contact_email": "البريد الإلكتروني",
+        "admin.settings.contact_phone": "الهاتف",
+        "admin.settings.store_address": "العنوان",
+
+        // Shipping
+        "admin.settings.default_shipping": "تكلفة الشحن",
+        "admin.settings.free_shipping_threshold": "حد الشحن المجاني",
+        "admin.settings.delivery_time": "وقت التسليم",
+        "admin.settings.shipping_zones": "مناطق الشحن",
+
+        // Payment
+        "admin.settings.cod_enabled": "الدفع عند الاستلام",
+        "admin.settings.payment_instructions": "تعليمات الدفع",
+        "admin.settings.payment_instructions_ar": "التعليمات (AR)",
+
+        // Notifications
+        "admin.settings.admin_email": "بريد المسؤول",
+        "admin.settings.order_notifications": "إشعارات الطلبات",
+        "admin.settings.push_enabled": "الإشعارات الفورية",
+        "admin.settings.test_notification": "اختبار",
+
+        // Product
         "admin.settings.currency": "العملة",
-        "admin.settings.promotions": "العروض والنصوص",
+        "admin.settings.tax_rate": "معدل الضريبة (%)",
+        "admin.settings.low_stock_threshold": "حد المخزون المنخفض",
+
+        // Marketing
         "admin.settings.announcement_bar": "شريط الإعلانات",
-        "admin.settings.announcement_bar_ar": "شريط الإعلانات (عربي)",
-        "admin.settings.promo_code": "كود الخصم",
-        "admin.settings.hero_title": "العنوان الرئيسي",
-        "admin.settings.hero_subtitle": "العنوان الفرعي",
-        "admin.settings.hero_title_ar": "العنوان الرئيسي (عربي)",
-        "admin.settings.hero_subtitle_ar": "العنوان الفرعي (عربي)",
-        "admin.settings.whatsapp_contact": "واتساب والتواصل",
+        "admin.settings.announcement_bar_ar": "شريط الإعلانات (AR)",
         "admin.settings.whatsapp_number": "رقم الواتساب",
-        "admin.settings.contact_phone": "هاتف التواصل",
-        "admin.settings.admin_security": "أمان المسؤول",
-        "admin.settings.admin_pin": "رمز PIN المسؤول",
-        "admin.settings.admin_pin_desc": "يستخدم للتحقق من الوصول للوحة التحكم",
-        "admin.settings.system_notifications": "إشعارات النظام",
-        "admin.settings.push_notifications": "إشعارات الهاتف",
-        "admin.settings.push_notifications_desc": "استلم تنبيهات فورية للطلبات الجديدة على جهازك.",
-        "admin.settings.device_status": "حالة الجهاز",
-        "admin.settings.device_status_desc": "اشترك بهاتفك/حاسوبك الحالي لاستلام التنبيهات.",
-        "admin.settings.subscribe_device": "اشتراك الجهاز",
-        "admin.settings.test_notification": "إرسال إشعار تجريبي",
-        "admin.settings.mobile_requirements": "متطلبات الهاتف",
-        "admin.settings.android_info": "أندرويد: يعمل في كروم الحديث.",
-        "admin.settings.ios_info": "iOS (آيفون): يجب \"إضافة إلى الشاشة الرئيسية\" أولاً.",
-        "admin.settings.device_specific": "الاشتراكات خاصة بكل جهاز؛ يجب تفعيلها على كل هاتف.",
-        "admin.settings.test_sent": "تم الإرسال إلى {count} جهاز",
-        "admin.settings.no_subscriptions": "لا توجد اشتراكات نشطة لهذا المتجر.",
-        "admin.settings.test_failed": "فشل إرسال الإشعار التجريبي",
+        "admin.settings.promo_code": "كود الخصم",
+
+        // System
+        "admin.settings.admin_pin": "رمز PIN",
+        "admin.settings.maintenance_mode": "وضع الصيانة",
+        "admin.settings.session_timeout": "مهلة الجلسة (دقيقة)",
 
         // Admin POS
         "admin.pos.title": "نقطة البيع (POS)",

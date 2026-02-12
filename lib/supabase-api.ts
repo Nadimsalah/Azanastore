@@ -689,29 +689,6 @@ export async function getRevenueAnalytics() {
     return Object.entries(revenueByDay).map(([name, revenue]) => ({ name, revenue }))
 }
 
-export async function getTopProducts(limit = 5) {
-    const { data: items } = await supabase
-        .from('order_items')
-        .select('product_title, quantity, subtotal')
-
-    if (!items) return []
-
-    // Group by product
-    const products: Record<string, { sales: number, revenue: number }> = {}
-    items.forEach(item => {
-        if (!products[item.product_title]) {
-            products[item.product_title] = { sales: 0, revenue: 0 }
-        }
-        products[item.product_title].sales += item.quantity
-        products[item.product_title].revenue += item.subtotal
-    })
-
-    return Object.entries(products)
-        .map(([name, stats]) => ({ name, ...stats }))
-        .sort((a, b) => b.sales - a.sales)
-        .slice(0, limit)
-}
-
 export async function getAdminSettings() {
     const { data, error } = await supabase
         .from('admin_settings')
@@ -1053,4 +1030,156 @@ export async function createProductVariant(variant: {
         return { success: false, error: error.message }
     }
     return { success: true, data }
+}
+
+// Analytics API
+export interface AnalyticsSummary {
+    totalRevenue: number
+    posRevenue: number
+    ecommerceRevenue: number
+    posOrders: number
+    ecommerceOrders: number
+}
+
+export interface TopProduct {
+    id: string
+    title: string
+    title_ar: string | null
+    images: string[]
+    totalSold: number
+    revenue: number
+    orderCount: number
+    category: string | null
+}
+
+export async function getAnalyticsSummary(startDate?: string, endDate?: string): Promise<AnalyticsSummary> {
+    try {
+        let query = supabase
+            .from('orders')
+            .select('total, source, status')
+            .neq('status', 'cancelled')
+
+        if (startDate) {
+            query = query.gte('created_at', startDate)
+        }
+        if (endDate) {
+            query = query.lte('created_at', endDate)
+        }
+
+        const { data: orders, error } = await query
+
+        if (error) throw error
+
+        const summary: AnalyticsSummary = {
+            totalRevenue: 0,
+            posRevenue: 0,
+            ecommerceRevenue: 0,
+            posOrders: 0,
+            ecommerceOrders: 0
+        }
+
+        orders?.forEach(order => {
+            summary.totalRevenue += order.total
+            if (order.source === 'pos') {
+                summary.posRevenue += order.total
+                summary.posOrders++
+            } else {
+                summary.ecommerceRevenue += order.total
+                summary.ecommerceOrders++
+            }
+        })
+
+        return summary
+    } catch (error) {
+        console.error('Error fetching analytics summary:', error)
+        return {
+            totalRevenue: 0,
+            posRevenue: 0,
+            ecommerceRevenue: 0,
+            posOrders: 0,
+            ecommerceOrders: 0
+        }
+    }
+}
+
+export async function getTopProducts(startDate?: string, endDate?: string, limit: number = 50): Promise<TopProduct[]> {
+    try {
+        let orderItemsQuery = supabase
+            .from('order_items')
+            .select(`
+                product_id,
+                product_title,
+                quantity,
+                subtotal,
+                order_id,
+                orders!inner(status, created_at)
+            `)
+            .neq('orders.status', 'cancelled')
+
+        if (startDate) {
+            orderItemsQuery = orderItemsQuery.gte('orders.created_at', startDate)
+        }
+        if (endDate) {
+            orderItemsQuery = orderItemsQuery.lte('orders.created_at', endDate)
+        }
+
+        const { data: orderItems, error: itemsError } = await orderItemsQuery
+
+        if (itemsError) throw itemsError
+
+        // Aggregate by product_id
+        const productMap = new Map<string, { totalSold: number; revenue: number; orderCount: number; orderIds: Set<string> }>()
+
+        orderItems?.forEach(item => {
+            if (!item.product_id) return
+
+            const existing = productMap.get(item.product_id) || {
+                totalSold: 0,
+                revenue: 0,
+                orderCount: 0,
+                orderIds: new Set<string>()
+            }
+
+            existing.totalSold += item.quantity
+            existing.revenue += item.subtotal
+            existing.orderIds.add(item.order_id)
+            existing.orderCount = existing.orderIds.size
+
+            productMap.set(item.product_id, existing)
+        })
+
+        // Fetch product details
+        const productIds = Array.from(productMap.keys())
+        if (productIds.length === 0) return []
+
+        const { data: products, error: productsError } = await supabase
+            .from('products')
+            .select('id, title, title_ar, images, category')
+            .in('id', productIds)
+
+        if (productsError) throw productsError
+
+        // Combine data
+        const topProducts: TopProduct[] = products?.map(product => {
+            const stats = productMap.get(product.id)!
+            return {
+                id: product.id,
+                title: product.title,
+                title_ar: product.title_ar,
+                images: product.images || [],
+                totalSold: stats.totalSold,
+                revenue: stats.revenue,
+                orderCount: stats.orderCount,
+                category: product.category
+            }
+        }) || []
+
+        // Sort by totalSold descending
+        topProducts.sort((a, b) => b.totalSold - a.totalSold)
+
+        return topProducts.slice(0, limit)
+    } catch (error) {
+        console.error('Error fetching top products:', error)
+        return []
+    }
 }

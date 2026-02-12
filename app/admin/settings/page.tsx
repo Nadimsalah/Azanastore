@@ -1,20 +1,34 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Save, Loader2, RotateCcw, Globe, Bell, Mail, Shield, Smartphone, Send } from "lucide-react"
-import { toast } from "sonner"
-import { getAdminSettings, updateAdminSettings } from "@/lib/supabase-api"
 import { AdminSidebar } from "@/components/admin/admin-sidebar"
 import { useLanguage } from "@/components/language-provider"
-import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
+import { getAdminSettings, updateAdminSettings } from "@/lib/supabase-api"
+import { toast } from "sonner"
+import {
+    Settings,
+    Store,
+    Truck,
+    CreditCard,
+    Bell,
+    Package,
+    Megaphone,
+    Shield,
+    Save,
+    Loader2
+} from "lucide-react"
+
+type TabType = "store" | "shipping" | "payment" | "notifications" | "product" | "marketing" | "system"
 
 export default function SettingsPage() {
+    const { t, language } = useLanguage()
+    const [activeTab, setActiveTab] = useState<TabType>("store")
     const [settings, setSettings] = useState<Record<string, string>>({})
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
-    const [testing, setTesting] = useState(false)
-    const { t } = useLanguage()
 
     useEffect(() => {
         loadSettings()
@@ -42,321 +56,355 @@ export default function SettingsPage() {
         setSettings(prev => ({ ...prev, [key]: value }))
     }
 
-    async function handleTestNotification() {
-        setTesting(true)
-        try {
-            const response = await fetch('/api/admin/push/notify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title: "Test Connection 📡",
-                    body: "System check: Your device is now connected to Azana alerts!",
-                    tag: 'test-push'
-                })
-            })
-            const data = await response.json()
-            if (data.sent > 0) {
-                toast.success(t('admin.settings.test_sent').replace('{count}', data.sent))
-            } else {
-                toast.error(t('admin.settings.no_subscriptions'))
-            }
-        } catch (error) {
-            toast.error(t('admin.settings.test_failed'))
-        } finally {
-            setTesting(false)
-        }
-    }
+    const tabs = [
+        { id: "store" as TabType, label: t('admin.settings.tab_store'), icon: Store },
+        { id: "shipping" as TabType, label: t('admin.settings.tab_shipping'), icon: Truck },
+        { id: "payment" as TabType, label: t('admin.settings.tab_payment'), icon: CreditCard },
+        { id: "notifications" as TabType, label: t('admin.settings.tab_notifications'), icon: Bell },
+        { id: "product" as TabType, label: t('admin.settings.tab_product'), icon: Package },
+        { id: "marketing" as TabType, label: t('admin.settings.tab_marketing'), icon: Megaphone },
+        { id: "system" as TabType, label: t('admin.settings.tab_system'), icon: Shield },
+    ]
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="flex items-center justify-center min-h-screen">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
         )
     }
 
     return (
-        <div className="flex min-h-screen bg-background">
+        <div className="min-h-screen bg-background relative overflow-hidden">
+            {/* Background gradients */}
+            <div className="fixed inset-0 pointer-events-none">
+                <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" />
+                <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[100px]" />
+            </div>
+
             <AdminSidebar />
 
-            <main className="flex-1 lg:ml-72 lg:rtl:ml-0 lg:rtl:mr-72 p-4 sm:p-8 transition-all duration-300">
-                <div className="max-w-4xl mx-auto space-y-8">
-                    {/* Header */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                                {t('admin.settings.title')}
-                            </h1>
-                            <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-                                {t('admin.settings.subtitle')}
-                            </p>
+            <main className="lg:pl-72 lg:rtl:pl-0 lg:rtl:pr-72 p-4 sm:p-6 lg:p-8 min-h-screen relative z-10 transition-all duration-300">
+                {/* Header */}
+                <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 sticky top-4 z-40 glass-strong p-4 rounded-3xl border border-white/5 shadow-lg shadow-black/5">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-full">
+                            <Settings className="w-5 h-5 text-primary" />
                         </div>
-                        <div className="flex items-center gap-3">
-                            <button
-                                onClick={loadSettings}
-                                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center justify-center gap-2 text-sm font-medium whitespace-nowrap"
-                            >
-                                <RotateCcw className="w-4 h-4" />
-                                {t('admin.settings.reset')}
-                            </button>
-                            <button
-                                onClick={handleSave}
-                                disabled={saving}
-                                className="px-6 py-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground transition-all flex items-center justify-center gap-2 text-sm font-semibold shadow-lg shadow-primary/20"
-                            >
-                                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                                {t('admin.settings.save')}
-                            </button>
+                        <div>
+                            <h1 className="text-xl font-bold text-foreground">{t('admin.settings.title')}</h1>
+                            <p className="text-xs text-muted-foreground">{t('admin.settings.subtitle')}</p>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Store Info Section */}
-                        <div className="bg-white/5 border border-white/5 rounded-3xl p-6 space-y-6">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                                    <Globe className="w-5 h-5 text-primary" />
-                                </div>
-                                <h2 className="text-lg font-bold">{t('admin.settings.store_info')}</h2>
-                            </div>
+                    <Button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="rounded-full"
+                    >
+                        {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                        {saving ? t('admin.settings.saving') : t('admin.settings.save')}
+                    </Button>
+                </header>
 
-                            <div className="space-y-4">
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.store_name')}</label>
-                                    <input
-                                        type="text"
+                {/* Tabs */}
+                <div className="glass-strong rounded-3xl overflow-hidden">
+                    <div className="flex overflow-x-auto border-b border-white/10 scrollbar-hide">
+                        {tabs.map((tab) => {
+                            const Icon = tab.icon
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex items-center gap-2 px-6 py-4 text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab.id
+                                            ? "text-primary border-b-2 border-primary bg-primary/5"
+                                            : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                                        }`}
+                                >
+                                    <Icon className="w-4 h-4" />
+                                    {tab.label}
+                                </button>
+                            )
+                        })}
+                    </div>
+
+                    <div className="p-6">
+                        {/* Store Tab */}
+                        {activeTab === "store" && (
+                            <div className="space-y-6 max-w-2xl">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.store_name')}</label>
+                                    <Input
                                         value={settings.store_name || ""}
                                         onChange={(e) => handleChange("store_name", e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30"
-                                        placeholder={t('admin.settings.store_name_placeholder')}
+                                        className="rounded-xl bg-white/5 border-white/10"
                                     />
                                 </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.support_email')}</label>
-                                    <input
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.store_name_ar')}</label>
+                                    <Input
+                                        value={settings.store_name_ar || ""}
+                                        onChange={(e) => handleChange("store_name_ar", e.target.value)}
+                                        className="rounded-xl bg-white/5 border-white/10 text-right"
+                                        dir="rtl"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.store_description')}</label>
+                                    <textarea
+                                        rows={3}
+                                        value={settings.store_description || ""}
+                                        onChange={(e) => handleChange("store_description", e.target.value)}
+                                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none transition-all text-sm resize-none"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.store_description_ar')}</label>
+                                    <textarea
+                                        rows={3}
+                                        value={settings.store_description_ar || ""}
+                                        onChange={(e) => handleChange("store_description_ar", e.target.value)}
+                                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none transition-all text-sm resize-none text-right"
+                                        dir="rtl"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.contact_email')}</label>
+                                    <Input
                                         type="email"
-                                        value={settings.support_email || ""}
-                                        onChange={(e) => handleChange("support_email", e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30"
-                                        placeholder={t('admin.settings.support_email_placeholder')}
+                                        value={settings.contact_email || ""}
+                                        onChange={(e) => handleChange("contact_email", e.target.value)}
+                                        className="rounded-xl bg-white/5 border-white/10"
                                     />
                                 </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.currency')}</label>
-                                    <input
-                                        type="text"
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.contact_phone')}</label>
+                                    <Input
+                                        type="tel"
+                                        value={settings.contact_phone || ""}
+                                        onChange={(e) => handleChange("contact_phone", e.target.value)}
+                                        className="rounded-xl bg-white/5 border-white/10"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.store_address')}</label>
+                                    <textarea
+                                        rows={2}
+                                        value={settings.store_address || ""}
+                                        onChange={(e) => handleChange("store_address", e.target.value)}
+                                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none transition-all text-sm resize-none"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Shipping Tab */}
+                        {activeTab === "shipping" && (
+                            <div className="space-y-6 max-w-2xl">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.default_shipping')}</label>
+                                    <Input
+                                        type="number"
+                                        value={settings.default_shipping || ""}
+                                        onChange={(e) => handleChange("default_shipping", e.target.value)}
+                                        className="rounded-xl bg-white/5 border-white/10"
+                                        placeholder="50"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.free_shipping_threshold')}</label>
+                                    <Input
+                                        type="number"
+                                        value={settings.free_shipping_threshold || ""}
+                                        onChange={(e) => handleChange("free_shipping_threshold", e.target.value)}
+                                        className="rounded-xl bg-white/5 border-white/10"
+                                        placeholder="500"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.delivery_time')}</label>
+                                    <Input
+                                        value={settings.delivery_time || ""}
+                                        onChange={(e) => handleChange("delivery_time", e.target.value)}
+                                        className="rounded-xl bg-white/5 border-white/10"
+                                        placeholder="2-5 business days"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Payment Tab */}
+                        {activeTab === "payment" && (
+                            <div className="space-y-6 max-w-2xl">
+                                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+                                    <label className="text-sm font-medium">{t('admin.settings.cod_enabled')}</label>
+                                    <Switch
+                                        checked={settings.cod_enabled === "true"}
+                                        onCheckedChange={(checked) => handleChange("cod_enabled", checked ? "true" : "false")}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.payment_instructions')}</label>
+                                    <textarea
+                                        rows={3}
+                                        value={settings.payment_instructions || ""}
+                                        onChange={(e) => handleChange("payment_instructions", e.target.value)}
+                                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none transition-all text-sm resize-none"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.payment_instructions_ar')}</label>
+                                    <textarea
+                                        rows={3}
+                                        value={settings.payment_instructions_ar || ""}
+                                        onChange={(e) => handleChange("payment_instructions_ar", e.target.value)}
+                                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none transition-all text-sm resize-none text-right"
+                                        dir="rtl"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Notifications Tab */}
+                        {activeTab === "notifications" && (
+                            <div className="space-y-6 max-w-2xl">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.admin_email')}</label>
+                                    <Input
+                                        type="email"
+                                        value={settings.admin_email || ""}
+                                        onChange={(e) => handleChange("admin_email", e.target.value)}
+                                        className="rounded-xl bg-white/5 border-white/10"
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+                                    <label className="text-sm font-medium">{t('admin.settings.order_notifications')}</label>
+                                    <Switch
+                                        checked={settings.order_notifications === "true"}
+                                        onCheckedChange={(checked) => handleChange("order_notifications", checked ? "true" : "false")}
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+                                    <label className="text-sm font-medium">{t('admin.settings.push_enabled')}</label>
+                                    <Switch
+                                        checked={settings.push_enabled === "true"}
+                                        onCheckedChange={(checked) => handleChange("push_enabled", checked ? "true" : "false")}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Product Tab */}
+                        {activeTab === "product" && (
+                            <div className="space-y-6 max-w-2xl">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.currency')}</label>
+                                    <Input
                                         value={settings.currency || ""}
                                         onChange={(e) => handleChange("currency", e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30"
+                                        className="rounded-xl bg-white/5 border-white/10"
                                         placeholder="MAD"
                                     />
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* Promotions Section */}
-                        <div className="bg-white/5 border border-white/5 rounded-3xl p-6 space-y-6">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center">
-                                    <Bell className="w-5 h-5 text-secondary" />
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.tax_rate')}</label>
+                                    <Input
+                                        type="number"
+                                        value={settings.tax_rate || ""}
+                                        onChange={(e) => handleChange("tax_rate", e.target.value)}
+                                        className="rounded-xl bg-white/5 border-white/10"
+                                        placeholder="0"
+                                    />
                                 </div>
-                                <h2 className="text-lg font-bold">{t('admin.settings.promotions')}</h2>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.low_stock_threshold')}</label>
+                                    <Input
+                                        type="number"
+                                        value={settings.low_stock_threshold || ""}
+                                        onChange={(e) => handleChange("low_stock_threshold", e.target.value)}
+                                        className="rounded-xl bg-white/5 border-white/10"
+                                        placeholder="10"
+                                    />
+                                </div>
                             </div>
+                        )}
 
-                            <div className="space-y-4">
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.announcement_bar')}</label>
+                        {/* Marketing Tab */}
+                        {activeTab === "marketing" && (
+                            <div className="space-y-6 max-w-2xl">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.announcement_bar')}</label>
                                     <textarea
-                                        rows={3}
+                                        rows={2}
                                         value={settings.announcement_bar || ""}
                                         onChange={(e) => handleChange("announcement_bar", e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm resize-none placeholder:text-muted-foreground/30"
-                                        placeholder="Free shipping on orders over MAD 500 | Use code ARGAN20 for 20% off"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none transition-all text-sm resize-none"
                                     />
                                 </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.announcement_bar_ar')}</label>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.announcement_bar_ar')}</label>
                                     <textarea
-                                        rows={3}
+                                        rows={2}
                                         value={settings.announcement_bar_ar || ""}
                                         onChange={(e) => handleChange("announcement_bar_ar", e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm resize-none placeholder:text-muted-foreground/30 text-right font-arabic"
-                                        placeholder="شحن مجاني للطلبات فوق 500 د.م | استخدم كود ARGAN20 لخصم 20%"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none transition-all text-sm resize-none text-right"
                                         dir="rtl"
                                     />
                                 </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.promo_code')}</label>
-                                    <input
-                                        type="text"
-                                        value={settings.promo_code || ""}
-                                        onChange={(e) => handleChange("promo_code", e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30"
-                                        placeholder="ARGAN20"
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.hero_title')}</label>
-                                    <input
-                                        type="text"
-                                        value={settings.hero_title || ""}
-                                        onChange={(e) => handleChange("hero_title", e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30"
-                                        placeholder="The Beauty of Morocco"
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.hero_subtitle')}</label>
-                                    <textarea
-                                        rows={2}
-                                        value={settings.hero_subtitle || ""}
-                                        onChange={(e) => handleChange("hero_subtitle", e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm resize-none placeholder:text-muted-foreground/30"
-                                        placeholder="Experience the magic of pure argan oil..."
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.hero_title_ar')}</label>
-                                    <input
-                                        type="text"
-                                        value={settings.hero_title_ar || ""}
-                                        onChange={(e) => handleChange("hero_title_ar", e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30 text-right font-arabic"
-                                        placeholder="سر الجمال المغربي"
-                                        dir="rtl"
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.hero_subtitle_ar')}</label>
-                                    <textarea
-                                        rows={2}
-                                        value={settings.hero_subtitle_ar || ""}
-                                        onChange={(e) => handleChange("hero_subtitle_ar", e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm resize-none placeholder:text-muted-foreground/30 text-right font-arabic"
-                                        placeholder="اكتشفي القوة التحويلية لزيت الأرغان النقي..."
-                                        dir="rtl"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Contact & WhatsApp Section */}
-                        <div className="bg-white/5 border border-white/5 rounded-3xl p-6 space-y-6">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
-                                    <Smartphone className="w-5 h-5 text-green-500" />
-                                </div>
-                                <h2 className="text-lg font-bold">{t('admin.settings.whatsapp_contact')}</h2>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.whatsapp_number')}</label>
-                                    <input
-                                        type="text"
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.whatsapp_number')}</label>
+                                    <Input
+                                        type="tel"
                                         value={settings.whatsapp_number || ""}
                                         onChange={(e) => handleChange("whatsapp_number", e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30"
-                                        placeholder="+201234567890"
+                                        className="rounded-xl bg-white/5 border-white/10"
+                                        placeholder="+212XXXXXXXXX"
                                     />
                                 </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.contact_phone')}</label>
-                                    <input
-                                        type="text"
-                                        value={settings.contact_phone || ""}
-                                        onChange={(e) => handleChange("contact_phone", e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30"
-                                        placeholder="+20 123 456 7890"
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.promo_code')}</label>
+                                    <Input
+                                        value={settings.promo_code || ""}
+                                        onChange={(e) => handleChange("promo_code", e.target.value)}
+                                        className="rounded-xl bg-white/5 border-white/10"
+                                        placeholder="WELCOME20"
                                     />
                                 </div>
                             </div>
-                        </div>
+                        )}
 
-                        {/* Security Section */}
-                        <div className="bg-white/5 border border-white/5 rounded-3xl p-6 space-y-6">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
-                                    <Shield className="w-5 h-5 text-red-500" />
-                                </div>
-                                <h2 className="text-lg font-bold">{t('admin.settings.admin_security')}</h2>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.admin_pin')}</label>
-                                    <input
+                        {/* System Tab */}
+                        {activeTab === "system" && (
+                            <div className="space-y-6 max-w-2xl">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.admin_pin')}</label>
+                                    <Input
                                         type="password"
                                         value={settings.admin_pin || ""}
                                         onChange={(e) => handleChange("admin_pin", e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30"
+                                        className="rounded-xl bg-white/5 border-white/10"
                                         placeholder="••••••"
                                     />
-                                    <p className="text-[10px] text-muted-foreground mt-1 ml-1 rtl:ml-0 rtl:mr-1">{t('admin.settings.admin_pin_desc')}</p>
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* Notifications Section */}
-                        <div className="bg-white/5 border border-white/5 rounded-3xl p-6 space-y-6">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                                    <Bell className="w-5 h-5 text-primary" />
-                                </div>
-                                <h2 className="text-lg font-bold">{t('admin.settings.system_notifications')}</h2>
-                            </div>
-
-                            <div className="space-y-6">
-                                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] border border-white/5">
-                                    <div className="space-y-0.5">
-                                        <label className="text-sm font-semibold text-foreground">{t('admin.settings.push_notifications')}</label>
-                                        <p className="text-xs text-muted-foreground">{t('admin.settings.push_notifications_desc')}</p>
-                                    </div>
+                                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+                                    <label className="text-sm font-medium">{t('admin.settings.maintenance_mode')}</label>
                                     <Switch
-                                        checked={settings.push_notifications_enabled === "true"}
-                                        onCheckedChange={(checked) => handleChange("push_notifications_enabled", checked ? "true" : "false")}
+                                        checked={settings.maintenance_mode === "true"}
+                                        onCheckedChange={(checked) => handleChange("maintenance_mode", checked ? "true" : "false")}
                                     />
                                 </div>
-
-                                <div className="space-y-3 p-4 rounded-xl bg-white/[0.03] border border-white/5">
-                                    <div className="flex items-center justify-between">
-                                        <div className="space-y-0.5">
-                                            <p className="text-sm font-semibold text-foreground">{t('admin.settings.device_status')}</p>
-                                            <p className="text-[10px] text-muted-foreground">{t('admin.settings.device_status_desc')}</p>
-                                        </div>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            className="h-8 rounded-lg text-[10px] border-white/10 hover:bg-white/5"
-                                            onClick={() => window.dispatchEvent(new CustomEvent('show-push-prompt'))}
-                                        >
-                                            {t('admin.settings.subscribe_device')}
-                                        </Button>
-                                    </div>
-                                    <Button
-                                        variant="secondary"
-                                        size="sm"
-                                        className="w-full h-8 rounded-lg text-[10px] bg-primary/10 hover:bg-primary/20 text-primary border-none"
-                                        onClick={handleTestNotification}
-                                        disabled={testing}
-                                    >
-                                        {testing ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <Send className="w-3 h-3 mr-2" />}
-                                        {t('admin.settings.test_notification')}
-                                    </Button>
-                                </div>
-
-                                <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                                    <h4 className="text-[10px] font-bold text-blue-500 mb-1 flex items-center gap-1">
-                                        <Shield className="w-3 h-3" /> {t('admin.settings.mobile_requirements')}
-                                    </h4>
-                                    <ul className="text-[9px] text-blue-400/80 list-disc list-inside space-y-1 leading-normal">
-                                        <li>{t('admin.settings.android_info')}</li>
-                                        <li>{t('admin.settings.ios_info')}</li>
-                                        <li>{t('admin.settings.device_specific')}</li>
-                                    </ul>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('admin.settings.session_timeout')}</label>
+                                    <Input
+                                        type="number"
+                                        value={settings.session_timeout || ""}
+                                        onChange={(e) => handleChange("session_timeout", e.target.value)}
+                                        className="rounded-xl bg-white/5 border-white/10"
+                                        placeholder="30"
+                                    />
                                 </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </main>

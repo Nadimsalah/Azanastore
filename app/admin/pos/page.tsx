@@ -299,11 +299,13 @@ export default function POSPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" className="rounded-xl h-10 w-10 text-gray-400 hover:text-primary hover:bg-primary/5" onClick={() => setIsScannerOpen(true)}>
-                            <Barcode className="w-5 h-5" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="rounded-xl h-10 w-10 text-gray-400">
-                            <Settings className="w-5 h-5" />
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-2xl h-14 w-14 bg-primary/10 text-primary hover:bg-primary/20 hover:scale-105 transition-all shadow-sm border border-primary/20"
+                            onClick={() => setIsScannerOpen(true)}
+                        >
+                            <Barcode className="w-8 h-8" />
                         </Button>
                     </div>
                 </header>

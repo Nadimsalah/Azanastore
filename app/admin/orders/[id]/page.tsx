@@ -306,20 +306,22 @@ export default function OrderDetailsPage() {
                             <div className="glass-strong rounded-3xl p-6 border-l-4 border-primary">
                                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">{t('admin.order.update_status')}</h3>
                                 <div className="space-y-3">
-                                    {["Pending", "Processing", "Shipped", "Delivered", "Sale", "Cancelled"].map((s) => (
-                                        <button
-                                            key={s}
-                                            disabled={updating}
-                                            onClick={() => handleStatusChange(s)}
-                                            className={`w-full text-left rtl:text-right px-4 py-3 rounded-xl transition-all flex items-center justify-between ${order.status === s.toLowerCase()
-                                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                                                : "hover:bg-white/5 text-foreground"
-                                                } ${updating ? "opacity-50 cursor-not-allowed" : ""}`}
-                                        >
-                                            <span className="font-medium">{t(`status.${s.toLowerCase()}`)}</span>
-                                            {order.status === s.toLowerCase() && <CheckCircle2 className="w-4 h-4" />}
-                                        </button>
-                                    ))}
+                                    {["Pending", "Processing", "Shipped", "Delivered", "Sale", "Cancelled"]
+                                        .filter(s => s !== "Sale" || order.source === 'pos')
+                                        .map((s) => (
+                                            <button
+                                                key={s}
+                                                disabled={updating}
+                                                onClick={() => handleStatusChange(s)}
+                                                className={`w-full text-left rtl:text-right px-4 py-3 rounded-xl transition-all flex items-center justify-between ${order.status === s.toLowerCase()
+                                                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                                                    : "hover:bg-white/5 text-foreground"
+                                                    } ${updating ? "opacity-50 cursor-not-allowed" : ""}`}
+                                            >
+                                                <span className="font-medium">{t(`status.${s.toLowerCase()}`)}</span>
+                                                {order.status === s.toLowerCase() && <CheckCircle2 className="w-4 h-4" />}
+                                            </button>
+                                        ))}
                                 </div>
                             </div>
                         )}
