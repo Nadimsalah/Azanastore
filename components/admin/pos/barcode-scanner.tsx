@@ -53,6 +53,12 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
 
         const startScanner = async () => {
             try {
+                // Check for Secure Context (HTTPS or localhost)
+                if (!window.isSecureContext) {
+                    setError("Camera access requires HTTPS or localhost. Please check your connection security.");
+                    return;
+                }
+
                 // Check permissions first
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -88,11 +94,13 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                     { facingMode: "environment" }, // Prefer back camera
                     config,
                     (decodedText: string) => {
-                        if (!isPaused) {
-                            onScan(decodedText)
-                            setLastScanned(decodedText)
-                            setIsPaused(true)
-                            if (navigator.vibrate) navigator.vibrate(200)
+                        // Check lock to prevent double-scanning in the same frame
+                        if (scannerRef.current?.getState() === 2) { // 2 = SCANNING
+                            scannerRef.current.pause(true); // Pause scanning, keep feed
+                            onScan(decodedText);
+                            setLastScanned(decodedText);
+                            setIsPaused(true);
+                            if (navigator.vibrate) navigator.vibrate(200);
                         }
                     },
                     () => { /* Ignore frame failures */ }
@@ -107,6 +115,27 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                     errorMessage = "No camera found on this device.";
                 } else if (err?.name === "NotReadableError") {
                     errorMessage = "Camera is already in use by another app.";
+                } else if (err?.name === "OverconstrainedError") {
+                    // Fallback to any camera if environment facing mode fails
+                    try {
+                        await scannerRef.current.start(
+                            true, // Use default camera
+                            config,
+                            (decodedText: string) => {
+                                if (scannerRef.current?.getState() === 2) {
+                                    scannerRef.current.pause(true);
+                                    onScan(decodedText);
+                                    setLastScanned(decodedText);
+                                    setIsPaused(true);
+                                    if (navigator.vibrate) navigator.vibrate(200);
+                                }
+                            },
+                            () => { }
+                        );
+                        return; // Success on fallback
+                    } catch (fallbackErr) {
+                        errorMessage = "Could not start any camera.";
+                    }
                 }
                 setError(errorMessage);
             }
