@@ -27,19 +27,34 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
     const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null)
     const scannerRef = useRef<any>(null)
     const scannerRegionId = "html5qr-code-full-region"
+    const [logs, setLogs] = useState<string[]>([])
+
+    const addLog = (msg: string) => {
+        console.log(msg)
+        setLogs(prev => [...prev.slice(-4), `${new Date().toLocaleTimeString()}: ${msg}`])
+    }
 
     // Load scanner library
     useEffect(() => {
         if (window.Html5Qrcode) {
             setIsLibraryLoaded(true);
+            addLog("Library already loaded");
             return;
         }
 
+        addLog("Loading library from CDN...");
         const script = document.createElement("script");
         script.src = "https://unpkg.com/html5-qrcode";
         script.async = true;
-        script.onload = () => setIsLibraryLoaded(true);
-        script.onerror = () => setError("Failed to load scanner library. Please check internet connection.");
+        script.onload = () => {
+            setIsLibraryLoaded(true);
+            addLog("Library loaded successfully");
+        };
+        script.onerror = () => {
+            const err = "Failed to load library";
+            setError(err);
+            addLog(err);
+        };
         document.body.appendChild(script);
 
         return () => {
@@ -47,116 +62,130 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
         }
     }, []);
 
-    // Initialize Scanner
-    useEffect(() => {
+    const startScanner = async () => {
         if (!isLibraryLoaded || !window.Html5Qrcode) return;
 
-        const startScanner = async () => {
+        // Reset state
+        setError(null);
+        addLog("Starting scanner initialization...");
+
+        try {
+            // Check for Secure Context (HTTPS or localhost)
+            if (!window.isSecureContext) {
+                const err = "Detected Insecure Context (HTTP). Camera likely blocked.";
+                addLog(err);
+                setError(err);
+                return;
+            }
+
+            // Check permissions first
+            addLog("Requesting camera permissions...");
             try {
-                // Check for Secure Context (HTTPS or localhost)
-                if (!window.isSecureContext) {
-                    setError("Camera access requires HTTPS or localhost. Please check your connection security.");
-                    return;
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                stream.getTracks().forEach(track => track.stop());
+                setHasCameraPermission(true);
+                addLog("Camera permission granted.");
+            } catch (err: any) {
+                const msg = `Permission denied: ${err.message || err.name}`;
+                console.error(msg, err);
+                setHasCameraPermission(false);
+                setError("Camera permission denied.");
+                addLog(msg);
+                return;
+            }
+
+            if (!scannerRef.current) {
+                scannerRef.current = new window.Html5Qrcode(scannerRegionId);
+                addLog("Scanner instance created.");
+            }
+
+            const config = {
+                fps: 10,
+                qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
+                    const minEdgePercentage = 0.70;
+                    const minSize = Math.min(viewfinderWidth, viewfinderHeight);
+                    const boxSize = Math.floor(minSize * minEdgePercentage);
+                    return {
+                        width: boxSize,
+                        height: Math.floor(boxSize * 0.6)
+                    };
+                },
+                aspectRatio: 1.0
+            };
+
+            const onScanSuccess = (decodedText: string) => {
+                if (scannerRef.current?.getState() === 2) {
+                    scannerRef.current.pause(true);
+                    onScan(decodedText);
+                    setLastScanned(decodedText);
+                    setIsPaused(true);
+                    if (navigator.vibrate) navigator.vibrate(200);
+                    addLog(`Scanned: ${decodedText}`);
                 }
+            };
 
-                // Check permissions first
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                    stream.getTracks().forEach(track => track.stop()); // Stop immediately, just checking
-                    setHasCameraPermission(true);
-                } catch (err) {
-                    console.error("Permission check failed:", err);
-                    setHasCameraPermission(false);
-                    setError("Camera permission denied. Please allow camera access in your browser settings.");
-                    return;
-                }
-
-                if (!scannerRef.current) {
-                    scannerRef.current = new window.Html5Qrcode(scannerRegionId);
-                }
-
-                const config = {
-                    fps: 10,
-                    qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
-                        // Responsive box size
-                        const minEdgePercentage = 0.70; // 70%
-                        const minSize = Math.min(viewfinderWidth, viewfinderHeight);
-                        const boxSize = Math.floor(minSize * minEdgePercentage);
-                        return {
-                            width: boxSize,
-                            height: Math.floor(boxSize * 0.6) // Rectangular for barcodes
-                        };
-                    },
-                    aspectRatio: 1.0
-                };
-
+            addLog("Starting camera stream (Environment)...");
+            try {
                 await scannerRef.current.start(
-                    { facingMode: "environment" }, // Prefer back camera
+                    { facingMode: "environment" },
                     config,
-                    (decodedText: string) => {
-                        // Check lock to prevent double-scanning in the same frame
-                        if (scannerRef.current?.getState() === 2) { // 2 = SCANNING
-                            scannerRef.current.pause(true); // Pause scanning, keep feed
-                            onScan(decodedText);
-                            setLastScanned(decodedText);
-                            setIsPaused(true);
-                            if (navigator.vibrate) navigator.vibrate(200);
-                        }
-                    },
+                    onScanSuccess,
                     () => { /* Ignore frame failures */ }
                 );
-
-            } catch (err: any) {
-                console.error("Scanner start error:", err);
-                let errorMessage = "Failed to start camera.";
-                if (err?.name === "NotAllowedError" || err?.name === "PermissionDeniedError") {
-                    errorMessage = "Camera permission denied.";
-                } else if (err?.name === "NotFoundError") {
-                    errorMessage = "No camera found on this device.";
-                } else if (err?.name === "NotReadableError") {
-                    errorMessage = "Camera is already in use by another app.";
-                } else if (err?.name === "OverconstrainedError") {
-                    // Fallback to any camera if environment facing mode fails
-                    try {
-                        await scannerRef.current.start(
-                            true, // Use default camera
-                            config,
-                            (decodedText: string) => {
-                                if (scannerRef.current?.getState() === 2) {
-                                    scannerRef.current.pause(true);
-                                    onScan(decodedText);
-                                    setLastScanned(decodedText);
-                                    setIsPaused(true);
-                                    if (navigator.vibrate) navigator.vibrate(200);
-                                }
-                            },
-                            () => { }
-                        );
-                        return; // Success on fallback
-                    } catch (fallbackErr) {
-                        errorMessage = "Could not start any camera.";
-                    }
-                }
-                setError(errorMessage);
+                addLog("Camera started via Environment Mode.");
+            } catch (envErr: any) {
+                addLog(`Env camera failed: ${envErr.name}. Trying fallback...`);
+                // Fallback
+                await scannerRef.current.start(
+                    true, // Default camera
+                    config,
+                    onScanSuccess,
+                    () => { }
+                );
+                addLog("Camera started via Fallback Mode.");
             }
-        };
 
-        // Small delay to ensure DOM is ready
-        const timer = setTimeout(startScanner, 100);
+        } catch (err: any) {
+            console.error("Scanner fatal error:", err);
+            let errorMessage = "Failed to start camera.";
+            addLog(`Fatal Error: ${err.message || err.name}`);
 
-        return () => {
-            clearTimeout(timer);
-            if (scannerRef.current && scannerRef.current.isScanning) {
-                scannerRef.current.stop().catch((e: any) => console.error("Create stop error:", e));
+            if (err?.name === "NotAllowedError" || err?.name === "PermissionDeniedError") {
+                errorMessage = "Camera permission denied.";
+            } else if (err?.name === "NotFoundError") {
+                errorMessage = "No camera found on this device.";
+            } else if (err?.name === "NotReadableError") {
+                errorMessage = "Camera is already in use.";
             }
-        };
+            setError(errorMessage);
+        }
+    };
+
+    // Auto-start on load
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (isLibraryLoaded && !scannerRef.current?.isScanning) {
+                startScanner();
+            }
+        }, 500);
+        return () => clearTimeout(timer);
     }, [isLibraryLoaded, onScan]);
+
+    // Cleanup
+    useEffect(() => {
+        return () => {
+            if (scannerRef.current && scannerRef.current.isScanning) {
+                scannerRef.current.stop().catch((e: any) => console.error("Stop error:", e));
+            }
+        }
+    }, []);
 
     const handleResume = () => {
         setIsPaused(false);
         setLastScanned(null);
         if (scannerRef.current) {
             scannerRef.current.resume();
+            addLog("Resumed scanning.");
         }
     };
 
@@ -171,7 +200,7 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                     <div>
                         <h2 className="font-bold text-lg leading-tight">{t("admin.pos.scanner")}</h2>
                         <p className="text-[10px] text-white/60 uppercase tracking-wider">
-                            {isLibraryLoaded ? "Ready" : "Loading..."}
+                            {isLibraryLoaded ? "System Ready" : "Initializing..."}
                         </p>
                     </div>
                 </div>
@@ -192,27 +221,35 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
                 <div className="relative w-full h-full bg-black rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10">
                     <div id={scannerRegionId} className="w-full h-full object-cover" />
 
-                    {/* Loading State */}
-                    {!isLibraryLoaded && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-black z-20">
-                            <RefreshCw className="w-10 h-10 animate-spin mb-4 text-primary" />
-                            <p className="text-sm font-medium opacity-70">Starting Camera...</p>
+                    {/* Loading/Error State Overlay */}
+                    {(!isLibraryLoaded || error) && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-black/90 z-20 p-6 text-center">
+                            {error ? (
+                                <>
+                                    <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+                                    <h3 className="text-xl font-bold mb-2">Scanner Error</h3>
+                                    <p className="text-white/60 mb-6 max-w-xs">{error}</p>
+                                    <Button onClick={() => startScanner()} className="mb-4">
+                                        Retry Camera
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <RefreshCw className="w-10 h-10 animate-spin mb-4 text-primary" />
+                                    <p>Loading Component...</p>
+                                </>
+                            )}
                         </div>
                     )}
 
-                    {/* Error State */}
-                    {error && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-black/90 z-30 p-8 text-center">
-                            <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mb-6">
-                                <AlertCircle className="w-8 h-8 text-red-500" />
-                            </div>
-                            <h3 className="text-xl font-bold mb-2">Camera Error</h3>
-                            <p className="text-white/60 mb-8">{error}</p>
-                            <Button onClick={onClose} variant="secondary" className="rounded-full px-8">
-                                Close Scanner
-                            </Button>
+                    {/* Debug Console (Bottom Left) */}
+                    <div className="absolute bottom-4 left-4 z-50 pointer-events-none opacity-50">
+                        <div className="bg-black/50 p-2 rounded text-[10px] font-mono text-green-400 max-w-[200px] overflow-hidden">
+                            {logs.map((log, i) => (
+                                <div key={i} className="truncate">{log}</div>
+                            ))}
                         </div>
-                    )}
+                    </div>
 
                     {/* Success Overlay */}
                     <AnimatePresence>
