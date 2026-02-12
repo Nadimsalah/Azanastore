@@ -5,7 +5,8 @@ import { X, RefreshCw, AlertCircle, CheckCircle2, Video } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
 import { useLanguage } from "@/components/language-provider"
-import { BrowserMultiFormatReader, VideoInputDevice } from "@zxing/browser"
+import { BrowserMultiFormatReader, IScannerControls } from "@zxing/browser"
+import { DecodeHintType, BarcodeFormat } from "@zxing/library"
 
 interface BarcodeScannerProps {
     onScan: (barcode: string) => void
@@ -18,8 +19,8 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
     const [isScanning, setIsScanning] = useState(true) // Controls the "Scan Next" flow
     const [isInitializing, setIsInitializing] = useState(true)
     const [error, setError] = useState<string | null>(null)
-    const [availableCameras, setAvailableCameras] = useState<VideoInputDevice[]>([])
-    const [activeCameraId, setActiveCameraId] = useState<string | null>(null)
+    const [availableCameras, setAvailableCameras] = useState<MediaDeviceInfo[]>([])
+    const [activeCameraId, setActiveCameraId] = useState<string | undefined>(undefined)
 
     const videoRef = useRef<HTMLVideoElement>(null)
     const codeReaderRef = useRef<BrowserMultiFormatReader | null>(null)
@@ -30,7 +31,29 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
         let mounted = true;
         const init = async () => {
             try {
-                const reader = new BrowserMultiFormatReader();
+                // Initialize with ALL formats and TRY_HARDER for better detection
+                const hints = new Map();
+                const formats = [
+                    BarcodeFormat.EAN_13,
+                    BarcodeFormat.EAN_8,
+                    BarcodeFormat.UPC_A,
+                    BarcodeFormat.UPC_E,
+                    BarcodeFormat.UPC_EAN_EXTENSION,
+                    BarcodeFormat.CODE_128,
+                    BarcodeFormat.CODE_39,
+                    BarcodeFormat.CODE_93,
+                    BarcodeFormat.CODABAR,
+                    BarcodeFormat.ITF,
+                    BarcodeFormat.QR_CODE,
+                    BarcodeFormat.DATA_MATRIX,
+                    BarcodeFormat.AZTEC,
+                    BarcodeFormat.PDF_417
+                ];
+                hints.set(DecodeHintType.POSSIBLE_FORMATS, formats);
+                hints.set(DecodeHintType.TRY_HARDER, true);
+
+                // Cast hints to any to avoid version mismatch type errors between @zxing/browser and @zxing/library
+                const reader = new BrowserMultiFormatReader(hints as any);
                 codeReaderRef.current = reader;
 
                 // 0. Explicitly Request Permission First
