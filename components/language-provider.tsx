@@ -226,6 +226,13 @@ const translations = {
         "admin.dashboard.title": "Tableau de bord",
         "admin.dashboard.subtitle": "Vue d'ensemble détaillée",
         "admin.dashboard.search": "Rechercher...",
+        "admin.dashboard.search_placeholder": "Rechercher produits, commandes, clients...",
+        "admin.dashboard.search_results": "Résultats de recherche",
+        "admin.dashboard.no_results": "Aucun résultat trouvé",
+        "admin.dashboard.products_found": "Produits",
+        "admin.dashboard.orders_found": "Commandes",
+        "admin.dashboard.customers_found": "Clients",
+        "admin.dashboard.view_details": "Voir détails",
 
         // Admin Login
         "admin.login.title": "Accès Admin",
@@ -850,6 +857,13 @@ const translations = {
         "admin.dashboard.title": "لوحة القيادة",
         "admin.dashboard.subtitle": "نظرة عامة مفصلة",
         "admin.dashboard.search": "بحث...",
+        "admin.dashboard.search_placeholder": "البحث عن منتجات، طلبات، عملاء...",
+        "admin.dashboard.search_results": "نتائج البحث",
+        "admin.dashboard.no_results": "لا توجد نتائج",
+        "admin.dashboard.products_found": "المنتجات",
+        "admin.dashboard.orders_found": "الطلبات",
+        "admin.dashboard.customers_found": "العملاء",
+        "admin.dashboard.view_details": "عرض التفاصيل",
 
         // Admin Login
         "admin.login.title": "دخول المسؤول",

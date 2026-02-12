@@ -1183,3 +1183,53 @@ export async function getTopProducts(startDate?: string, endDate?: string, limit
         return []
     }
 }
+
+// Global Search
+export interface GlobalSearchResults {
+    products: Product[]
+    orders: Order[]
+    customers: Customer[]
+}
+
+export async function globalSearch(query: string): Promise<GlobalSearchResults> {
+    if (!query || query.trim().length < 2) {
+        return { products: [], orders: [], customers: [] }
+    }
+
+    const searchTerm = query.trim().toLowerCase()
+
+    try {
+        // Search products (by title, title_ar, SKU)
+        const { data: products } = await supabase
+            .from('products')
+            .select('*')
+            .or(`title.ilike.%${searchTerm}%,title_ar.ilike.%${searchTerm}%,sku.ilike.%${searchTerm}%`)
+            .eq('status', 'active')
+            .limit(5)
+
+        // Search orders (by order_number, customer_name, customer_email)
+        const { data: orders } = await supabase
+            .from('orders')
+            .select('*')
+            .or(`order_number.ilike.%${searchTerm}%,customer_name.ilike.%${searchTerm}%,customer_email.ilike.%${searchTerm}%`)
+            .order('created_at', { ascending: false })
+            .limit(5)
+
+        // Search customers (by name, email, phone)
+        const { data: customers } = await supabase
+            .from('customers')
+            .select('*')
+            .or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%`)
+            .order('created_at', { ascending: false })
+            .limit(5)
+
+        return {
+            products: products || [],
+            orders: orders || [],
+            customers: customers || []
+        }
+    } catch (error) {
+        console.error('Error in global search:', error)
+        return { products: [], orders: [], customers: [] }
+    }
+}
