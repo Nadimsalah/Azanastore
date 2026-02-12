@@ -37,10 +37,6 @@ export function AdminSidebar() {
         { icon: Users, label: t('admin.nav.customers'), href: "/admin/customers" },
         { icon: BarChart3, label: t('admin.nav.analytics'), href: "/admin/analytics" },
         { icon: ImageIcon, label: t('admin.nav.carousel'), href: "/admin/hero-carousel" },
-        // CRM / Marketing
-        { icon: MessageCircle, label: t('admin.nav.whatsapp'), href: "/admin/whatsapp" },
-        { icon: Phone, label: t('admin.nav.contacts'), href: "/admin/contacts" },
-        { icon: Briefcase, label: t('admin.nav.careers'), href: "/admin/careers" },
         { icon: Settings, label: t('admin.nav.settings'), href: "/admin/settings" },
     ]
 

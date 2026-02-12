@@ -200,14 +200,24 @@ function HeroCarousel({ products }: { products: Product[] }) {
       }
 
       if (items && items.length > 0) {
-        // Use database items
-        setCarouselItems(items.map(item => ({
-          image: item.image_url,
-          title: item.title,
-          subtitle: item.subtitle || '',
-          link: item.link
-        })))
-      } else {
+        // Use database items - only show slides with images
+        const itemsWithImages = items.filter(item => item.image_url && item.image_url.trim() !== '')
+
+        if (itemsWithImages.length > 0) {
+          setCarouselItems(itemsWithImages.map(item => ({
+            image: item.image_url,
+            title: item.title,
+            subtitle: item.subtitle || '',
+            link: item.link
+          })))
+          setLoading(false)
+          return
+        }
+        // If no items with images, fall through to default fallback below
+      }
+
+      // Fallback to default showcase items
+      {
         // Fallback to default showcase items
         if (language === 'ar') {
           setCarouselItems([
@@ -294,7 +304,7 @@ function HeroCarousel({ products }: { products: Product[] }) {
 export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [showBackToTop, setShowBackToTop] = useState(false)
-  const [visibleProducts, setVisibleProducts] = useState(4)
+  const [visibleProducts, setVisibleProducts] = useState(8)
   const [selectedCategory, setSelectedCategory] = useState("All")
   const { t, language, toggleLanguage, dir } = useLanguage()
 

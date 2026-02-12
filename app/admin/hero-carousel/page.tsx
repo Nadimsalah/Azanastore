@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { Upload, Save, RotateCcw, Loader2, Image as ImageIcon, GripVertical, Link as LinkIcon, Type } from "lucide-react"
+import { Upload, Save, RotateCcw, Loader2, Image as ImageIcon, Plus, Trash2, CheckCircle2, XCircle, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 import {
     getHeroCarouselItems,
@@ -13,13 +13,18 @@ import {
     type HeroCarouselItem
 } from "@/lib/supabase-api"
 import { supabase } from "@/lib/supabase"
-import { Plus, Trash2, CheckCircle2, XCircle } from "lucide-react"
 import { AdminSidebar } from "@/components/admin/admin-sidebar"
+import { useLanguage } from "@/components/language-provider"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 
 export default function HeroCarouselPage() {
+    const { t, language } = useLanguage()
     const [items, setItems] = useState<HeroCarouselItem[]>([])
     const [loading, setLoading] = useState(true)
-    const [saving, setSaving] = useState(false)
+    const [saving, setSaving] = useState<string | null>(null)
+    const [uploading, setUploading] = useState<string | null>(null)
+    const [deleting, setDeleting] = useState<string | null>(null)
     const [editingId, setEditingId] = useState<string | null>(null)
     const [products, setProducts] = useState<{ id: string, title: string }[]>([])
 
@@ -37,7 +42,7 @@ export default function HeroCarouselPage() {
 
     async function loadCarouselItems() {
         setLoading(true)
-        const data = await getHeroCarouselItems(true) // Pass true to get all items (active and inactive)
+        const data = await getHeroCarouselItems(true)
         setItems(data)
         setLoading(false)
     }
@@ -53,7 +58,8 @@ export default function HeroCarouselPage() {
             return
         }
 
-        const uploadToast = toast.loading('Uploading image...')
+        setUploading(itemId)
+        const uploadToast = toast.loading(t('admin.carousel.uploading'))
 
         const result = await uploadHeroCarouselImage(file, position)
 
@@ -69,25 +75,33 @@ export default function HeroCarouselPage() {
         } else {
             toast.error(result.error || 'Failed to upload image', { id: uploadToast })
         }
+        setUploading(null)
     }
 
     async function handleAddSlide() {
-        const nextPosition = items.length > 0 ? Math.max(...items.map(i => i.position)) + 1 : 1
         const addToast = toast.loading('Adding new slide...')
 
+        // Shift all existing slides down by 1 position
+        const updatePromises = items.map(item =>
+            updateHeroCarouselItem(item.id, { position: item.position + 1 })
+        )
+        await Promise.all(updatePromises)
+
+        // Create new slide at position 1
         const newItem = {
             title: 'New Slide',
             subtitle: 'Add a description',
-            image_url: '', // Empty initially, user will upload
-            position: nextPosition,
-            is_active: false // Inactive by default until image is uploaded
+            image_url: '',
+            position: 1,
+            is_active: true
         }
 
         const result = await addHeroCarouselItem(newItem)
 
         if (result.success && result.data) {
             toast.success('Slide added! Now upload an image.', { id: addToast })
-            setItems(prev => [...prev, result.data!])
+            // Reload all items to get updated positions
+            loadCarouselItems()
             setEditingId(result.data.id)
         } else {
             toast.error(result.error || 'Failed to add slide', { id: addToast })
@@ -97,7 +111,8 @@ export default function HeroCarouselPage() {
     async function handleDeleteSlide(id: string) {
         if (!confirm('Are you sure you want to delete this slide?')) return
 
-        const deleteToast = toast.loading('Deleting slide...')
+        setDeleting(id)
+        const deleteToast = toast.loading(t('admin.carousel.deleting'))
         const result = await deleteHeroCarouselItem(id)
 
         if (result.success) {
@@ -106,6 +121,7 @@ export default function HeroCarouselPage() {
         } else {
             toast.error(result.error || 'Failed to delete slide', { id: deleteToast })
         }
+        setDeleting(null)
     }
 
     async function handleToggleActive(item: HeroCarouselItem) {
@@ -127,7 +143,7 @@ export default function HeroCarouselPage() {
     }
 
     async function handleSaveItem(item: HeroCarouselItem) {
-        setSaving(true)
+        setSaving(item.id)
         const result = await updateHeroCarouselItem(item.id, {
             title: item.title,
             subtitle: item.subtitle,
@@ -140,18 +156,19 @@ export default function HeroCarouselPage() {
         } else {
             toast.error(result.error || 'Failed to save')
         }
-        setSaving(false)
+        setSaving(null)
     }
 
     function handleInputChange(id: string, field: 'title' | 'subtitle' | 'link', value: string) {
         setItems(prev => prev.map(item =>
             item.id === id ? { ...item, [field]: value } : item
         ))
+        if (editingId !== id) setEditingId(id)
     }
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="flex items-center justify-center min-h-screen">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
         )
@@ -159,72 +176,95 @@ export default function HeroCarouselPage() {
 
     return (
         <div className="min-h-screen bg-background relative overflow-hidden">
+            {/* Background gradients */}
+            <div className="fixed inset-0 pointer-events-none">
+                <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" />
+                <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[100px]" />
+            </div>
+
             <AdminSidebar />
+
             <main className="lg:pl-72 lg:rtl:pl-0 lg:rtl:pr-72 p-4 sm:p-6 lg:p-8 min-h-screen relative z-10 transition-all duration-300">
-                <div className="space-y-8 max-w-5xl mx-auto">
-                    {/* Header */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                                Hero Carousel
-                            </h1>
-                            <p className="text-muted-foreground mt-2 max-w-2xl text-sm leading-relaxed">
-                                Customize your homepage slider. High-quality images (16:9 or 4:3) work best.
-                                Link slides to products to drive sales.
-                            </p>
+                {/* Header */}
+                <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 sticky top-4 z-40 glass-strong p-4 rounded-3xl border border-white/5 shadow-lg shadow-black/5">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-full">
+                            <Sparkles className="w-5 h-5 text-primary" />
                         </div>
-                        <div className="flex items-center gap-3">
-                            <button
-                                onClick={handleAddSlide}
-                                className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground transition-all flex items-center justify-center gap-2 text-sm font-semibold shadow-lg shadow-primary/20"
-                            >
-                                <Plus className="w-4 h-4" />
-                                Add Slide
-                            </button>
-                            <button
-                                onClick={loadCarouselItems}
-                                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center justify-center gap-2 text-sm font-medium whitespace-nowrap"
-                            >
-                                <RotateCcw className="w-4 h-4" />
-                                Refresh
-                            </button>
+                        <div>
+                            <h1 className="text-xl font-bold text-foreground">{t('admin.carousel.title')}</h1>
+                            <p className="text-xs text-muted-foreground">{t('admin.carousel.subtitle')}</p>
                         </div>
                     </div>
 
-                    {/* List View */}
-                    <div className="space-y-4">
-                        {items.map((item) => (
-                            <div
-                                key={item.id}
-                                className="group relative bg-white/5 border border-white/5 rounded-3xl p-4 sm:p-6 transition-all duration-300 hover:bg-white/[0.07] hover:border-white/10"
-                            >
-                                <div className="flex flex-col md:flex-row gap-6 items-start">
+                    <div className="flex items-center gap-3">
+                        <Button
+                            onClick={loadCarouselItems}
+                            variant="outline"
+                            size="sm"
+                            className="rounded-full"
+                        >
+                            <RotateCcw className="w-4 h-4 mr-2" />
+                            {t('admin.carousel.refresh')}
+                        </Button>
+                        <Button
+                            onClick={handleAddSlide}
+                            size="sm"
+                            className="rounded-full"
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            {t('admin.carousel.add_slide')}
+                        </Button>
+                    </div>
+                </header>
 
-                                    {/* Left: Image & Position */}
-                                    <div className="relative shrink-0 w-full md:w-64 aspect-[4/3] rounded-2xl overflow-hidden bg-muted/20 border border-white/5">
-                                        {/* Position Badge */}
-                                        <div className="absolute top-3 left-3 z-10 w-8 h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                                            {item.position}
-                                        </div>
+                {/* Carousel Items Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {items.map((item) => (
+                        <div
+                            key={item.id}
+                            className="glass-strong rounded-3xl overflow-hidden border border-white/5 transition-all duration-300 hover:border-white/10 flex flex-col"
+                        >
+                            {/* Image Section */}
+                            <div className="relative aspect-[4/3] bg-muted/20">
+                                {/* Position Badge */}
+                                <div className="absolute top-3 left-3 z-10 w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                    {item.position}
+                                </div>
 
-                                        {item.image_url ? (
-                                            <Image
-                                                src={item.image_url}
-                                                alt={item.title}
-                                                fill
-                                                className="object-cover"
-                                            />
+                                {/* Status Badge */}
+                                <button
+                                    onClick={() => handleToggleActive(item)}
+                                    className="absolute top-3 right-3 z-10"
+                                >
+                                    <Badge
+                                        className={`${item.is_active
+                                            ? 'bg-green-500/20 text-green-500 border-green-500/30'
+                                            : 'bg-white/10 text-white/60 border-white/20'
+                                            } backdrop-blur-md cursor-pointer hover:scale-105 transition-transform`}
+                                    >
+                                        {item.is_active ? (
+                                            <><CheckCircle2 className="w-3 h-3 mr-1" /> {t('admin.carousel.active')}</>
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center">
-                                                <ImageIcon className="w-8 h-8 text-muted-foreground/30" />
-                                            </div>
+                                            <><XCircle className="w-3 h-3 mr-1" /> {t('admin.carousel.inactive')}</>
                                         )}
+                                    </Badge>
+                                </button>
 
-                                        {/* Image Upload Overlay */}
-                                        <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex flex-col items-center justify-center gap-2">
-                                            <Upload className="w-6 h-6 text-white" />
-                                            <span className="text-xs font-medium text-white px-3 py-1 rounded-full bg-white/10 border border-white/20">
-                                                Change Image
+                                {/* Image or Placeholder */}
+                                {item.image_url ? (
+                                    <>
+                                        <Image
+                                            src={item.image_url}
+                                            alt={item.title}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                        {/* Upload Overlay */}
+                                        <label className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 transition-opacity cursor-pointer flex flex-col items-center justify-center gap-2">
+                                            <Upload className="w-8 h-8 text-white" />
+                                            <span className="text-sm font-medium text-white px-4 py-2 rounded-full bg-white/10 border border-white/20">
+                                                {t('admin.carousel.change_image')}
                                             </span>
                                             <input
                                                 type="file"
@@ -234,132 +274,129 @@ export default function HeroCarouselPage() {
                                                     const file = e.target.files?.[0]
                                                     if (file) handleImageUpload(item.id, item.position, file)
                                                 }}
+                                                disabled={uploading === item.id}
                                             />
                                         </label>
+                                    </>
+                                ) : (
+                                    <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-muted/30 transition-colors">
+                                        <ImageIcon className="w-12 h-12 text-muted-foreground/30 mb-2" />
+                                        <span className="text-sm text-muted-foreground">{t('admin.carousel.no_image')}</span>
+                                        <span className="text-xs text-muted-foreground/60 mt-1">{t('admin.carousel.upload_image')}</span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0]
+                                                if (file) handleImageUpload(item.id, item.position, file)
+                                            }}
+                                            disabled={uploading === item.id}
+                                        />
+                                    </label>
+                                )}
+
+                                {/* Uploading Overlay */}
+                                {uploading === item.id && (
+                                    <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
+                                        <Loader2 className="w-8 h-8 animate-spin text-white" />
                                     </div>
+                                )}
+                            </div>
 
-                                    {/* Middle: Content Inputs */}
-                                    <div className="flex-1 space-y-4 w-full">
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            {/* Title */}
-                                            <div className="space-y-1.5">
-                                                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground ml-1">
-                                                    <Type className="w-3.5 h-3.5" />
-                                                    Title
-                                                </div>
-                                                <input
-                                                    type="text"
-                                                    value={item.title}
-                                                    onChange={(e) => handleInputChange(item.id, 'title', e.target.value)}
-                                                    onFocus={() => setEditingId(item.id)}
-                                                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm font-medium placeholder:text-muted-foreground/30"
-                                                    placeholder="Slide Title"
-                                                />
-                                            </div>
+                            {/* Content Section */}
+                            <div className="p-4 space-y-3 flex-1 flex flex-col">
+                                {/* Title */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-muted-foreground">
+                                        {t('admin.carousel.slide_title')}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={item.title}
+                                        onChange={(e) => handleInputChange(item.id, 'title', e.target.value)}
+                                        className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none transition-all text-sm"
+                                        placeholder="Slide Title"
+                                    />
+                                </div>
 
-                                            {/* Subtitle */}
-                                            <div className="space-y-1.5">
-                                                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground ml-1">
-                                                    <Type className="w-3.5 h-3.5" />
-                                                    Subtitle
-                                                </div>
-                                                <input
-                                                    type="text"
-                                                    value={item.subtitle || ''}
-                                                    onChange={(e) => handleInputChange(item.id, 'subtitle', e.target.value)}
-                                                    onFocus={() => setEditingId(item.id)}
-                                                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm placeholder:text-muted-foreground/30"
-                                                    placeholder="Small text above title"
-                                                />
-                                            </div>
-                                        </div>
+                                {/* Subtitle */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-muted-foreground">
+                                        {t('admin.carousel.slide_subtitle')}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={item.subtitle || ''}
+                                        onChange={(e) => handleInputChange(item.id, 'subtitle', e.target.value)}
+                                        className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none transition-all text-sm"
+                                        placeholder="Small text above title"
+                                    />
+                                </div>
 
-                                        {/* Link Selection */}
-                                        <div className="space-y-1.5">
-                                            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground ml-1">
-                                                <LinkIcon className="w-3.5 h-3.5" />
-                                                Linked Product
-                                            </div>
-                                            <div className="relative">
-                                                <select
-                                                    value={item.link || ''}
-                                                    onChange={(e) => handleInputChange(item.id, 'link', e.target.value)}
-                                                    onFocus={() => setEditingId(item.id)}
-                                                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-primary/50 focus:bg-white/[0.06] focus:outline-none transition-all text-sm appearance-none cursor-pointer hover:bg-white/[0.08]"
-                                                >
-                                                    <option value="" className="bg-background text-foreground">No Link (Just Image)</option>
-                                                    <optgroup label="Select Product" className="bg-background text-foreground">
-                                                        {products.map(p => (
-                                                            <option key={p.id} value={`/product/${p.id}`} className="bg-background">
-                                                                {p.title}
-                                                            </option>
-                                                        ))}
-                                                    </optgroup>
-                                                </select>
-                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                                                    <GripVertical className="w-4 h-4 rotate-90" />
-                                                </div>
-                                            </div>
-                                            {item.link && (
-                                                <div className="text-[10px] text-green-500/80 px-2 flex items-center gap-1.5">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                                    Linked to: {products.find(p => `/product/${p.id}` === item.link)?.title || item.link}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Right: Actions */}
-                                    <div className="flex md:flex-col items-center justify-end gap-2 w-full md:w-auto mt-2 md:mt-0">
-                                        <button
-                                            onClick={() => handleToggleActive(item)}
-                                            className={`h-10 px-4 md:w-32 rounded-xl border transition-all flex items-center justify-center gap-2 text-sm font-medium ${item.is_active
-                                                ? 'bg-green-500/10 border-green-500/20 text-green-500 hover:bg-green-500/20'
-                                                : 'bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10'
-                                                }`}
-                                        >
-                                            {item.is_active ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
-                                            {item.is_active ? 'Active' : 'Inactive'}
-                                        </button>
-
-                                        {editingId === item.id ? (
-                                            <button
-                                                onClick={() => handleSaveItem(item)}
-                                                disabled={saving}
-                                                className="h-10 px-6 md:w-32 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2"
-                                            >
-                                                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                                                Save
-                                            </button>
-                                        ) : (
-                                            <div className="h-10 flex items-center text-sm text-muted-foreground px-4 md:w-32 justify-center italic bg-white/[0.02] rounded-xl border border-white/5">
-                                                Saved
-                                            </div>
-                                        )}
-
-                                        <button
-                                            onClick={() => handleDeleteSlide(item.id)}
-                                            className="h-10 px-4 md:w-32 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 transition-all flex items-center justify-center gap-2 text-sm font-medium"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                            Delete
-                                        </button>
-                                    </div>
+                                {/* Product Link */}
+                                <div className="space-y-1.5 flex-1">
+                                    <label className="text-xs font-medium text-muted-foreground">
+                                        {t('admin.carousel.linked_product')}
+                                    </label>
+                                    <select
+                                        value={item.link || ''}
+                                        onChange={(e) => handleInputChange(item.id, 'link', e.target.value)}
+                                        className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none transition-all text-sm appearance-none cursor-pointer"
+                                    >
+                                        <option value="" className="bg-background">{t('admin.carousel.no_link')}</option>
+                                        {products.map(p => (
+                                            <option key={p.id} value={`/product/${p.id}`} className="bg-background">
+                                                {p.title}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
-                        ))}
-                    </div>
 
-                    {/* Helper Footer */}
-                    <div className="flex flex-wrap gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1.5">
-                            <ImageIcon className="w-3.5 h-3.5" />
-                            Max 5MB images
-                        </span>
-                        <span className="w-px h-4 bg-white/10" />
-                        <span>Recommended: 1920x1080px or 1200x1200px</span>
-                    </div>
+                            {/* Actions Footer */}
+                            <div className="p-4 border-t border-white/5 flex gap-2">
+                                <Button
+                                    onClick={() => handleSaveItem(item)}
+                                    disabled={saving === item.id || editingId !== item.id}
+                                    className="flex-1 rounded-xl"
+                                    size="sm"
+                                >
+                                    {saving === item.id ? (
+                                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('admin.carousel.saving')}</>
+                                    ) : (
+                                        <><Save className="w-4 h-4 mr-2" /> {t('admin.carousel.save')}</>
+                                    )}
+                                </Button>
+                                <Button
+                                    onClick={() => handleDeleteSlide(item.id)}
+                                    disabled={deleting === item.id}
+                                    variant="destructive"
+                                    className="rounded-xl"
+                                    size="sm"
+                                >
+                                    {deleting === item.id ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <Trash2 className="w-4 h-4" />
+                                    )}
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
+
+                {/* Empty State */}
+                {items.length === 0 && (
+                    <div className="text-center py-16">
+                        <ImageIcon className="w-16 h-16 mx-auto mb-4 text-muted-foreground/20" />
+                        <p className="text-muted-foreground mb-4">No slides yet. Add your first slide!</p>
+                        <Button onClick={handleAddSlide} className="rounded-full">
+                            <Plus className="w-4 h-4 mr-2" />
+                            {t('admin.carousel.add_slide')}
+                        </Button>
+                    </div>
+                )}
             </main>
         </div>
     )

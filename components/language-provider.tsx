@@ -234,6 +234,21 @@ const translations = {
         "admin.dashboard.customers_found": "Clients",
         "admin.dashboard.view_details": "Voir détails",
 
+        // Dashboard Tabs
+        "admin.dashboard.tab_overview": "Aperçu",
+        "admin.dashboard.tab_messages": "Messages",
+        "admin.dashboard.tab_applications": "Candidatures",
+        "admin.dashboard.messages_title": "Messages de contact",
+        "admin.dashboard.applications_title": "Candidatures",
+        "admin.dashboard.view_message": "Voir le message",
+        "admin.dashboard.view_application": "Voir la candidature",
+        "admin.dashboard.no_messages": "Aucun message",
+        "admin.dashboard.no_applications": "Aucune candidature",
+        "admin.dashboard.message_details": "Détails du message",
+        "admin.dashboard.application_details": "Détails de la candidature",
+        "admin.dashboard.open_cv": "Ouvrir CV",
+        "admin.dashboard.no_file": "Aucun fichier",
+
         // Admin Login
         "admin.login.title": "Accès Admin",
         "admin.login.subtitle": "Entrez votre code PIN sécurisé",
@@ -505,6 +520,27 @@ const translations = {
         "admin.settings.admin_pin": "Code PIN admin",
         "admin.settings.maintenance_mode": "Mode maintenance",
         "admin.settings.session_timeout": "Délai de session (min)",
+
+        // Hero Carousel
+        "admin.carousel.title": "Carrousel Hero",
+        "admin.carousel.subtitle": "Gérez les diapositives de votre page d'accueil",
+        "admin.carousel.add_slide": "Ajouter une diapositive",
+        "admin.carousel.upload_image": "Télécharger une image",
+        "admin.carousel.change_image": "Changer l'image",
+        "admin.carousel.no_image": "Aucune image",
+        "admin.carousel.slide_title": "Titre",
+        "admin.carousel.slide_subtitle": "Sous-titre",
+        "admin.carousel.linked_product": "Produit lié",
+        "admin.carousel.no_link": "Aucun lien",
+        "admin.carousel.active": "Actif",
+        "admin.carousel.inactive": "Inactif",
+        "admin.carousel.save": "Enregistrer",
+        "admin.carousel.delete": "Supprimer",
+        "admin.carousel.position": "Position",
+        "admin.carousel.refresh": "Actualiser",
+        "admin.carousel.uploading": "Téléchargement...",
+        "admin.carousel.saving": "Enregistrement...",
+        "admin.carousel.deleting": "Suppression...",
 
 
         // Checkout
@@ -865,6 +901,21 @@ const translations = {
         "admin.dashboard.customers_found": "العملاء",
         "admin.dashboard.view_details": "عرض التفاصيل",
 
+        // Dashboard Tabs
+        "admin.dashboard.tab_overview": "نظرة عامة",
+        "admin.dashboard.tab_messages": "الرسائل",
+        "admin.dashboard.tab_applications": "الطلبات",
+        "admin.dashboard.messages_title": "رسائل الاتصال",
+        "admin.dashboard.applications_title": "طلبات التوظيف",
+        "admin.dashboard.view_message": "عرض الرسالة",
+        "admin.dashboard.view_application": "عرض الطلب",
+        "admin.dashboard.no_messages": "لا توجد رسائل",
+        "admin.dashboard.no_applications": "لا توجد طلبات",
+        "admin.dashboard.message_details": "تفاصيل الرسالة",
+        "admin.dashboard.application_details": "تفاصيل الطلب",
+        "admin.dashboard.open_cv": "فتح السيرة الذاتية",
+        "admin.dashboard.no_file": "لا يوجد ملف",
+
         // Admin Login
         "admin.login.title": "دخول المسؤول",
         "admin.login.subtitle": "أدخل رمز PIN الآمن",
@@ -1136,6 +1187,27 @@ const translations = {
         "admin.settings.admin_pin": "رمز PIN",
         "admin.settings.maintenance_mode": "وضع الصيانة",
         "admin.settings.session_timeout": "مهلة الجلسة (دقيقة)",
+
+        // Hero Carousel
+        "admin.carousel.title": "عرض البطل",
+        "admin.carousel.subtitle": "إدارة شرائح الصفحة الرئيسية",
+        "admin.carousel.add_slide": "إضافة شريحة",
+        "admin.carousel.upload_image": "تحميل صورة",
+        "admin.carousel.change_image": "تغيير الصورة",
+        "admin.carousel.no_image": "لا توجد صورة",
+        "admin.carousel.slide_title": "العنوان",
+        "admin.carousel.slide_subtitle": "العنوان الفرعي",
+        "admin.carousel.linked_product": "المنتج المرتبط",
+        "admin.carousel.no_link": "بدون رابط",
+        "admin.carousel.active": "نشط",
+        "admin.carousel.inactive": "غير نشط",
+        "admin.carousel.save": "حفظ",
+        "admin.carousel.delete": "حذف",
+        "admin.carousel.position": "الموضع",
+        "admin.carousel.refresh": "تحديث",
+        "admin.carousel.uploading": "جاري التحميل...",
+        "admin.carousel.saving": "جاري الحفظ...",
+        "admin.carousel.deleting": "جاري الحذف...",
 
         // Admin POS
         "admin.pos.title": "نقطة البيع (POS)",

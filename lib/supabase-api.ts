@@ -904,8 +904,8 @@ export async function uploadHeroCarouselImage(
 ): Promise<{ success: boolean; url?: string; error?: string }> {
     try {
         const fileExt = file.name.split('.').pop()
-        const fileName = `hero - carousel - ${position} -${Date.now()}.${fileExt} `
-        const filePath = `hero - carousel / ${fileName} `
+        const fileName = `hero-carousel-${position}-${Date.now()}.${fileExt}`
+        const filePath = `hero-carousel/${fileName}`
 
         const { error: uploadError } = await supabase.storage
             .from('product-images')
