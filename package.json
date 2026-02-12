@@ -72,6 +72,8 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
     "web-push": "^3.6.7",
+    "@zxing/browser": "^0.1.1",
+    "@zxing/library": "^0.20.0",
     "zod": "3.25.76"
   },
   "devDependencies": {
