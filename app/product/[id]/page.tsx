@@ -14,6 +14,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import { DrOutfitWidget } from "@/components/droutfit-widget"
 import { 
     ShoppingBag, 
     Star, 
@@ -45,11 +46,10 @@ export default function ProductPage() {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [scrolled, setScrolled] = useState(false)
-  
-  // VTO State
   const [showVTO, setShowVTO] = useState(false)
+  
   const MERCHANT_ID = "dr_8a95106b85940e83d121d818513a06f57164d7b858084a59"
-
+  
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [selectedColor, setSelectedColor] = useState<string | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -108,16 +108,11 @@ export default function ProductPage() {
     setQuantity(1)
   }, [productId])
 
-  // Listen for close message from the VTO Widget
   useEffect(() => {
-    const handleMessage = (e: MessageEvent) => {
-        if (e.data && e.data.type === 'droutfit-close') {
-            setShowVTO(false)
-        }
-    }
-    window.addEventListener('message', handleMessage)
-    return () => window.removeEventListener('message', handleMessage)
-  }, [])
+    window.scrollTo({ top: 0, behavior: "instant" })
+    setSelectedImage(0)
+    setQuantity(1)
+  }, [productId])
 
   const handleImageScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const scrollLeft = e.currentTarget.scrollLeft
@@ -175,11 +170,8 @@ export default function ProductPage() {
   const sizes = Array.from(new Set(product.variants?.map(v => v.size).filter(s => s !== null && s !== "") as string[]))
   const colors = Array.from(new Set(product.variants?.map(v => v.color).filter(c => c !== null && c !== "") as string[]))
 
-  // DrOutfit Widget URL Construction - Local Dev Mode
+  // Product Images
   const productImg = productImages[0]
-  const localHost = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
-  const fullImagePath = productImg?.startsWith('http') ? productImg : `${localHost}${productImg}`
-  const vtoUrl = `http://localhost:3001/widget/${productId}?merchant_id=${MERCHANT_ID}&name=${encodeURIComponent(displayTitle)}&image=${encodeURIComponent(fullImagePath)}`
 
   return (
     <div className="min-h-screen bg-white pb-32 lg:pb-20 overflow-x-hidden">
@@ -213,7 +205,6 @@ export default function ProductPage() {
           
           {/* Mobile Image Slider / Desktop Gallery */}
           <div className="relative lg:sticky lg:top-32 self-start mb-8 lg:mb-0">
-            {/* Desktop thumbnails (Hidden on mobile) */}
             <div className="hidden lg:flex absolute -left-20 top-0 flex-col gap-4">
               {productImages.map((img, idx) => (
                 <button 
@@ -228,7 +219,6 @@ export default function ProductPage() {
               ))}
             </div>
 
-            {/* Main Content (Snap Slider on Mobile) */}
             <div className="relative group overflow-hidden bg-gray-50 lg:rounded-[2.5rem] lg:shadow-2xl lg:shadow-black/5">
                 <div 
                     ref={scrollRef}
@@ -248,7 +238,6 @@ export default function ProductPage() {
                     ))}
                 </div>
 
-                {/* Navigation Dots (Mobile) */}
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 lg:hidden">
                     {productImages.map((_, idx) => (
                         <div 
@@ -260,7 +249,6 @@ export default function ProductPage() {
                     ))}
                 </div>
 
-                {/* Share/Wishlist buttons */}
                 <div className="absolute top-6 right-6 flex flex-col gap-3">
                     <button className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-md shadow-lg flex items-center justify-center text-gray-900 active:scale-90 transition-transform">
                         <Share2 className="w-4 h-4" />
@@ -270,7 +258,7 @@ export default function ProductPage() {
                     </button>
                 </div>
 
-                {/* DrOutfit VTO floating trigger for mobile (On top of image) */}
+                {/* Mobile VTO Trigger */}
                 <motion.button 
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -282,9 +270,7 @@ export default function ProductPage() {
             </div>
           </div>
 
-          {/* Product Info Section */}
           <div className="px-6 sm:px-0">
-            {/* Tag/Category */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3">
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 bg-primary/5 px-3 py-1 rounded-full">
@@ -320,14 +306,12 @@ export default function ProductPage() {
                 )}
             </div>
 
-            {/* Description (Mobile optimized) */}
             <div className="mb-10 p-6 bg-gray-50/50 rounded-3xl border border-gray-100/50">
                 <p className="text-gray-600 leading-relaxed font-medium text-sm md:text-base">
                     {displayDescription}
                 </p>
             </div>
 
-            {/* Variant Selectors */}
             <div className="space-y-10 mb-12">
                {sizes.length > 0 && (
                 <div>
@@ -382,7 +366,6 @@ export default function ProductPage() {
                )}
             </div>
 
-            {/* Details Accordion */}
             <Accordion type="single" collapsible className="space-y-4 mb-16">
               {displayBenefits.length > 0 && (
                 <AccordionItem value="benefits" className="border-none">
@@ -420,7 +403,6 @@ export default function ProductPage() {
               )}
             </Accordion>
 
-            {/* Trust Factors */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
                   { icon: Truck, label: "LIVRAISON PARTOUT", sub: "Expédition en 24/48h" },
@@ -437,7 +419,6 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* Related Products */}
         {relatedProducts.length > 0 && (
             <div className="mt-32 px-6 sm:px-4">
                 <div className="flex items-end justify-between mb-12">
@@ -474,14 +455,12 @@ export default function ProductPage() {
         )}
       </main>
 
-      {/* Floating Action Bar (Optimized for Mobile) */}
       <div className="fixed bottom-0 left-0 right-0 z-[110] lg:pb-8 pb-4 px-4 pointer-events-none">
         <motion.div 
             initial={{ y: 100 }}
             animate={{ y: 0 }}
             className="container mx-auto max-w-2xl bg-white/90 backdrop-blur-2xl p-4 rounded-[2.5rem] shadow-2xl shadow-indigo-200 border border-white/40 pointer-events-auto flex gap-3 h-20 items-center"
         >
-          {/* Quantity Micro-control */}
           <div className="flex items-center gap-1 bg-gray-50 p-1.5 rounded-2xl h-full border border-gray-100">
             <button 
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -530,52 +509,15 @@ export default function ProductPage() {
         </motion.div>
       </div>
 
-      {/* DrOutfit VTO Overlay */}
-      <AnimatePresence>
-        {showVTO && (
-            <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 md:p-8"
-            >
-                <div className="absolute inset-0" onClick={() => setShowVTO(false)} />
-                
-                <motion.div 
-                    initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                    animate={{ scale: 1, opacity: 1, y: 0 }}
-                    exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                    className="relative w-full max-w-[480px] h-full max-h-[90vh] bg-white rounded-[2rem] overflow-hidden shadow-2xl"
-                >
-                    {/* Header with close button */}
-                    <div className="absolute top-4 right-4 z-10">
-                        <button 
-                            onClick={() => setShowVTO(false)}
-                            className="w-10 h-10 rounded-full bg-white/10 hover:bg-black/5 flex items-center justify-center text-gray-400 hover:text-gray-900 transition-all border border-gray-100/50 backdrop-blur-md"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
-                    </div>
-
-                    {/* VTO Iframe */}
-                    <iframe 
-                        src={vtoUrl}
-                        title="Virtual Try-On"
-                        className="w-full h-full border-none"
-                        allow="camera"
-                    />
-
-                    {/* Branding/Tip */}
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none">
-                        <div className="bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-gray-100 shadow-sm flex items-center gap-2">
-                            <Sparkles className="w-3 h-3 text-indigo-600" />
-                            <span className="text-[9px] font-black uppercase tracking-widest text-indigo-600">Powered by Droutfit.com</span>
-                        </div>
-                    </div>
-                </motion.div>
-            </motion.div>
-        )}
-      </AnimatePresence>
+      {/* New Clean DrOutfit Widget Integration */}
+      <DrOutfitWidget
+        isOpen={showVTO}
+        onClose={() => setShowVTO(false)}
+        productId={productId}
+        productName={displayTitle}
+        productImage={productImages[0]}
+        merchantId={MERCHANT_ID}
+      />
     </div>
   )
 }
