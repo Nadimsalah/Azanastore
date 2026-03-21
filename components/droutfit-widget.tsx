@@ -31,7 +31,12 @@ export function DrOutfitWidget({
     ? 'http://localhost:3005' 
     : 'https://droutfit.com'
     
-  const vtoUrl = `${widgetBaseUrl}/widget/${productId}?merchant_id=${merchantId}&name=${encodeURIComponent(productName)}&image=${encodeURIComponent(fullImagePath)}`
+  // Use all possible param aliases to ensure compatibility
+  const vtoUrl = `${widgetBaseUrl}/widget/${productId}?merchant_id=${merchantId}&m=${merchantId}&name=${encodeURIComponent(productName)}&image=${encodeURIComponent(fullImagePath)}&img=${encodeURIComponent(fullImagePath)}`
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log("[DrOutfit] Launching Widget with URL:", vtoUrl);
+  }
 
   // Handle "Close" messages from inside the iframe
   useEffect(() => {
@@ -72,12 +77,14 @@ export function DrOutfitWidget({
               </button>
             </div>
 
-            {/* VTO Engine Iframe */}
+            {/* VTO Engine Iframe - Using key to force clean reload with params */}
             <iframe
+              key={vtoUrl}
               src={vtoUrl}
               title="DrOutfit Virtual Try-On"
-              className="w-full h-full border-none"
+              className="w-full h-full border-none bg-[#F8F9FB]"
               allow="camera; microphone"
+              onLoad={() => console.log("[DrOutfit] Iframe Loaded Successfully")}
             />
 
             {/* Powered By Branding */}

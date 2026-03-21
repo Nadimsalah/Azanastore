@@ -14,7 +14,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { DrOutfitWidget } from "@/components/droutfit-widget"
 import { 
     ShoppingBag, 
     Star, 
@@ -27,12 +26,10 @@ import {
     Sparkles, 
     Search,
     Share2,
-    Heart,
-    X,
-    Maximize2
+    Heart
 } from "lucide-react"
 import { ProductDetailsSkeleton } from "@/components/ui/store-skeletons"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 
 export default function ProductPage() {
   const params = useParams()
@@ -46,7 +43,6 @@ export default function ProductPage() {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [scrolled, setScrolled] = useState(false)
-  const [showVTO, setShowVTO] = useState(false)
   
   const MERCHANT_ID = "dr_8a95106b85940e83d121d818513a06f57164d7b858084a59"
   
@@ -258,15 +254,6 @@ export default function ProductPage() {
                     </button>
                 </div>
 
-                {/* Mobile VTO Trigger */}
-                <motion.button 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowVTO(true)}
-                    className="absolute bottom-10 right-6 lg:hidden bg-indigo-600 text-white px-5 py-3 rounded-2xl shadow-2xl shadow-indigo-500/40 flex items-center gap-2 text-xs font-black uppercase tracking-widest z-20"
-                >
-                    <Sparkles className="w-4 h-4 animate-pulse" /> Try It On
-                </motion.button>
             </div>
           </div>
 
@@ -282,15 +269,6 @@ export default function ProductPage() {
                         <span className="text-xs font-black text-gray-900">5.0</span>
                     </div>
                 </div>
-
-                {/* Desktop VTO Trigger */}
-                <Button 
-                    variant="outline" 
-                    onClick={() => setShowVTO(true)}
-                    className="hidden lg:flex rounded-2xl border-indigo-100 bg-indigo-50/20 text-indigo-600 font-black uppercase tracking-widest text-[10px] h-10 px-6 hover:bg-indigo-600 hover:text-white transition-all gap-2"
-                >
-                    <Sparkles className="w-3.5 h-3.5" /> Virtual Try-On ✨
-                </Button>
             </div>
 
             <h1 className="text-4xl lg:text-5xl font-black text-gray-900 mb-4 tracking-tighter leading-tight">
@@ -509,15 +487,6 @@ export default function ProductPage() {
         </motion.div>
       </div>
 
-      {/* New Clean DrOutfit Widget Integration */}
-      <DrOutfitWidget
-        isOpen={showVTO}
-        onClose={() => setShowVTO(false)}
-        productId={productId}
-        productName={displayTitle}
-        productImage={productImages[0]}
-        merchantId={MERCHANT_ID}
-      />
     </div>
   )
 }

@@ -18,6 +18,7 @@ export async function POST(req: Request) {
         const mimeType = image.split(';')[0].split(':')[1] || 'image/jpeg';
 
         const genAI = new GoogleGenerativeAI(apiKey);
+        console.log(">>> [ADMIN:analyze-image] Using Model: gemini-1.5-flash, API: v1beta");
 
         // 1. ANALYZE METADATA (Gemini 2.5 Flash)
         const customPrompts = await getAIPrompts()
