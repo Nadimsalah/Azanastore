@@ -21,8 +21,11 @@ export function generateSKU(
     const m = sanitize(model) || 'PRD';
     const col = sanitize(color) || 'NA';
     const s = sanitize(size) || 'NA';
+    
+    // Add a small random suffix to ensure uniqueness in DB
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
 
-    return `${m}-${col}-${s}`;
+    return `${m}-${col}-${s}-${random}`;
 }
 
 export function parseSKU(sku: string) {

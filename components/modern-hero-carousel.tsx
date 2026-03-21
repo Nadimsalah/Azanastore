@@ -91,7 +91,7 @@ export function ModernHeroCarousel({ items }: HeroCarouselProps) {
                         return (
                             <div
                                 key={index}
-                                className="flex-[0_0_100%] min-w-0 relative aspect-[4/3] sm:aspect-[16/10] lg:aspect-square xl:aspect-[4/3]"
+                                className="flex-[0_0_100%] min-w-0 relative aspect-[4/3] sm:aspect-[16/10] lg:aspect-[16/9] xl:aspect-[16/10]"
                             >
                                 {item.link ? (
                                     <Link href={item.link} className="block w-full h-full relative cursor-pointer" draggable={false}>

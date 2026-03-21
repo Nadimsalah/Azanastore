@@ -35,6 +35,8 @@ export default function AdminLoginPage() {
         if (pin === ADMIN_PIN) {
             // Set session cookie
             document.cookie = "admin_session=true; path=/; max-age=86400; SameSite=Strict" // 1 day expiry
+            // Set localStorage as fallback
+            localStorage.setItem("admin_session", "true")
             toast.success(t('admin.login.access_granted'))
             router.push("/admin/dashboard")
         } else {

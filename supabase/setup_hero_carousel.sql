@@ -28,6 +28,7 @@ DROP POLICY IF EXISTS "Public can view active carousel" ON hero_carousel;
 DROP POLICY IF EXISTS "Public can view carousel" ON hero_carousel;
 DROP POLICY IF EXISTS "Allow all for authenticated users" ON hero_carousel;
 DROP POLICY IF EXISTS "Admin full access" ON hero_carousel;
+DROP POLICY IF EXISTS "Allow all operations" ON hero_carousel;
 
 -- 5. Create RLS policies
 -- Public can view active carousel items

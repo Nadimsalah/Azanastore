@@ -19,10 +19,14 @@ export default function AdminLayout({
 
     useEffect(() => {
         // Check for admin session cookie
-        const hasSession = document.cookie
+        const hasCookieSession = document.cookie
             .split("; ")
             .find((row) => row.startsWith("admin_session="))
             ?.split("=")[1] === "true"
+        
+        const hasStorageSession = typeof window !== 'undefined' && localStorage.getItem("admin_session") === "true"
+        
+        const hasSession = hasCookieSession || hasStorageSession
 
         if (!hasSession && pathname !== "/admin/login") {
             router.push("/admin/login")

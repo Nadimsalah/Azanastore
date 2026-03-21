@@ -411,19 +411,11 @@ export default function HomePage() {
         <div className="absolute bottom-1/4 left-0 w-72 h-72 bg-primary/3 rounded-full blur-3xl" />
       </div>
 
-      {/* Announcement Bar */}
-      <div className="bg-primary text-primary-foreground py-2 text-center text-sm">
-        <p>
-          {language === 'ar'
-            ? (settings.announcement_bar_ar || settings.announcement_bar || "شحن مجاني للطلبات فوق 500 د.م | استخدم كود ARGAN20 لخصم 20%")
-            : (settings.announcement_bar || "Livraison gratuite pour les commandes de plus de 500 MAD | Utilisez le code ARGAN20 pour 20% de réduction")
-          }
-        </p>
-      </div>
+
 
       {/* Header */}
       <header
-        className={`sticky top-0 z-50 transition-all duration-500 ${isScrolled ? "glass-strong py-2" : "bg-transparent py-4"
+        className={`sticky top-0 z-50 transition-all duration-500 ${isScrolled ? "glass-strong py-2" : "bg-transparent py-2 sm:py-3"
           }`}
       >
         <div className="container mx-auto px-4">
@@ -588,11 +580,11 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-16 sm:py-20 lg:py-28">
+      <section className="relative py-8 sm:py-12 lg:py-16">
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight text-balance">
+          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
+            <div className="space-y-6">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground leading-tight text-balance">
                 {language === 'ar' ? (
                   settings.hero_title_ar || settings.hero_title || (
                     <>
@@ -607,7 +599,7 @@ export default function HomePage() {
                   )
                 )}
               </h1>
-              <p className="text-lg text-muted-foreground max-w-lg">
+              <p className="text-lg text-muted-foreground max-w-xl">
                 {language === 'ar'
                   ? (settings.hero_subtitle_ar || settings.hero_subtitle || t('hero.subtitle'))
                   : ((language === 'fr' ? null : settings.hero_subtitle) || t('hero.subtitle'))

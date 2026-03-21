@@ -18,6 +18,7 @@ import {
     Globe,
     Zap,
     Layers,
+    Sparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -37,6 +38,7 @@ export function AdminSidebar() {
         { icon: Users, label: t('admin.nav.customers'), href: "/admin/customers" },
         { icon: BarChart3, label: t('admin.nav.analytics'), href: "/admin/analytics" },
         { icon: ImageIcon, label: t('admin.nav.carousel'), href: "/admin/hero-carousel" },
+        { icon: Sparkles, label: "AI Settings", href: "/admin/ai-prompts" },
         { icon: Settings, label: t('admin.nav.settings'), href: "/admin/settings" },
     ]
 

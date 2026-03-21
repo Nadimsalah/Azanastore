@@ -1,10 +1,28 @@
 import { supabase } from './supabase'
 
+/**
+ * Helper to log Supabase errors only if environment is properly configured.
+ * This prevents flooding the console with errors when using placeholder credentials.
+ */
+function logSupabaseError(context: string, error: any) {
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+        console.error(context, error)
+    }
+}
+
 export interface Category {
     id: string
     name: string
     slug: string
     created_at?: string
+}
+
+export interface AIPrompt {
+    id: string
+    title_prompt: string
+    description_prompt: string
+    image_prompt: string
+    updated_at: string
 }
 
 export interface Product {
@@ -209,7 +227,7 @@ export async function listContactMessages(): Promise<ContactMessage[]> {
         .order('created_at', { ascending: false })
 
     if (error) {
-        console.error('Error loading contact messages:', error.message)
+        logSupabaseError('Error loading contact messages:', error.message)
         return []
     }
 
@@ -252,7 +270,7 @@ export async function listCareerApplications(): Promise<CareerApplication[]> {
         .order('created_at', { ascending: false })
 
     if (error) {
-        console.error('Error loading career applications:', error.message)
+        logSupabaseError('Error loading career applications:', error.message)
         return []
     }
 
@@ -361,25 +379,57 @@ export async function getProducts(filters?: {
 }
 
 export async function getProductById(id: string) {
-    const { data, error } = await supabase
-        .from('products')
-        .select(`
-    *,
-    variants: product_variants(*)
-        `)
-        .eq('id', id)
-        .single()
+    try {
+        console.log(`[API] Fetching product: ${id}`)
+        
+        // 1. Try fetching with variants join
+        const { data, error } = await supabase
+            .from('products')
+            .select(`
+                *,
+                variants: product_variants(*)
+            `)
+            .eq('id', id)
+            .single()
 
-    if (error) {
-        if (error.code === 'PGRST116') {
-            console.warn(`Product with ID ${id} not found`)
-            return null
+        if (error) {
+            // PGRST116 is 'no rows returned'
+            if (error.code === 'PGRST116') {
+                console.warn(`[API] Product ${id} not found in DB`)
+                return null
+            }
+            
+            console.error(`[API] Join query failed for ${id}, trying fallback:`, error)
+            
+            // 2. Fallback: Simple fetch without join
+            const { data: simpleData, error: simpleError } = await supabase
+                .from('products')
+                .select('*')
+                .eq('id', id)
+                .single()
+                
+            if (simpleError) {
+                console.error(`[API] Fallback also failed for ${id}:`, simpleError)
+                return null
+            }
+            
+            // If simple fetch succeeded, try to get variants separately
+            const { data: variantsData } = await supabase
+                .from('product_variants')
+                .select('*')
+                .eq('product_id', id)
+                
+            return {
+                ...(simpleData as Product),
+                variants: (variantsData || []) as ProductVariant[]
+            }
         }
-        console.error(`Error fetching product ${id}: `, error)
+
+        return data as Product
+    } catch (err) {
+        console.error(`[API] Fatal error in getProductById for ${id}:`, err)
         return null
     }
-
-    return data as Product
 }
 
 export async function getProductBySku(sku: string) {
@@ -695,7 +745,7 @@ export async function getAdminSettings() {
         .select('key, value')
 
     if (error) {
-        console.error('Error fetching admin settings:', {
+        logSupabaseError('Error fetching admin settings:', {
             message: error.message,
             code: error.code,
             details: error.details,
@@ -767,7 +817,8 @@ export async function getHeroCarouselItems(admin = false): Promise<HeroCarouselI
     const { data, error } = await query
 
     if (error) {
-        console.error('Error fetching hero carousel items:', {
+        // Only log error if we're not using the placeholder values
+        logSupabaseError('Error fetching hero carousel items:', {
             message: error.message || 'Unknown error',
             code: error.code || 'NO_CODE',
             details: error.details || 'No details',
@@ -963,7 +1014,7 @@ export async function getCategories() {
         .order('name')
 
     if (error) {
-        console.error('Error fetching categories:', {
+        logSupabaseError('Error fetching categories:', {
             message: error.message,
             code: error.code,
             details: error.details,
@@ -1231,5 +1282,48 @@ export async function globalSearch(query: string): Promise<GlobalSearchResults> 
     } catch (error) {
         console.error('Error in global search:', error)
         return { products: [], orders: [], customers: [] }
+    }
+}
+
+export async function getAIPrompts(): Promise<AIPrompt | null> {
+    try {
+        const { data, error } = await supabase
+            .from('ai_prompts')
+            .select('*')
+            .single()
+
+        if (error) {
+            if (error.code === 'PGRST116') { // No rows found
+                return null
+            }
+            throw error
+        }
+        return data
+    } catch (err) {
+        logSupabaseError('getAIPrompts', err)
+        return null
+    }
+}
+
+export async function updateAIPrompts(prompts: Partial<AIPrompt>): Promise<boolean> {
+    try {
+        const existing = await getAIPrompts()
+        
+        if (existing) {
+            const { error } = await supabase
+                .from('ai_prompts')
+                .update({ ...prompts, updated_at: new Date().toISOString() })
+                .eq('id', existing.id)
+            if (error) throw error
+        } else {
+            const { error } = await supabase
+                .from('ai_prompts')
+                .insert([{ ...prompts }])
+            if (error) throw error
+        }
+        return true
+    } catch (err) {
+        logSupabaseError('updateAIPrompts', err)
+        return false
     }
 }

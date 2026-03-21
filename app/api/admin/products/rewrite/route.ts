@@ -80,8 +80,8 @@ export async function POST(request: Request) {
         const systemPrompt = `You are an embedded AI assistant inside an e-commerce admin panel for a cosmetics brand.
 
 LANGUAGE & STYLE:
-- Output language: Egyptian Arabic ONLY (اللهجة المصرية).
-- No English words.
+- Output language: Moroccan Darija ONLY (الدارجة المغربية).
+- Use ONLY Arabic script (no Latin letters, no Arabizi, no French words).
 - No emojis.
 - Natural, marketing-friendly cosmetics tone.
 - Suitable for an online beauty store.
@@ -104,7 +104,7 @@ Return ONLY the generated content for that field. No explanations. No labels. No
             console.log('Using Direct Google Gemini API...')
 
             try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${process.env.GOOGLE_API_KEY}`
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`
 
                 const controller = new AbortController()
                 const timeoutId = setTimeout(() => controller.abort(), 8000)
