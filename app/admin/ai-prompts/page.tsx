@@ -18,12 +18,14 @@ import { AdminSidebar } from "@/components/admin/admin-sidebar"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { toast } from "sonner"
-import { getAIPrompts, updateAIPrompts, type AIPrompt } from "@/lib/supabase-api"
+import { getAIPrompts, updateAIPrompts, type AIPrompt, getAdminSettings, updateAdminSettings } from "@/lib/supabase-api"
+import { supabase } from "@/lib/supabase"
 
 export default function AIPromptsPage() {
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [lastSaved, setLastSaved] = useState<string | null>(null)
+    const [stats, setStats] = useState({ generatedImages: 0, limit: 1000 })
     const [prompts, setPrompts] = useState<Partial<AIPrompt>>({
         title_prompt: "",
         description_prompt: "",
@@ -32,7 +34,43 @@ export default function AIPromptsPage() {
 
     useEffect(() => {
         loadPrompts()
+        loadStats()
     }, [])
+
+    const loadStats = async () => {
+        try {
+            let settings = await getAdminSettings()
+            let count = 0
+            
+            // Force reset if it's stuck at the baseline we previously set
+            if (settings.total_ai_images_generated === "51") {
+                await updateAdminSettings({ total_ai_images_generated: "0" })
+                count = 0
+            } else if (settings.total_ai_images_generated) {
+                count = parseInt(settings.total_ai_images_generated) || 0
+            } else {
+                count = 0
+                await updateAdminSettings({ total_ai_images_generated: "0" })
+            }
+            
+            setStats(prev => ({
+                ...prev,
+                generatedImages: count
+            }))
+        } catch (error) {
+            console.error("Failed to load AI stats", error)
+        }
+    }
+
+    const handleResetStats = async () => {
+        if (confirm("Reset AI Vision Usage counter to zero?")) {
+            const success = await updateAdminSettings({ total_ai_images_generated: "0" })
+            if (success) {
+                setStats(prev => ({ ...prev, generatedImages: 0 }))
+                toast.success("Usage stats reset successfully")
+            }
+        }
+    }
 
     const loadPrompts = async () => {
         setLoading(true)
@@ -145,7 +183,7 @@ export default function AIPromptsPage() {
                                 badge="IDENTITY"
                                 icon={<Type className="w-5 h-5" />}
                                 value={prompts.title_prompt || ""}
-                                onChange={(val) => setPrompts({...prompts, title_prompt: val})}
+                                onChange={(val: string) => setPrompts({...prompts, title_prompt: val})}
                                 delay={0}
                                 color="indigo"
                                 info="This prompt determines the product's primary name and naming style."
@@ -156,7 +194,7 @@ export default function AIPromptsPage() {
                                 badge="STORYTELLING"
                                 icon={<FileText className="w-5 h-5" />}
                                 value={prompts.description_prompt || ""}
-                                onChange={(val) => setPrompts({...prompts, description_prompt: val})}
+                                onChange={(val: string) => setPrompts({...prompts, description_prompt: val})}
                                 delay={0.1}
                                 color="violet"
                                 info="Craft the narrative and voice used in product descriptions."
@@ -167,7 +205,7 @@ export default function AIPromptsPage() {
                                 badge="VISUALS"
                                 icon={<ImageIcon className="w-5 h-5" />}
                                 value={prompts.image_prompt || ""}
-                                onChange={(val) => setPrompts({...prompts, image_prompt: val})}
+                                onChange={(val: string) => setPrompts({...prompts, image_prompt: val})}
                                 delay={0.2}
                                 color="blue"
                                 isImage
@@ -193,10 +231,25 @@ export default function AIPromptsPage() {
                                             <span className="opacity-60 font-bold uppercase">Engine</span>
                                             <span className="font-black bg-white/20 px-2 py-0.5 rounded">Droutfit AI</span>
                                         </div>
-                                        <div className="space-y-2 pt-2">
-                                            <p className="text-[11px] leading-relaxed opacity-80 font-medium">
-                                                Your configuration is pushed directly to the Droutfit Core. All changes impact live image and text generation immediately.
-                                            </p>
+                                        <div className="space-y-4 pt-4 border-t border-white/10">
+                                            <div className="flex justify-between items-end mb-1">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] font-black uppercase opacity-60 tracking-widest">AI Vision Usage</span>
+                                                    <span className="text-[9px] font-bold text-indigo-200">Images Generated</span>
+                                                </div>
+                                                <span className="text-sm font-black tracking-tighter">{stats.generatedImages} <span className="text-[10px] opacity-40">/ {stats.limit}</span></span>
+                                            </div>
+                                            <div className="h-3 bg-black/20 rounded-full overflow-hidden p-0.5 border border-white/5">
+                                                <motion.div 
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${Math.min(100, (stats.generatedImages / stats.limit) * 100)}%` }}
+                                                    className="h-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400 rounded-full shadow-[0_0_15px_rgba(52,211,153,0.3)]"
+                                                />
+                                            </div>
+                                            <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-wider">
+                                                <span className="opacity-40">{Math.round((stats.generatedImages / stats.limit) * 100)}% Consumed</span>
+                                                <button onClick={handleResetStats} className="text-white/40 hover:text-white transition-colors">Reset Stats</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

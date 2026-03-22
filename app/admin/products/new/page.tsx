@@ -332,6 +332,15 @@ export default function NewProductPage() {
             
             if (!res.ok) {
                 const errorData = await res.json().catch(() => ({}))
+                if (res.status === 403) {
+                    toast.error("AI Limit Reached", {
+                        description: "You've reached your 1,000 image limit. Please upgrade your plan component to continue.",
+                        duration: 6000
+                    })
+                    setAIAnalyzing(false)
+                    setAIProcessingStage(null)
+                    return
+                }
                 throw new Error(errorData.error || errorData.message || 'Gemini failed')
             }
             
@@ -462,47 +471,45 @@ export default function NewProductPage() {
             <main className="lg:pl-72 lg:rtl:pl-0 lg:rtl:pr-72 p-4 sm:p-6 lg:p-8 min-h-screen relative z-10 pb-24 transition-all duration-300">
                 {/* Header */}
                 <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 sticky top-4 z-40 bg-white/80 backdrop-blur-xl p-4 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4 flex-1">
                         <Link href="/admin/products">
-                            <Button variant="ghost" size="icon" className="rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
+                            <Button variant="ghost" size="icon" className="rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors h-9 w-9 sm:h-10 sm:w-10">
                                 <ArrowLeft className="w-5 h-5" />
                             </Button>
                         </Link>
-                        <div>
-                            <h1 className="text-xl font-bold text-gray-900">{t('admin.products.add_product')}</h1>
-                            <p className="text-xs text-gray-500 font-medium">{t('admin.products.new_arrival')}</p>
+                        <div className="min-w-0">
+                            <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">
+                                {t('admin.products.add_product')}
+                            </h1>
+                            <p className="text-[10px] sm:text-xs text-gray-500 font-medium">{t('admin.products.new_arrival')}</p>
                         </div>
                     </div>
 
 
 
-                    <div className="hidden sm:flex items-center gap-3">
-                        <Link href="/admin/products">
-                            <Button variant="ghost" className="rounded-full hover:bg-gray-100 text-gray-600 hover:text-gray-900">
-                                {t('admin.products.discard')}
-                            </Button>
-                        </Link>
-                        
+                    <div className="flex items-center gap-2 sm:gap-3 ml-auto">
                         <Button
                             onClick={() => setShowAIModal(true)}
-                            className="rounded-full px-5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:shadow-lg hover:shadow-violet-500/20 shadow-none text-white border-none font-bold"
+                            className="rounded-full px-3 sm:px-5 h-10 sm:h-11 bg-gradient-to-r from-violet-600 to-indigo-600 hover:shadow-lg hover:shadow-violet-500/20 shadow-none text-white border-none font-bold transition-all active:scale-95"
                         >
-                            <Zap className="w-4 h-4 mr-2" />
-                            Magic AI
+                            <Zap className="w-4 h-4 sm:mr-2" />
+                            <span className="hidden xs:inline">Magic AI</span>
                         </Button>
 
                         <Button
                             onClick={handlePublish}
                             disabled={isPublishing || showSuccess}
-                            className="rounded-full px-6 shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 text-white border-none transition-all"
+                            className="rounded-full px-4 sm:px-6 h-10 sm:h-11 shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 text-white border-none transition-all active:scale-95"
                         >
                             {isPublishing ? (
                                 <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('admin.products.uploading')}
+                                    <Loader2 className="w-4 h-4 sm:mr-2 animate-spin" /> 
+                                    <span className="hidden sm:inline">{t('admin.products.uploading')}</span>
                                 </>
                             ) : (
                                 <>
-                                    <Save className="w-4 h-4 mr-2" /> {t('admin.products.publish')}
+                                    <Save className="w-4 h-4 sm:mr-2" /> 
+                                    <span className="hidden xs:inline">{t('admin.products.publish')}</span>
                                 </>
                             )}
                         </Button>
@@ -824,32 +831,34 @@ export default function NewProductPage() {
                             </section>
                         )}
 
-                        {/* Navigation Buttons */}
-                        <div className="mt-8 flex items-center justify-between bg-white p-4 rounded-2xl border border-gray-100 shadow-lg">
+                        {/* Navigation Buttons - Sticky on mobile */}
+                        <div className="mt-8 flex items-center justify-between bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-gray-100 shadow-lg sticky bottom-4 z-40 sm:static sm:bg-white sm:shadow-none sm:border-0 sm:p-0">
                             <Button
                                 variant="outline"
                                 onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
                                 disabled={currentStep === 1}
-                                className="rounded-xl px-6"
+                                className="rounded-xl px-4 sm:px-6 h-11 sm:h-12 border-gray-200 text-gray-600 hover:bg-gray-50"
                             >
-                                <ArrowLeft className="w-4 h-4 mr-2" /> Retour
+                                <ArrowLeft className="w-4 h-4 mr-1 sm:mr-2" /> 
+                                <span className="text-sm font-semibold">Retour</span>
                             </Button>
                             
-                            {currentStep < 6 ? (
+                            {currentStep < 5 ? (
                                 <Button
-                                    onClick={() => setCurrentStep(prev => Math.min(6, prev + 1))}
-                                    className="rounded-xl px-8 bg-blue-600 hover:bg-blue-700 text-white"
+                                    onClick={() => setCurrentStep(prev => Math.min(5, prev + 1))}
+                                    className="rounded-xl px-6 sm:px-8 h-11 sm:h-12 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 transition-all active:scale-95"
                                 >
-                                    Suivant <ArrowRight className="w-4 h-4 ml-2" />
+                                    <span className="text-sm font-bold">Suivant</span>
+                                    <ArrowRight className="w-4 h-4 ml-1 sm:ml-2" />
                                 </Button>
                             ) : (
                                 <Button
                                     onClick={handlePublish}
                                     disabled={isPublishing || showSuccess}
-                                    className="rounded-xl px-8 bg-green-600 hover:bg-green-700 text-white border-none"
+                                    className="rounded-xl px-6 sm:px-8 h-11 sm:h-12 bg-green-600 hover:bg-green-700 text-white border-none shadow-lg shadow-green-500/20 transition-all active:scale-95"
                                 >
-                                    {isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
-                                    Publier le produit
+                                    {isPublishing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Check className="w-4 h-4 mr-1 sm:mr-2" />}
+                                    <span className="text-sm font-bold">Publier</span>
                                 </Button>
                             )}
                         </div>
@@ -861,26 +870,26 @@ export default function NewProductPage() {
                     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
                         <div className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300" onClick={() => !aiAnalyzing && setShowAIModal(false)} />
                         
-                        <div className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl border border-white/20 overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-500">
+                        <div className="relative bg-white w-full max-w-2xl rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl border border-white/20 overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 max-h-[90vh] flex flex-col">
                             {/* Header */}
-                            <div className="p-8 border-b border-gray-100 bg-gradient-to-br from-indigo-50/50 to-white">
+                            <div className="p-4 sm:p-8 border-b border-gray-100 bg-gradient-to-br from-indigo-50/50 to-white flex-shrink-0">
                                 <div className="flex items-center justify-between pointer-events-auto">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                                            <Wand2 className="w-6 h-6 text-white" />
+                                    <div className="flex items-center gap-3 sm:gap-4">
+                                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 flex-shrink-0">
+                                            <Wand2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                                         </div>
                                         <div>
-                                            <h2 className="text-2xl font-black text-gray-900 tracking-tight">AI Product Creator</h2>
-                                            <p className="text-sm text-gray-500 font-medium">Capturez ou uploadez, l'IA fait le reste.</p>
+                                            <h2 className="text-lg sm:text-2xl font-black text-gray-900 tracking-tight leading-tight">AI Product Creator</h2>
+                                            <p className="text-[10px] sm:text-sm text-gray-500 font-medium tracking-tight">Capturez ou uploadez, l'IA fait le reste.</p>
                                         </div>
                                     </div>
-                                    <Button variant="ghost" size="icon" className="rounded-full" onClick={() => !aiAnalyzing && setShowAIModal(false)}>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10 rounded-full" onClick={() => !aiAnalyzing && setShowAIModal(false)}>
                                         <X className="w-5 h-5" />
                                     </Button>
                                 </div>
                             </div>
 
-                            <div className="p-8">
+                            <div className="p-4 sm:p-8 overflow-y-auto flex-1">
                                 {aiAnalyzing ? (
                                     <div className="flex flex-col items-center justify-center py-12 text-center pointer-events-none">
                                         <div className="relative mb-8">

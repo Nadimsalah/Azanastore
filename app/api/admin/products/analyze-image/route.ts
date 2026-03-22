@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getAIPrompts } from "@/lib/supabase-api";
+import { getAIPrompts, getAdminSettings, updateAdminSettings } from "@/lib/supabase-api";
 
 export async function POST(req: Request) {
     try {
@@ -13,6 +13,23 @@ export async function POST(req: Request) {
         if (!image) {
             return NextResponse.json({ error: 'Image is required' }, { status: 400 })
         }
+
+        // --- ENFORCE GENERATION LIMIT ---
+        try {
+            const settings = await getAdminSettings()
+            const currentCount = parseInt(settings.total_ai_images_generated || "0")
+            const limit = 1000
+            
+            if (currentCount >= limit) {
+                return NextResponse.json({ 
+                    error: "AI Limit Reached", 
+                    message: "You have reached your limit of 1000 AI generated images this month. Please upgrade your plan to generate more."
+                }, { status: 403 });
+            }
+        } catch (e) {
+            console.warn("Limit check failed, proceeding anyway:", e)
+        }
+        // ---------------------------------
 
         const base64Data = image.split(',')[1] || image;
         const mimeType = image.split(';')[0].split(':')[1] || 'image/jpeg';
@@ -84,6 +101,17 @@ The final image must be a 2000x2000 pixel high-resolution catalog shot where the
         } catch (e: any) {
             errorMsg = `Image generation model error: ${e.message}`;
             console.error("Gemini 2.5 Image generation failed:", e);
+        }
+
+        // 3. Update Generation Count in Admin Settings
+        try {
+            const settings = await getAdminSettings()
+            const currentCount = parseInt(settings.total_ai_images_generated || "0")
+            await updateAdminSettings({
+                total_ai_images_generated: (currentCount + 1).toString()
+            })
+        } catch (e) {
+            console.error("Failed to update AI usage stats:", e)
         }
 
         return NextResponse.json({
